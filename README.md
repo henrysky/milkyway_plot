@@ -103,7 +103,7 @@ plot_instance.radius = 5 * units.kpc
 plot_instance.s = 50.0  # make the scatter points bigger
 
 # plot
-plot_instance.mw_plot(x, y, 'r', 'Orbit of Sun in 20Gyr using Galpy colored by potential')
+plot_instance.mw_plot(x, y, 'r', 'Orbit of Sun in 20Gyr using Galpy')
 
 # Save the figure
 plot_instance.savefig(file='mw_plot_zoomed.png')
