@@ -1,4 +1,5 @@
 import pylab as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 from astropy import units as u
 
 
@@ -12,7 +13,7 @@ class MWPlot():
         2018-Mar-17 - Written - Henry Leung (University of Toronto)
     """
     def __init__(self):
-        self.fontsize = 20
+        self.fontsize = 25
         self.unit = u.lyr
         self.coord = None
         self.s = 1.0
@@ -20,7 +21,7 @@ class MWPlot():
         self.dpi = 200
         self.cmap = "viridis"
         self.center = (0, 0) * u.lyr
-        self.radius = 90750 * u.lyr
+        self.radius = 90000 * u.lyr
 
         # Fixed value
         self.__resolution = 24.2 * u.lyr
@@ -98,14 +99,18 @@ class MWPlot():
         self.__fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
         plt.title(title, fontsize=self.fontsize)
         plt.scatter(x, y, zorder=1, s=self.s, c=color, cmap=plt.get_cmap(self.cmap))
-        plt.imshow(img, zorder=0, extent=ext)
         plt.xlabel(f'{coord_english} ({unit_english})', fontsize=self.fontsize)
         plt.ylabel(f'{coord_english} ({unit_english})', fontsize=self.fontsize)
         aspect = img.shape[0] / float(img.shape[1]) * ((ext[1] - ext[0]) / (ext[3] - ext[2]))
-        plt.gca().set_aspect(aspect)
+        ax = plt.gca()
+        ax.set_aspect(aspect)
+        ax.imshow(img, zorder=0, extent=ext)
+
         if cbar_flag is True:
-            cbar = plt.colorbar()
+            divider = make_axes_locatable(ax)
+            cax = divider.append_axes("right", size="5%", pad=0.05)
+            cbar = plt.colorbar(cax=cax)
             cbar.ax.tick_params(labelsize=self.fontsize)
             cbar.set_label(f"{cbar_label}", size=self.fontsize)
-        plt.xticks(fontsize=self.fontsize)
-        plt.yticks(fontsize=self.fontsize)
+
+        ax.tick_params(labelsize=self.fontsize)
