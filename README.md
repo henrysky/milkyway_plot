@@ -2,12 +2,12 @@
 
 A handy python script to plot things on a face-on milkyway using pylab
 
-The Milky-Way background Credits: NASA/JPL-Caltech/R. Hurt (SSC/Caltech)
-Both MW.png and MW_galactocentric.png are 7500x7500px with resolution of 24.2 lightyears per pixel
+Both MW.png and MW_galactocentric.png is modified from an images by **NASA/JPL-Caltech/R. Hurt (SSC/Caltech)**
+Both images are 7500x7500px with resolution of 24.2 lightyears per pixel
 
 ## Basic Usage
 
-```
+```python
 from mw_plot import MWPlot
 from astropy import units
 
@@ -43,7 +43,7 @@ plot_instance.savefig('name.png')
 
 ![](example_plot_1.png)
 
-```
+```python
 from galpy.potential import LogarithmicHaloPotential
 from galpy.orbit import Orbit
 import numpy as np
@@ -75,7 +75,7 @@ plot_instance.show()
 
 ![](example_plot_2.png)
 
-```
+```python
 from galpy.potential import LogarithmicHaloPotential
 from galpy.orbit import Orbit
 import numpy as np
