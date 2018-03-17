@@ -25,10 +25,11 @@ plot_instance.s = 50.0  # make the scatter points bigger
 
 # Here is the mw_plot if you have an array to color the point
 # x and y must both carry astropy unit
-plot_instance.mw_plot(x, y, [z, 'title of color bar'], 'Title of the plot here')
+plot_instance.mw_plot(x, y, [z, 'colorbar_title'], 'Title of the plot here')
 
-# Here is the mw_plot if you do array to color the point
+# Here is the mw_plot if you do not have array to color the point
 # x and y must both carry astropy unit
+plot_instance.mw_plot(x, y, 'scatter_point_color_here', 'Title of the plot here')
 
 # To plot
 plot_instance.plot()
