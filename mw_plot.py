@@ -22,8 +22,9 @@ class MWPlot():
         self.figsize = (20, 20)
         self.dpi = 200
         self.cmap = "viridis"
+        self.imalpha = 0.85
         self.center = (0, 0) * u.lyr
-        self.radius = 90750 * u.lyr  # originally 90750
+        self.radius = 90750 * u.lyr
 
         # Fixed value
         self.__pixels = 7500
@@ -33,7 +34,8 @@ class MWPlot():
     def plot(self, *args, **kwargs):
         plt.plot(*args, **kwargs)
 
-    def show(self, *args, **kwargs):
+    @staticmethod
+    def show(*args, **kwargs):
         plt.show(*args, **kwargs)
 
     def savefig(self, file='MWPlot.png'):
@@ -69,7 +71,7 @@ class MWPlot():
 
         # decide whether it needs to fill black pixels because the range outside the pre-compiled images
         if np.all(np.array([x_left_px, self.__pixels - x_right_px, y_bottom_px, self.__pixels - y_top_px]) >= 0):
-            img = img[x_left_px:x_right_px, y_bottom_px:y_top_px]
+            img = img[y_bottom_px:y_top_px, x_left_px:x_right_px]
         else:
             # create a black image first with 3 channel with the same data type
             black_img = np.zeros((pixel_radius * 2, pixel_radius * 2, 3), dtype=img.dtype)
@@ -80,7 +82,7 @@ class MWPlot():
             temp_y_bottom_px = max(y_bottom_px, 0)
             temp_y_top_px = min(y_top_px, self.__pixels)
             # Extract available area from pre-compiled first
-            img = img[temp_x_left_px:temp_x_right_px, temp_y_bottom_px:temp_y_top_px]
+            img = img[temp_y_bottom_px:temp_y_top_px, temp_x_left_px:temp_x_right_px]
 
             black_img[max(0, -x_left_px):max(self.__pixels, x_right_px),
             max(0, -y_bottom_px):max(self.__pixels, y_top_px), :] = img
@@ -88,8 +90,8 @@ class MWPlot():
             # Set the images as the filled black-background image
             img = np.array(black_img)
 
-        ext = [(self.center[1] - self.radius).value, (self.center[1] + self.radius).value,
-               (self.center[0] - self.radius).value, (self.center[0] + self.radius).value]
+        ext = [(self.center[0] - self.radius).value, (self.center[0] + self.radius).value,
+               (self.center[1] - self.radius).value, (self.center[1] + self.radius).value]
 
         return img, coord_english, ext
 
@@ -130,7 +132,8 @@ class MWPlot():
         aspect = img.shape[0] / float(img.shape[1]) * ((ext[1] - ext[0]) / (ext[3] - ext[2]))
         ax = plt.gca()
         ax.set_aspect(aspect)
-        ax.imshow(img, zorder=0, extent=ext)
+        ax.set_facecolor('k') # have a black color background for image with <1.0 alpha
+        ax.imshow(img, zorder=0, extent=ext, alpha=self.imalpha)
 
         if cbar_flag is True:
             divider = make_axes_locatable(ax)

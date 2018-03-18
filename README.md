@@ -16,6 +16,7 @@ from mw_plot import MWPlot
 plot_instance = MWPlot()
 
 # Here are some setting you can set
+plot_instance.fontsize = 25  # fontsize for pylab plotting
 plot_instance.unit = u.kpc  # units of the plot (astropy.units)
 plot_instance.coord = 'galactocentric'  # can be 'galactocentric' or 'galactic'
 plot_instance.center = (0, 0) * u.kpc  # Coordinates of the center of the plot
@@ -23,6 +24,7 @@ plot_instance.radius = 90000 * u.lyr  # Radius of the plot
 plot_instance.figsize = (20, 20)
 plot_instance.dpi = 200
 plot_instance.cmap = 'viridis'  # matplotlib cmap: https://matplotlib.org/examples/color/colormaps_reference.html
+plot_instance.imalpha = 0.85  # alpha value for the milkyway image
 plot_instance.s = 50.0  # make the scatter points bigger
 
 # Here is the mw_plot if you have an array to color the point
@@ -59,7 +61,7 @@ op = Orbit(vxvv=[-8. * u.kpc, 22. * u.km / u.s, 242 * u.km / u.s, 0. * u.kpc, 22
 lp = LogarithmicHaloPotential(normalize=1.)
 ts = np.linspace(0, 20, 10000)
 op.integrate(ts, lp)
-x = (op.x(ts)) * u.kpc
+x = op.x(ts) * u.kpc
 y = op.y(ts) * u.kpc
 z = op.z(ts)
 
@@ -67,6 +69,7 @@ z = op.z(ts)
 plot_instance = MWPlot()
 plot_instance.unit = u.kpc
 plot_instance.coord = 'galactocentric'
+plot_instance.imalpha = 1.0 # alpha value for the milkyway image
 
 # plot
 plot_instance.mw_plot(x, y, [z, 'kpc above galactic plane'],
@@ -97,7 +100,7 @@ op = Orbit(vxvv=[-8. * u.kpc, 22. * u.km / u.s, 242 * u.km / u.s, 0. * u.kpc, 22
 lp = LogarithmicHaloPotential(normalize=1.)
 ts = np.linspace(0, 20, 10000)
 op.integrate(ts, lp)
-x = (op.x(ts)) * u.kpc
+x = op.x(ts) * u.kpc
 y = op.y(ts) * u.kpc
 z = op.z(ts)
 
@@ -105,9 +108,10 @@ z = op.z(ts)
 plot_instance = MWPlot()
 plot_instance.unit = u.kpc
 plot_instance.coord = 'galactocentric'
+plot_instance.imalpha = 1.0 # alpha value for the milkyway image
 
-# Set the center and radius of the plot
-plot_instance.center = (0, -8) * u.kpc
+# Set the center and radius of the plot to the Sun's galactocentric coordinates
+plot_instance.center = (-8, 0) * u.kpc
 plot_instance.radius = 5 * u.kpc
 
 plot_instance.s = 50.0  # make the scatter points bigger
