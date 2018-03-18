@@ -43,8 +43,8 @@ plot_instance.mw_plot(x, y, [z, 'colorbar_title'], 'Title of the plot here')
 # x and y must both carry astropy unit
 plot_instance.mw_plot(x, y, 'scatter_point_color_here', 'Title of the plot here')
 
-# To plot
-plot_instance.plot()
+# To show
+plot_instance.show()
 
 # To save
 plot_instance.savefig('name.png')
