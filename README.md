@@ -1,6 +1,7 @@
 ## mw_plot
 
-A handy python script to plot things on a face-on milkyway using pylab
+A handy python script to plot scatters (so far, will support more later) on a face-on milkyway using pylab.
+You can set the center and radius of the plot anywhere on a milkyway galaxy image with galactic or galactocentric coordinates.
 
 Both MW.png and MW_galactocentric.png is modified from an images by **NASA/JPL-Caltech/R. Hurt (SSC/Caltech)**
 Both images are 7500x7500px with resolution of 24.2 lightyears per pixel, mw_plot will fill black pixel for region
