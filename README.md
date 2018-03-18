@@ -134,5 +134,51 @@ plot_instance.savefig(file='mw_plot_zoomed.png')
 plot_instance.show()
 ```
 
+## Example: plotting Gaia observation with astroNN in Galactic coordinates
+
+![](example_plot_gaia.png)
+
+```python
+from mw_plot import MWPlot
+
+from astroNN.gaia import tgas_load
+from astropy import units as  u
+import astropy.coordinates as apycoords
+
+# Use astroNN to load Gaia TGAS DR1 data files
+# cuts=True to cut bad data (negative parallax and percentage error more than 20%)
+output = tgas_load(dr=1, cuts=True)
+
+# outout dictionary
+ra = output['ra'] * u.deg  # ra(J2015)
+dec = output['dec'] * u.deg  # dec(J2015)
+parallax = output['parallax']  # parallax
+distance = 1 / parallax * u.kpc
+
+# error propagation to parsec
+distance_err = (1 / parallax) * output['parallax_err'] / output['parallax'] * 1000
+
+# use astropy coordinates tranformation
+c = apycoords.SkyCoord(ra=ra, dec=dec, distance=distance, frame='icrs')
+
+# setup a MWPlot instance
+plot_instance = MWPlot()
+plot_instance.unit = u.kpc
+plot_instance.s = 0.0001
+plot_instance.coord = 'galactic'  # use galactic coordinates because Gaia observations are from Earth
+
+# Set the center and radius of the plot
+plot_instance.radius = 5 * u.kpc
+
+plot_instance.s = 50.0  # make the scatter points bigger
+
+# plot
+plot_instance.mw_plot(c.galactic.cartesian.x, c.galactic.cartesian.y, [distance_err, 'Gaia Distance Error [parsec]'],
+                      'Gaia TGAS Distance with 20% error cuts')
+
+# Save the figure
+plot_instance.savefig(file='gaia.png')
+```
+
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
