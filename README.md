@@ -92,7 +92,7 @@ plot_instance.show()
 
 ![](example_plot_2.png)
 
-You can set the center point and radius of the plot. In this case, we set (0, -8) in a galactocentric coordinates
+You can set the center point and radius of the plot. In this case, we set (-8, 0) in a galactocentric coordinates
 such that the plot centered at the Sun, and set the plot radius as 5 kpc to close up on the Sun.
 
 ```python
@@ -137,6 +137,8 @@ plot_instance.show()
 ## Example: plotting Gaia observation with astroNN in Galactic coordinates
 
 ![](example_plot_gaia.png)
+
+You can set the coord to `galactic` to plot observation from Gaia
 
 ```python
 from mw_plot import MWPlot
