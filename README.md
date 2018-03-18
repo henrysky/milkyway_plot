@@ -9,16 +9,16 @@ outside the pre-compiled images.
 ## Basic Usage
 
 ```python
+from astropy import units as u
 from mw_plot import MWPlot
-from astropy import units
 
 # setup a MWPlot instance
 plot_instance = MWPlot()
 
 # Here are some setting you can set
-plot_instance.unit = units.kpc  # units of the plot (astropy.units)
+plot_instance.unit = u.kpc  # units of the plot (astropy.units)
 plot_instance.coord = 'galactocentric'  # can be 'galactocentric' or 'galactic'
-plot_instance.center = (0, 0) * units.kpc  # Coordinates of the center of the plot
+plot_instance.center = (0, 0) * u.kpc  # Coordinates of the center of the plot
 plot_instance.radius = 90000 * u.lyr  # Radius of the plot
 plot_instance.figsize = (20, 20)
 plot_instance.dpi = 200
@@ -47,20 +47,20 @@ plot_instance.savefig('name.png')
 You can plot the orbit which are some scatter points on a face-on milkyway
 
 ```python
-from galpy.potential import LogarithmicHaloPotential
-from galpy.orbit import Orbit
 import numpy as np
 from astropy import units as u
+from galpy.orbit import Orbit
+from galpy.potential import LogarithmicHaloPotential
 from mw_plot import MWPlot
 
 # Orbit Integration using galpy for the Sun
 # see http://galpy.readthedocs.io/en/latest/orbit.html for detail
-op= Orbit(vxvv=[-8.*u.kpc,22.*u.km/u.s,242*u.km/u.s,0.*u.kpc,22.*u.km/u.s,0.*u.deg])
-lp= LogarithmicHaloPotential(normalize=1.)
-ts= np.linspace(0,20,10000)
-op.integrate(ts,lp)
-x = (op.x(ts))*u.kpc
-y = op.y(ts)*u.kpc
+op = Orbit(vxvv=[-8. * u.kpc, 22. * u.km / u.s, 242 * u.km / u.s, 0. * u.kpc, 22. * u.km / u.s, 0. * u.deg])
+lp = LogarithmicHaloPotential(normalize=1.)
+ts = np.linspace(0, 20, 10000)
+op.integrate(ts, lp)
+x = (op.x(ts)) * u.kpc
+y = op.y(ts) * u.kpc
 z = op.z(ts)
 
 # setup a MWPlot instance
@@ -85,20 +85,20 @@ You can set the center point and radius of the plot. In this case, we set (0, -8
 such that the plot centered at the Sun, and set the plot radius as 5 kpc to close up on the Sun.
 
 ```python
-from galpy.potential import LogarithmicHaloPotential
-from galpy.orbit import Orbit
 import numpy as np
 from astropy import units as u
+from galpy.orbit import Orbit
+from galpy.potential import LogarithmicHaloPotential
 from mw_plot import MWPlot
 
 # Orbit Integration using galpy for the Sun
 # see http://galpy.readthedocs.io/en/latest/orbit.html for detail
-op= Orbit(vxvv=[-8.*u.kpc,22.*u.km/u.s,242*u.km/u.s,0.*u.kpc,22.*u.km/u.s,0.*u.deg])
-lp= LogarithmicHaloPotential(normalize=1.)
-ts= np.linspace(0,20,10000)
-op.integrate(ts,lp)
-x = (op.x(ts))*u.kpc
-y = op.y(ts)*u.kpc
+op = Orbit(vxvv=[-8. * u.kpc, 22. * u.km / u.s, 242 * u.km / u.s, 0. * u.kpc, 22. * u.km / u.s, 0. * u.deg])
+lp = LogarithmicHaloPotential(normalize=1.)
+ts = np.linspace(0, 20, 10000)
+op.integrate(ts, lp)
+x = (op.x(ts)) * u.kpc
+y = op.y(ts) * u.kpc
 z = op.z(ts)
 
 # setup a MWPlot instance
