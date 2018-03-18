@@ -1,6 +1,7 @@
+import numpy as np
 import pylab as plt
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 from astropy import units as u
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 
 class MWPlot():
@@ -12,6 +13,7 @@ class MWPlot():
     HISTORY:
         2018-Mar-17 - Written - Henry Leung (University of Toronto)
     """
+
     def __init__(self):
         self.fontsize = 25
         self.unit = u.lyr
@@ -21,9 +23,10 @@ class MWPlot():
         self.dpi = 200
         self.cmap = "viridis"
         self.center = (0, 0) * u.lyr
-        self.radius = 90000 * u.lyr
+        self.radius = 90750 * u.lyr  # originally 90750
 
         # Fixed value
+        self.__pixels = 7500
         self.__resolution = 24.2 * u.lyr
         self.__fig = None
 
@@ -51,16 +54,39 @@ class MWPlot():
             print(f"You did not specify units for center and radius, assuming the unit is {self.unit.long_names[0]}")
             self.center = self.center * self.unit
             self.radius = self.radius * self.unit
-            self.__resolution = self.__resolution.to(self.unit)
 
+        self.__resolution = self.__resolution.to(self.unit)
         self.center = self.center.to(self.unit)
         self.radius = self.radius.to(self.unit)
 
-        pixel_radius = self.radius / self.__resolution
-        pixel_center = (3750 + self.center / self.__resolution)
+        pixel_radius = int((self.radius / self.__resolution).value)
+        pixel_center = list(map(int, (self.__pixels / 2 + self.center / self.__resolution).value))
 
-        img = img[int((pixel_center[0]-pixel_radius).value):int((pixel_center[0]+pixel_radius).value),
-              int((pixel_center[1]-pixel_radius).value):int((pixel_center[1]+pixel_radius).value)]
+        x_left_px = pixel_center[0] - pixel_radius
+        x_right_px = pixel_center[0] + pixel_radius
+        y_bottom_px = pixel_center[1] - pixel_radius
+        y_top_px = pixel_center[1] + pixel_radius
+
+        # decide whether it needs to fill black pixels because the range outside the pre-compiled images
+        if np.all(np.array([x_left_px, self.__pixels - x_right_px, y_bottom_px, self.__pixels - y_top_px]) >= 0):
+            img = img[x_left_px:x_right_px, y_bottom_px:y_top_px]
+        else:
+            # create a black image first with 3 channel with the same data type
+            black_img = np.zeros((pixel_radius * 2, pixel_radius * 2, 3), dtype=img.dtype)
+
+            # assign them to temp value
+            temp_x_left_px = max(x_left_px, 0)
+            temp_x_right_px = min(x_right_px, self.__pixels)
+            temp_y_bottom_px = max(y_bottom_px, 0)
+            temp_y_top_px = min(y_top_px, self.__pixels)
+            # Extract available area from pre-compiled first
+            img = img[temp_x_left_px:temp_x_right_px, temp_y_bottom_px:temp_y_top_px]
+
+            black_img[max(0, -x_left_px):max(self.__pixels, x_right_px),
+            max(0, -y_bottom_px):max(self.__pixels, y_top_px), :] = img
+
+            # Set the images as the filled black-background image
+            img = np.array(black_img)
 
         ext = [(self.center[1] - self.radius).value, (self.center[1] + self.radius).value,
                (self.center[0] - self.radius).value, (self.center[0] + self.radius).value]
