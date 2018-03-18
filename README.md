@@ -6,7 +6,15 @@ Both MW.png and MW_galactocentric.png is modified from an images by **NASA/JPL-C
 Both images are 7500x7500px with resolution of 24.2 lightyears per pixel, mw_plot will fill black pixel for region
 outside the pre-compiled images.
 
+## Author
+
+* **Henry Leung** - *Initial work and developer* - [henrysky](https://github.com/henrysky)\
+*Contact Henry: henrysky.leung [at] mail.utoronto.ca*
+
 ## Basic Usage
+
+Since this is just a python script, you should copy `mw_plot.py`, `example_plot_1.png` and `example_plot_2.png` to your
+desired location. Another usage is run python under milkyway_plot folder.
 
 ```python
 from astropy import units as u
@@ -125,12 +133,6 @@ plot_instance.savefig(file='mw_plot_zoomed.png')
 # Show the figure
 plot_instance.show()
 ```
-
-## Author
-
-* **Henry Leung** - *Initial work and developer* - [henrysky](https://github.com/henrysky)\
-*Astronomy Undergrad, University of Toronto*\
-*Contact Henry: henrysky.leung [at] mail.utoronto.ca*
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
