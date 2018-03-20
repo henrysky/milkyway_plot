@@ -3,7 +3,7 @@
 A handy python script to plot scatters (so far, will support more later) on a face-on milkyway using pylab.
 You can set the center and radius of the plot anywhere on a milkyway galaxy image with galactic or galactocentric coordinates.
 
-Both ``MW_galactic.png`` and ``MW_galactocentric.png`` are modified from an images by **NASA/JPL-Caltech/R. Hurt (SSC/Caltech)**
+Both ``MW_bg_annotate.png`` and ``MW_bg_unannotate.png`` are modified from an images by **NASA/JPL-Caltech/R. Hurt (SSC/Caltech)**
 Both images are 7500x7500px with resolution of 24.2 light years per pixel, mw_plot will fill black pixel for region
 outside the pre-compiled images.
 
@@ -39,7 +39,7 @@ Or run the following command to install after you open a command line window in 
 $ python setup.py install
 ```
 
-OR copy `mw_plot.py`, `MW_galactic.png` and `MW_galactocentric.png` to your desired location.
+OR copy `mw_plot.py`, `MW_bg_annotate.png` and `MW_bg_unannotate.png` to your desired location.
 
 ## Basic Usage
 
@@ -62,6 +62,7 @@ plot_instance.cmap = 'viridis'  # matplotlib cmap: https://matplotlib.org/exampl
 plot_instance.imalpha = 0.85  # alpha value for the milkyway image
 plot_instance.s = 50.0  # make the scatter points bigger
 plot_instance.tight_layout = True # whether plt.tight_layout() will be run
+plot_instance.mw_annotation = True # whether use a milkyway background with annotation
 
 # Here is the mw_plot if you have an array to color the point
 # x and y must both carry astropy unit
@@ -78,9 +79,9 @@ plot_instance.show()
 plot_instance.savefig('name.png')
 ```
 
-## Example: plotting orbit of Sun integrated by galpy
+## Example 1: plotting orbit of Sun integrated by galpy
 
-![](example_plot_1.png)
+![](readme_images/example_plot_1.png)
 
 You can plot the orbit which are some scatter points on a face-on milkyway
 
@@ -118,7 +119,12 @@ plot_instance.savefig(file='mw_plot.png')
 plot_instance.show()
 ```
 
-![](example_plot_2.png)
+You can turn off the annotation by ``plot_instance.mw_annotation = False``
+![](readme_images/example_plot_1_unannotation.png)
+
+## Example 2: Change the center and radius of the plot
+
+![](readme_images/example_plot_2.png)
 
 You can set the center point and radius of the plot. In this case, we set (10, -10) in a galactocentric coordinates
 such that the plot centered at the Sun at the end of 20Gyr orbit, and set the plot radius as 6 kpc to close up. We will
@@ -160,9 +166,9 @@ plot_instance.savefig(file='mw_plot_zoomed.png')
 plot_instance.show()
 ```
 
-## Example: plotting Gaia DR1 observation with astroNN in Galactic coordinates
+## Example 3: plotting Gaia DR1 observation with astroNN in Galactic coordinates
 
-![](example_plot_gaia.png)
+![](readme_images/example_plot_gaia.png)
 
 You can set the coord to `galactic` to plot observation from Gaia
 

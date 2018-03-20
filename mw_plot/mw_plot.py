@@ -1,10 +1,11 @@
 import numpy as np
 import pylab as plt
 from astropy import units as u
+import os
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 
-class MWPlot():
+class MWPlot:
     """
     NAME: MWPlot
     PURPOSE:
@@ -26,9 +27,10 @@ class MWPlot():
         self.center = (0, 0) * u.lyr
         self.radius = 90750 * u.lyr
         self.tight_layout = True
+        self.mw_annotation = True
 
         # Fixed value
-        self.__pixels = 7500
+        self.__pixels = 5600
         self.__resolution = 24.2 * u.lyr
         self.__fig = None
 
@@ -47,11 +49,23 @@ class MWPlot():
         self.__fig.savefig(file)
 
     def images_read(self):
+        image_filename = 'MW_bg_annotate.png'
+        if self.mw_annotation is False:
+            image_filename = 'MW_bg_unannotate.png'
+
+        try:
+            img = plt.imread(image_filename)
+        except FileNotFoundError:
+            import mw_plot
+            path = os.path.join(os.path.dirname(mw_plot.__path__[0]), 'mw_plot', image_filename)
+            img = plt.imread(path)
         if self.coord == 'galactic':
-            img = plt.imread("MW_galactic.png")
+            try:
+                self.center[0] += -8. * u.kpc
+            except TypeError:
+                self.center[0] += -8.
             coord_english = 'Galactic Coordinates'
         elif self.coord == 'galactocentric':
-            img = plt.imread("MW_galactocentric.png")
             coord_english = 'Galactocentric Coordinates'
         else:
             raise ValueError("Unknown coordinates, can only be 'galactic' or 'galactocentric'")
