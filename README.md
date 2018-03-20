@@ -3,7 +3,7 @@
 A handy python script to plot scatters (so far, will support more later) on a face-on milkyway using pylab.
 You can set the center and radius of the plot anywhere on a milkyway galaxy image with galactic or galactocentric coordinates.
 
-Both MW_galactic.png and MW_galactocentric.png is modified from an images by **NASA/JPL-Caltech/R. Hurt (SSC/Caltech)**
+Both ``MW_galactic.png`` and ``MW_galactocentric.png`` is modified from an images by **NASA/JPL-Caltech/R. Hurt (SSC/Caltech)**
 Both images are 7500x7500px with resolution of 24.2 lightyears per pixel, mw_plot will fill black pixel for region
 outside the pre-compiled images.
 
@@ -11,6 +11,13 @@ outside the pre-compiled images.
 
 * **Henry Leung** - *Initial work and developer* - [henrysky](https://github.com/henrysky)\
 *Contact Henry: henrysky.leung [at] mail.utoronto.ca*
+
+## System Requirement
+
+* **Python** 3.6 or above
+* **astropy** 2.0 or above
+* **Numpy** 1.12.0 or above
+* **Matplotlib** 2.1.0 above
 
 ## Basic Usage
 
@@ -52,7 +59,7 @@ plot_instance.show()
 plot_instance.savefig('name.png')
 ```
 
-## Example: plotting orbits of Sun integrated by galpy
+## Example: plotting orbit of Sun integrated by galpy
 
 ![](example_plot_1.png)
 
@@ -134,7 +141,7 @@ plot_instance.savefig(file='mw_plot_zoomed.png')
 plot_instance.show()
 ```
 
-## Example: plotting Gaia observation with astroNN in Galactic coordinates
+## Example: plotting Gaia DR1 observation with astroNN in Galactic coordinates
 
 ![](example_plot_gaia.png)
 

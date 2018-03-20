@@ -84,6 +84,8 @@ class MWPlot():
             # create a black image first with 3 channel with the same data type
             black_img = np.zeros((pixel_radius * 2, pixel_radius * 2, 3), dtype=img.dtype)
 
+            blackimg_pxcenter = list(map(int, (black_img.shape[0] / 2, black_img.shape[1] / 2)))
+
             # assign them to temp value
             # just in case the area is outside the images, will fill black pixel
             temp_x_left_px = max(x_left_px, 0)
@@ -93,7 +95,8 @@ class MWPlot():
             # Extract available area from pre-compiled first
             img = img[temp_y_top_px:temp_y_bottom_px, temp_x_left_px:temp_x_right_px]
 
-            black_img[max(0, -x_left_px):max(self.__pixels, x_right_px), max(0, y_top_px):max(self.__pixels, y_bottom_px), :] = img
+            black_img[max(0, -y_top_px):max(self.__pixels, y_bottom_px),
+            max(0, -x_left_px):max(self.__pixels, x_right_px), :] = img
 
             # Set the images as the filled black-background image
             img = np.array(black_img)
