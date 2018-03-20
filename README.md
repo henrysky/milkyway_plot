@@ -3,7 +3,7 @@
 A handy python script to plot scatters (so far, will support more later) on a face-on milkyway using pylab.
 You can set the center and radius of the plot anywhere on a milkyway galaxy image with galactic or galactocentric coordinates.
 
-Both MW.png and MW_galactocentric.png is modified from an images by **NASA/JPL-Caltech/R. Hurt (SSC/Caltech)**
+Both MW_galactic.png and MW_galactocentric.png is modified from an images by **NASA/JPL-Caltech/R. Hurt (SSC/Caltech)**
 Both images are 7500x7500px with resolution of 24.2 lightyears per pixel, mw_plot will fill black pixel for region
 outside the pre-compiled images.
 
@@ -14,7 +14,7 @@ outside the pre-compiled images.
 
 ## Basic Usage
 
-Since this is just a python script, you should copy `mw_plot.py`, `example_plot_1.png` and `example_plot_2.png` to your
+Since this is just a python script, you should copy `mw_plot.py`, `MW_galactic.png` and `MW_galactocentric.png` to your
 desired location. Another usage is run python under milkyway_plot folder.
 
 ```python
@@ -35,6 +35,7 @@ plot_instance.dpi = 200
 plot_instance.cmap = 'viridis'  # matplotlib cmap: https://matplotlib.org/examples/color/colormaps_reference.html
 plot_instance.imalpha = 0.85  # alpha value for the milkyway image
 plot_instance.s = 50.0  # make the scatter points bigger
+plot_instance.tight_layout = True # whether plt.tight_layout() will be run
 
 # Here is the mw_plot if you have an array to color the point
 # x and y must both carry astropy unit
@@ -58,27 +59,27 @@ plot_instance.savefig('name.png')
 You can plot the orbit which are some scatter points on a face-on milkyway
 
 ```python
+from galpy.potential import MWPotential2014
+from galpy.orbit import Orbit
 import numpy as np
 from astropy import units as u
-from galpy.orbit import Orbit
-from galpy.potential import LogarithmicHaloPotential
 from mw_plot import MWPlot
 
 # Orbit Integration using galpy for the Sun
-# see http://galpy.readthedocs.io/en/latest/orbit.html for detail
-op = Orbit(vxvv=[-8. * u.kpc, 22. * u.km / u.s, 242 * u.km / u.s, 0. * u.kpc, 22. * u.km / u.s, 0. * u.deg])
-lp = LogarithmicHaloPotential(normalize=1.)
+op = Orbit([1., 0.1, 1.1, 0., 0.1, 0.], ro=-8., vo=220.)
 ts = np.linspace(0, 20, 10000)
-op.integrate(ts, lp)
+op.integrate(ts, MWPotential2014)
 x = op.x(ts) * u.kpc
-y = op.y(ts) * u.kpc
+y = - op.y(ts) * u.kpc
 z = op.z(ts)
 
 # setup a MWPlot instance
 plot_instance = MWPlot()
 plot_instance.unit = u.kpc
 plot_instance.coord = 'galactocentric'
-plot_instance.imalpha = 1.0 # alpha value for the milkyway image
+plot_instance.radius = 20 * u.kpc
+plot_instance.imalpha = 1.0
+plot_instance.s = 10
 
 # plot
 plot_instance.mw_plot(x, y, [z, 'kpc above galactic plane'],
@@ -93,40 +94,38 @@ plot_instance.show()
 
 ![](example_plot_2.png)
 
-You can set the center point and radius of the plot. In this case, we set (-8, 0) in a galactocentric coordinates
-such that the plot centered at the Sun, and set the plot radius as 5 kpc to close up on the Sun.
+You can set the center point and radius of the plot. In this case, we set (10, -10) in a galactocentric coordinates
+such that the plot centered at the Sun at the end of 20Gyr orbit, and set the plot radius as 6 kpc to close up. We will
+just set the color to red without color bar title because there is no color bar needed
 
 ```python
+from galpy.potential import MWPotential2014
+from galpy.orbit import Orbit
 import numpy as np
 from astropy import units as u
-from galpy.orbit import Orbit
-from galpy.potential import LogarithmicHaloPotential
 from mw_plot import MWPlot
 
 # Orbit Integration using galpy for the Sun
-# see http://galpy.readthedocs.io/en/latest/orbit.html for detail
-op = Orbit(vxvv=[-8. * u.kpc, 22. * u.km / u.s, 242 * u.km / u.s, 0. * u.kpc, 22. * u.km / u.s, 0. * u.deg])
-lp = LogarithmicHaloPotential(normalize=1.)
+op = Orbit([1., 0.1, 1.1, 0., 0.1, 0.], ro=-8., vo=220.)
 ts = np.linspace(0, 20, 10000)
-op.integrate(ts, lp)
+op.integrate(ts, MWPotential2014)
 x = op.x(ts) * u.kpc
-y = op.y(ts) * u.kpc
+y = - op.y(ts) * u.kpc
 z = op.z(ts)
 
 # setup a MWPlot instance
 plot_instance = MWPlot()
 plot_instance.unit = u.kpc
-plot_instance.coord = 'galactocentric'
-plot_instance.imalpha = 1.0 # alpha value for the milkyway image
+plot_instance.coord = 'galactic'
 
-# Set the center and radius of the plot to the Sun's galactocentric coordinates
-plot_instance.center = (-8, 0) * u.kpc
-plot_instance.radius = 5 * u.kpc
+# Set the center and radius of the plot
+plot_instance.center = (10, -10) * u.kpc
+plot_instance.radius = 6 * u.kpc
 
 plot_instance.s = 50.0  # make the scatter points bigger
 
 # plot
-plot_instance.mw_plot(x, y, 'r', 'Orbit of Sun in 20Gyr using galpy')
+plot_instance.mw_plot(x + 8.*u.kpc, y, 'r', 'Orbit of Sun in 20Gyr using galpy')
 
 # Save the figure
 plot_instance.savefig(file='mw_plot_zoomed.png')
