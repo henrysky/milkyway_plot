@@ -19,10 +19,29 @@ outside the pre-compiled images.
 * **Numpy** 1.12.0 or above
 * **Matplotlib** 2.1.0 above
 
-## Basic Usage
+## Install
 
-Since this is just a python script, you should copy `mw_plot.py`, `MW_galactic.png` and `MW_galactocentric.png` to your
-desired location. Another usage is run python under milkyway_plot folder.
+To clone the latest commit of astroNN from github
+
+```bash
+$ git clone --depth=1 git://github.com/henrysky/astroNN
+```
+
+Recommended method of installation as mw_plot is just a small script:
+
+```bash
+$ python setup.py develop
+```
+
+Or run the following command to install after you open a command line window in the package folder:
+
+```bash
+$ python setup.py install
+```
+
+OR copy `mw_plot.py`, `MW_galactic.png` and `MW_galactocentric.png` to your desired location.
+
+## Basic Usage
 
 ```python
 from astropy import units as u
