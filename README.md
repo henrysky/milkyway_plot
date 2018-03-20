@@ -142,8 +142,8 @@ from mw_plot import MWPlot
 op= Orbit([0.,0.,0.,0.,0.,0.], radec=True, ro=8., vo=220.)
 ts = np.linspace(0, 10, 10000)
 op.integrate(ts, MWPotential2014)
-x = op.x(ts) * u.kpc
-y = - op.y(ts) * u.kpc
+x = - op.x(ts) * u.kpc
+y = op.y(ts) * u.kpc
 z = op.z(ts)
 
 # setup a MWPlot instance
@@ -158,7 +158,7 @@ plot_instance.radius = 6 * u.kpc
 plot_instance.s = 50.0  # make the scatter points bigger
 
 # plot
-plot_instance.mw_plot(x + 8.*u.kpc, y, 'r', 'Orbit of Sun in 20Gyr using galpy')
+plot_instance.mw_plot(x + 8.*u.kpc, y, 'r', 'Orbit of Sun in 10Gyr using galpy')
 
 # Save the figure
 plot_instance.savefig(file='mw_plot_zoomed.png')
