@@ -4,7 +4,7 @@ A handy python script to plot scatters (so far, will support more later) on a fa
 You can set the center and radius of the plot anywhere on a milkyway galaxy image with galactic or galactocentric coordinates.
 
 Both ``MW_bg_annotate.png`` and ``MW_bg_unannotate.png`` are modified from an images by **NASA/JPL-Caltech/R. Hurt (SSC/Caltech)**
-Both images are 7500x7500px with resolution of 24.2 light years per pixel, mw_plot will fill black pixel for region
+Both images are 5600x5600px with resolution of 24.2 light years per pixel, mw_plot will fill black pixel for region
 outside the pre-compiled images.
 
 ## Author
