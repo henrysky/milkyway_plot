@@ -144,6 +144,10 @@ class MWPlot:
         # extract a correct area of the image according to the center and radius provided
         img, coord_english, ext = self.images_read()
 
+        # Temporarily correction, will have better solution later
+        if self.coord == 'galactic':
+            x -= 8. * u.kpc
+
         # decide whether we need colorbar or not
         if isinstance(c, list):
             color = c[0]

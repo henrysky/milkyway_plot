@@ -93,11 +93,11 @@ from astropy import units as u
 from mw_plot import MWPlot
 
 # Orbit Integration using galpy for the Sun
-op = Orbit([1., 0.1, 1.1, 0., 0.1, 0.], ro=-8., vo=220.)
+op= Orbit([0.,0.,0.,0.,0.,0.], radec=True, ro=8., vo=220.)
 ts = np.linspace(0, 20, 10000)
 op.integrate(ts, MWPotential2014)
-x = op.x(ts) * u.kpc
-y = - op.y(ts) * u.kpc
+x = - op.x(ts) * u.kpc
+y = op.y(ts) * u.kpc
 z = op.z(ts)
 
 # setup a MWPlot instance
@@ -126,9 +126,10 @@ You can turn off the annotation by ``plot_instance.mw_annotation = False``
 
 ![](readme_images/example_plot_2.png)
 
-You can set the center point and radius of the plot. In this case, we set (10, -10) in a galactocentric coordinates
-such that the plot centered at the Sun at the end of 20Gyr orbit, and set the plot radius as 6 kpc to close up. We will
-just set the color to red without color bar title because there is no color bar needed
+You can set the center point and radius of the plot. In this case, we set (16, -3) in galactic coordinates
+such that the plot centered at the Sun at the end of 10Gyr orbit, and set the radius as 6 kpc to close up. We will
+just set the color to red without color bar title because there is no color bar needed. Please notice the plot assumed
+the milkyway is not moving.
 
 ```python
 from galpy.potential import MWPotential2014
@@ -138,8 +139,8 @@ from astropy import units as u
 from mw_plot import MWPlot
 
 # Orbit Integration using galpy for the Sun
-op = Orbit([1., 0.1, 1.1, 0., 0.1, 0.], ro=-8., vo=220.)
-ts = np.linspace(0, 20, 10000)
+op= Orbit([0.,0.,0.,0.,0.,0.], radec=True, ro=8., vo=220.)
+ts = np.linspace(0, 10, 10000)
 op.integrate(ts, MWPotential2014)
 x = op.x(ts) * u.kpc
 y = - op.y(ts) * u.kpc
@@ -151,7 +152,7 @@ plot_instance.unit = u.kpc
 plot_instance.coord = 'galactic'
 
 # Set the center and radius of the plot
-plot_instance.center = (10, -10) * u.kpc
+plot_instance.center = (16, -3) * u.kpc
 plot_instance.radius = 6 * u.kpc
 
 plot_instance.s = 50.0  # make the scatter points bigger
