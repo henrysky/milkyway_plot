@@ -21,19 +21,19 @@ outside the pre-compiled images.
 
 ## Install
 
-To clone the latest commit of astroNN from github
+To clone the latest commit of mw_plot from github
 
 ```bash
-$ git clone --depth=1 git://github.com/henrysky/astroNN
+$ git clone --depth=1 git://github.com/henrysky/milkyway_plot
 ```
 
-Recommended method of installation as mw_plot is just a small script:
+Recommended method of installation as `mw_plot` is just a small script:
 
 ```bash
 $ python setup.py develop
 ```
 
-Or run the following command to install after you open a command line window in the package folder:
+OR run the following command to install after you open a command line window in the package folder:
 
 ```bash
 $ python setup.py install
@@ -44,7 +44,7 @@ OR copy `mw_plot.py`, `MW_bg_annotate.png` and `MW_bg_unannotate.png` to your de
 ## Basic Usage
 
 ```python
-from astropy import units as u
+from astropy import units asf u
 from mw_plot import MWPlot
 
 # setup a MWPlot instance
