@@ -44,7 +44,7 @@ OR copy `mw_plot.py`, `MW_bg_annotate.png` and `MW_bg_unannotate.png` to your de
 ## Basic Usage
 
 ```python
-from astropy import units asf u
+from astropy import units as u
 from mw_plot import MWPlot
 
 # setup a MWPlot instance
