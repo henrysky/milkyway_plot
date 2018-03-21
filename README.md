@@ -110,7 +110,7 @@ plot_instance.s = 10
 
 # plot
 plot_instance.mw_plot(x, y, [z, 'kpc above galactic plane'],
-                      'Orbit of Sun in 20Gyr using galpy colored by potential')
+                      'Orbit of Sun in 20Gyr using galpy colored by kpc abive galactic plane')
 
 # Save the figure
 plot_instance.savefig(file='mw_plot.png')
