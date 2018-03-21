@@ -152,7 +152,7 @@ plot_instance.unit = u.kpc
 plot_instance.coord = 'galactic'
 
 # Set the center and radius of the plot
-plot_instance.center = (16, -3) * u.kpc
+plot_instance.center = (16, -2.5) * u.kpc
 plot_instance.radius = 6 * u.kpc
 
 plot_instance.s = 50.0  # make the scatter points bigger

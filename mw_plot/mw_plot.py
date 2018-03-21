@@ -60,10 +60,7 @@ class MWPlot:
             path = os.path.join(os.path.dirname(mw_plot.__path__[0]), 'mw_plot', image_filename)
             img = plt.imread(path)
         if self.coord == 'galactic':
-            try:
-                self.center[0] += -8. * u.kpc
-            except TypeError:
-                self.center[0] += -8.
+            self.center[0] += -8. * u.kpc
             coord_english = 'Galactic Coordinates'
         elif self.coord == 'galactocentric':
             coord_english = 'Galactocentric Coordinates'
@@ -116,7 +113,7 @@ class MWPlot:
             # Set the images as the filled black-background image
             img = np.array(black_img)
 
-        ext = [(self.center[0] - self.radius).value, (self.center[0] + self.radius).value,
+        ext = [(self.center[0] - self.radius + 8. * u.kpc).value, (self.center[0] + self.radius + 8. * u.kpc).value,
                (self.center[1] - self.radius).value, (self.center[1] + self.radius).value]
 
         return img, coord_english, ext
@@ -137,16 +134,18 @@ class MWPlot:
         if not type(x) == u.quantity.Quantity or not type(y) == u.quantity.Quantity:
             raise TypeError("Both x and y must carry astropy's unit")
         else:
-            x = x.to(self.unit)
-            y = y.to(self.unit)
+            if x.unit is not None and y.unit is not None and self.center.unit is not None and \
+                    self.radius.unit is not None:
+                x = x.to(self.unit)
+                y = y.to(self.unit)
+                self.center = self.center.to(self.unit)
+                self.radius = self.radius.to(self.unit)
+            else:
+                raise TypeError("Both x, y, center and radius must carry astropy's unit")
 
         # Deal with coordinates issue, find out coordinates to the images area
         # extract a correct area of the image according to the center and radius provided
         img, coord_english, ext = self.images_read()
-
-        # Temporarily correction, will have better solution later
-        if self.coord == 'galactic':
-            x -= 8. * u.kpc
 
         # decide whether we need colorbar or not
         if isinstance(c, list):
