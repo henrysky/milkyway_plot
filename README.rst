@@ -14,6 +14,8 @@ Author
 -  | **Henry Leung** - *Initial work and developer* - henrysky_
    | Contact Henry: henrysky.leung [at] mail.utoronto.ca
 
+.. _henrysky: https://github.com/henrysky
+
 System Requirement
 ---------------------
 
@@ -225,4 +227,4 @@ You can set the coord to ``galactic`` to plot observation from Gaia
 License
 ---------------------------------------------------------
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
+This project is licensed under the MIT License - see the * :doc:`LICENSE` file for details
