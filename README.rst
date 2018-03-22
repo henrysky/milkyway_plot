@@ -4,7 +4,7 @@ mw_plot
 A handy python script to plot scatters (so far, will support more later) on a face-on milkyway using pylab.
 You can set the center and radius of the plot anywhere on a milkyway galaxy image with galactic or galactocentric coordinates.
 
-Both ``MW_bg_annotate.png`` and ``MW_bg_unannotate.png`` are modified from an images by **NASA/JPL-Caltech/R. Hurt (SSC/Caltech)**
+Both ``MW_bg_annotate.jpg`` and ``MW_bg_unannotate.jpg`` are modified from an images by **NASA/JPL-Caltech/R. Hurt (SSC/Caltech)**
 Both images are 5600x5600px with resolution of 24.2 light years per pixel, mw_plot will fill black pixel for region
 outside the pre-compiled images.
 
@@ -27,25 +27,18 @@ System Requirement
 Install
 ---------------------
 
-To clone the latest commit of mw_plot from github
+To install via ``pip``
+
+.. code-block:: bash
+
+   $ pip install mw_plot
+
+OR clone the latest commit of mw_plot from github and install
 
 .. code-block:: bash
 
    $ git clone --depth=1 git://github.com/henrysky/milkyway_plot
-
-Recommended method of installation as `mw_plot` is just a small script:
-
-.. code-block:: bash
-
-   $ python setup.py develop
-
-OR run the following command to install after you open a command line window in the package folder:
-
-.. code-block:: bash
-
    $ python setup.py install
-
-OR copy ``mw_plot.py``, ``MW_bg_annotate.png`` and ``MW_bg_unannotate.png`` to your desired location.
 
 Basic Usage
 ---------------------
@@ -89,6 +82,8 @@ Basic Usage
 Example 1: plotting orbit of Sun integrated by galpy
 ---------------------------------------------------------
 
+.. image:: https://github.com/henrysky/milkyway_plot/blob/master/readme_images/example_plot_1.png?raw=true
+
 .. image:: readme_images/example_plot_1.png
 
 You can plot the orbit which are some scatter points on a face-on milkyway
@@ -129,12 +124,12 @@ You can plot the orbit which are some scatter points on a face-on milkyway
 
 You can turn off the annotation by ``plot_instance.mw_annotation = False``
 
-.. image:: readme_images/example_plot_1_unannotation.png
+.. image:: https://github.com/henrysky/milkyway_plot/blob/master/readme_images/example_plot_1_unannotation.png?raw=true
 
 Example 2: Change the center and radius of the plot
 ---------------------------------------------------------
 
-.. image:: readme_images/example_plot_2.png
+.. image:: https://github.com/henrysky/milkyway_plot/blob/master/readme_images/example_plot_2.png?raw=true
 
 You can set the center point and radius of the plot. In this case, we set (16, -3) in galactic coordinates
 such that the plot centered at the Sun at the end of 10Gyr orbit, and set the radius as 6 kpc to close up. We will
@@ -179,7 +174,7 @@ the milkyway is not moving.
 Example 3: plotting Gaia DR1 observation with astroNN in Galactic coordinates
 ------------------------------------------------------------------------------------
 
-.. image:: readme_images/example_plot_gaia.png
+.. image:: https://github.com/henrysky/milkyway_plot/blob/master/readme_images/example_plot_gaia.png?raw=true
 
 You can set the coord to ``galactic`` to plot observation from Gaia
 
