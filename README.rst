@@ -84,8 +84,6 @@ Example 1: plotting orbit of Sun integrated by galpy
 
 .. image:: https://github.com/henrysky/milkyway_plot/blob/master/readme_images/example_plot_1.png?raw=true
 
-.. image:: readme_images/example_plot_1.png
-
 You can plot the orbit which are some scatter points on a face-on milkyway
 
 .. code:: python
