@@ -227,6 +227,6 @@ You can set the coord to ``galactic`` to plot observation from Gaia
 License
 ---------------------------------------------------------
 
-This project is licensed under the MIT License - see the * `LICENSE`_ file for details
+This project is licensed under the MIT License - see the `LICENSE`_ file for details
 
 .. _LICENSE: LICENSE
