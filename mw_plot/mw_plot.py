@@ -49,9 +49,9 @@ class MWPlot:
         self.__fig.savefig(file)
 
     def images_read(self):
-        image_filename = 'MW_bg_annotate.png'
+        image_filename = 'MW_bg_annotate.jpg'
         if self.mw_annotation is False:
-            image_filename = 'MW_bg_unannotate.png'
+            image_filename = 'MW_bg_unannotate.jpg'
 
         try:
             img = plt.imread(image_filename)
