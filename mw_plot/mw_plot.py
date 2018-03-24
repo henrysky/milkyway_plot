@@ -28,6 +28,7 @@ class MWPlot:
         self.radius = 90750 * u.lyr
         self.tight_layout = True
         self.mw_annotation = True
+        self.rot180 = False
 
         # Fixed value
         self.__pixels = 5600
@@ -59,10 +60,14 @@ class MWPlot:
             import mw_plot
             path = os.path.join(os.path.dirname(mw_plot.__path__[0]), 'mw_plot', image_filename)
             img = plt.imread(path)
-        if self.coord == 'galactic':
-            self.center[0] += -8. * u.kpc
+
+        x_shift = 0. * u.kpc
+
+        if self.coord.lower() == 'galactic':
+            x_shift = 8. * u.kpc
+            self.center[0] -= x_shift
             coord_english = 'Galactic Coordinates'
-        elif self.coord == 'galactocentric':
+        elif self.coord.lower() == 'galactocentric':
             coord_english = 'Galactocentric Coordinates'
         else:
             raise ValueError("Unknown coordinates, can only be 'galactic' or 'galactocentric'")
@@ -113,7 +118,10 @@ class MWPlot:
             # Set the images as the filled black-background image
             img = np.array(black_img)
 
-        ext = [(self.center[0] - self.radius + 8. * u.kpc).value, (self.center[0] + self.radius + 8. * u.kpc).value,
+        if self.rot180:
+            img = np.rot90(img, 2)
+
+        ext = [(self.center[0] - self.radius + x_shift).value, (self.center[0] + self.radius + x_shift).value,
                (self.center[1] - self.radius).value, (self.center[1] + self.radius).value]
 
         return img, coord_english, ext

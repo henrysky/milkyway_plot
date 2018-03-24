@@ -64,6 +64,7 @@ Basic Usage
    plot_instance.s = 50.0  # make the scatter points bigger
    plot_instance.tight_layout = True # whether plt.tight_layout() will be run
    plot_instance.mw_annotation = True # whether use a milkyway background with annotation
+   plot_instance.rot180 = False # whether rotate the image by 180 deg
 
    # Here is the mw_plot if you have an array to color the point
    # x and y must both carry astropy unit
