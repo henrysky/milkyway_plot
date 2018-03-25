@@ -61,13 +61,12 @@ class MWPlot:
             path = os.path.join(os.path.dirname(mw_plot.__path__[0]), 'mw_plot', image_filename)
             img = plt.imread(path)
 
-        x_shift = 0. * u.kpc
-
         if self.coord.lower() == 'galactic':
             x_shift = 8. * u.kpc
             self.center[0] -= x_shift
             coord_english = 'Galactic Coordinates'
         elif self.coord.lower() == 'galactocentric':
+            x_shift = 0. * u.kpc
             coord_english = 'Galactocentric Coordinates'
         else:
             raise ValueError("Unknown coordinates, can only be 'galactic' or 'galactocentric'")
@@ -120,9 +119,11 @@ class MWPlot:
 
         if self.rot180:
             img = np.rot90(img, 2)
-
-        ext = [(self.center[0] - self.radius + x_shift).value, (self.center[0] + self.radius + x_shift).value,
-               (self.center[1] - self.radius).value, (self.center[1] + self.radius).value]
+            ext = [(self.center[0] + self.radius + x_shift).value, (self.center[0] - self.radius + x_shift).value,
+                   (self.center[1] + self.radius).value, (self.center[1] - self.radius).value]
+        else:
+            ext = [(self.center[0] - self.radius + x_shift).value, (self.center[0] + self.radius + x_shift).value,
+                   (self.center[1] - self.radius).value, (self.center[1] + self.radius).value]
 
         return img, coord_english, ext
 
