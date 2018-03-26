@@ -40,6 +40,13 @@ OR clone the latest commit of mw_plot from github and install
    $ git clone --depth=1 git://github.com/henrysky/milkyway_plot
    $ python setup.py install
 
+To-do list
+---------------------
+
+- Add lines plotting
+- Add density/contour
+- Plot multiple things at once
+
 Basic Usage
 ---------------------
 
@@ -99,7 +106,7 @@ You can plot the orbit which are some scatter points on a face-on milkyway
    op= Orbit([0.,0.,0.,0.,0.,0.], radec=True, ro=8., vo=220.)
    ts = np.linspace(0, 20, 10000)
    op.integrate(ts, MWPotential2014)
-   x = - op.x(ts) * u.kpc
+   x = op.x(ts) * u.kpc
    y = op.y(ts) * u.kpc
    z = op.z(ts)
 
@@ -147,7 +154,7 @@ the milkyway is not moving.
    op= Orbit([0.,0.,0.,0.,0.,0.], radec=True, ro=8., vo=220.)
    ts = np.linspace(0, 10, 10000)
    op.integrate(ts, MWPotential2014)
-   x = - op.x(ts) * u.kpc
+   x = op.x(ts) * u.kpc
    y = op.y(ts) * u.kpc
    z = op.z(ts)
 
@@ -175,7 +182,9 @@ Example 3: plotting Gaia DR1 observation with astroNN in Galactic coordinates
 
 .. image:: https://github.com/henrysky/milkyway_plot/blob/master/readme_images/example_plot_gaia.png?raw=true
 
-You can set the coord to ``galactic`` to plot observation from Gaia
+You can set the coord to ``galactic`` to plot observation from Gaia. Please notice if you are using astropy's
+galactocentric transformation, they will transform to a left handed frame, you have to set x = -x to flip it to
+right handed which is also the expectation of ``mw_plot``
 
 .. code:: python
 

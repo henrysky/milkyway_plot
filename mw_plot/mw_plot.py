@@ -62,6 +62,7 @@ class MWPlot:
             img = plt.imread(path)
 
         if self.coord.lower() == 'galactic':
+            # shift the coord by 8 to the new coord system
             x_shift = 8. * u.kpc
             self.center[0] -= x_shift
             coord_english = 'Galactic Coordinates'
@@ -119,10 +120,10 @@ class MWPlot:
 
         if self.rot180:
             img = np.rot90(img, 2)
-            ext = [(self.center[0] + self.radius + x_shift).value, (self.center[0] - self.radius + x_shift).value,
+            ext = [(self.center[0] - self.radius + x_shift).value, (self.center[0] + self.radius + x_shift).value,
                    (self.center[1] + self.radius).value, (self.center[1] - self.radius).value]
         else:
-            ext = [(self.center[0] - self.radius + x_shift).value, (self.center[0] + self.radius + x_shift).value,
+            ext = [(self.center[0] + self.radius + x_shift).value, (self.center[0] - self.radius + x_shift).value,
                    (self.center[1] - self.radius).value, (self.center[1] + self.radius).value]
 
         return img, coord_english, ext
