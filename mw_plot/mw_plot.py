@@ -1,7 +1,8 @@
+import os
+
 import numpy as np
 import pylab as plt
 from astropy import units as u
-import os
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 
@@ -64,7 +65,7 @@ class MWPlot:
         if self.coord.lower() == 'galactic':
             # shift the coord by 8 to the new coord system
             x_shift = 8. * u.kpc
-            self.center[0] -= x_shift
+            self.center[0] += x_shift
             coord_english = 'Galactic Coordinates'
         elif self.coord.lower() == 'galactocentric':
             x_shift = 0. * u.kpc
@@ -85,7 +86,8 @@ class MWPlot:
 
         # convert physical unit to pixel unit
         pixel_radius = int((self.radius / self.__resolution).value)
-        pixel_center = list(map(int, (self.__pixels / 2 + self.center / self.__resolution).value))
+        pixel_center = [int((self.__pixels / 2 + self.center[0] / self.__resolution).value),
+                        int((self.__pixels / 2 - self.center[1] / self.__resolution).value)]
 
         # get the pixel coordinates
         x_left_px = pixel_center[0] - pixel_radius
@@ -120,11 +122,11 @@ class MWPlot:
 
         if self.rot180:
             img = np.rot90(img, 2)
-            ext = [(self.center[0] - self.radius + x_shift).value, (self.center[0] + self.radius + x_shift).value,
-                   (self.center[1] + self.radius).value, (self.center[1] - self.radius).value]
-        else:
-            ext = [(self.center[0] + self.radius + x_shift).value, (self.center[0] - self.radius + x_shift).value,
+            ext = [(self.center[0] + self.radius - x_shift).value, (self.center[0] - self.radius - x_shift).value,
                    (self.center[1] - self.radius).value, (self.center[1] + self.radius).value]
+        else:
+            ext = [(self.center[0] - self.radius - x_shift).value, (self.center[0] + self.radius - x_shift).value,
+                   (self.center[1] + self.radius).value, (self.center[1] - self.radius).value]
 
         return img, coord_english, ext
 

@@ -203,8 +203,8 @@ right handed which is also the expectation of ``mw_plot``
    parallax = output['parallax']  # parallax
    distance = 1 / parallax * u.kpc
 
-   # error propagation to parsec
-   distance_err = (1 / parallax) * output['parallax_err'] / output['parallax'] * 1000
+   # percentage error
+   distance_err = output['parallax_err'] / output['parallax']
 
    # use astropy coordinates tranformation
    c = apycoords.SkyCoord(ra=ra, dec=dec, distance=distance, frame='icrs')
@@ -221,7 +221,7 @@ right handed which is also the expectation of ``mw_plot``
    plot_instance.s = 50.0  # make the scatter points bigger
 
    # plot
-   plot_instance.mw_plot(c.galactic.cartesian.x, c.galactic.cartesian.y, [distance_err, 'Gaia Distance Error [parsec]'],
+   plot_instance.mw_plot(c.galactic.cartesian.x, c.galactic.cartesian.y, [distance_err, 'Gaia Distance Precentage Error'],
                       'Gaia TGAS Distance with 20% error cuts')
 
    # Save the figure
