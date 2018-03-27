@@ -55,23 +55,20 @@ Basic Usage
    from astropy import units as u
    from mw_plot import MWPlot
 
-   # setup a MWPlot instance
-   plot_instance = MWPlot()
+   # setup a MWPlot instance, you have to specify center, radius coordinates, unit with astropy unit and choice of coord
+   # or not specifying any to use default value shown below
+   # center: Coordinates of the center of the plot, radius: Radius of the plot
+   # coord: can be 'galactocentric' or 'galactic', annotation: whether use a milkyway background with annotation
+   plot_instance = MWPlot(center=(0, 0)*u.kpc, radius=90750*u.lyr, unit=u.kpc, coord='galactic', annotation=True, rot180=False)
 
    # Here are some setting you can set
    plot_instance.fontsize = 25  # fontsize for pylab plotting
-   plot_instance.unit = u.kpc  # units of the plot (astropy.units)
-   plot_instance.coord = 'galactocentric'  # can be 'galactocentric' or 'galactic'
-   plot_instance.center = (0, 0) * u.kpc  # Coordinates of the center of the plot
-   plot_instance.radius = 90000 * u.lyr  # Radius of the plot
    plot_instance.figsize = (20, 20)
    plot_instance.dpi = 200
    plot_instance.cmap = 'viridis'  # matplotlib cmap: https://matplotlib.org/examples/color/colormaps_reference.html
    plot_instance.imalpha = 0.85  # alpha value for the milkyway image
    plot_instance.s = 50.0  # make the scatter points bigger
    plot_instance.tight_layout = True # whether plt.tight_layout() will be run
-   plot_instance.mw_annotation = True # whether use a milkyway background with annotation
-   plot_instance.rot180 = False # whether rotate the image by 180 deg
 
    # Here is the mw_plot if you have an array to color the point
    # x and y must both carry astropy unit
@@ -111,10 +108,7 @@ You can plot the orbit which are some scatter points on a face-on milkyway
    z = op.z(ts)
 
    # setup a MWPlot instance
-   plot_instance = MWPlot()
-   plot_instance.unit = u.kpc
-   plot_instance.coord = 'galactocentric'
-   plot_instance.radius = 20 * u.kpc
+   plot_instance = MWPlot(radius=20*u.kpc, unit=u.kpc, coord='galactocentric')
    plot_instance.imalpha = 1.0
    plot_instance.s = 10
 
@@ -128,7 +122,7 @@ You can plot the orbit which are some scatter points on a face-on milkyway
    # Show the figure
    plot_instance.show()
 
-You can turn off the annotation by ``plot_instance.mw_annotation = False``
+You can turn off the annotation by putting ``annotation=False`` when creating an instance
 
 .. image:: https://github.com/henrysky/milkyway_plot/blob/master/readme_images/example_plot_1_unannotation.png?raw=true
 
@@ -159,13 +153,7 @@ the milkyway is not moving.
    z = op.z(ts)
 
    # setup a MWPlot instance
-   plot_instance = MWPlot()
-   plot_instance.unit = u.kpc
-   plot_instance.coord = 'galactic'
-
-   # Set the center and radius of the plot
-   plot_instance.center = (16, -2.5) * u.kpc
-   plot_instance.radius = 6 * u.kpc
+   plot_instance = MWPlot(center=(-16, -2.5)*u.kpc, radius=6*u.kpc, unit=u.kpc, coord='galactic')
    plot_instance.s = 50.0  # make the scatter points bigger
 
    # plot
@@ -210,13 +198,8 @@ right handed which is also the expectation of ``mw_plot``
    c = apycoords.SkyCoord(ra=ra, dec=dec, distance=distance, frame='icrs')
 
    # setup a MWPlot instance
-   plot_instance = MWPlot()
-   plot_instance.unit = u.kpc
-   plot_instance.s = 0.0001
-   plot_instance.coord = 'galactic'  # use galactic coordinates because Gaia observations are from Earth
-
-   # Set the center and radius of the plot
-   plot_instance.radius = 5 * u.kpc
+   # use galactic coordinates because Gaia observations are from Earth
+   plot_instance = MWPlot(radius=5*u.kpc, unit=u.kpc, coord='galactic')
 
    plot_instance.s = 50.0  # make the scatter points bigger
 

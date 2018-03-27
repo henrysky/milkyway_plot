@@ -16,25 +16,55 @@ class MWPlot:
         2018-Mar-17 - Written - Henry Leung (University of Toronto)
     """
 
-    def __init__(self):
+    def __init__(self, center=(0,0)*u.kpc, radius=90750*u.lyr, unit=u.kpc, coord='galactic', annotation=True, rot180=False):
+        """
+        :param center: Coordinates of the center of the plot with astropy units
+        :type center: u.quantity.Quantity
+        :param radius: Radius of the plot with astropy units
+        :type radius: u.quantity.Quantity
+        :param unit: astropy units
+        :type unit: u.quantity.Quantity
+        :param coord: 'galactocentric' or 'galactic'
+        :type coord: str
+        :param annotation: whether use a milkyway background with annotation
+        :type annotation: bool
+        :param rot180: whether rotate the image by 180 deg
+        :type rot180: bool
+        """
         self.fontsize = 25
-        self.unit = u.lyr
-        self.coord = None
         self.s = 1.0
         self.figsize = (20, 20)
         self.dpi = 200
         self.cmap = "viridis"
         self.imalpha = 0.85
-        self.center = (0, 0) * u.lyr
-        self.radius = 90750 * u.lyr
         self.tight_layout = True
-        self.mw_annotation = True
-        self.rot180 = False
+
+        # user should not change these values anyway
+        self.__center = center
+        self.__radius = radius
+        self.__unit = unit
+        self.__coord = coord
+        self.__annotation = annotation
+        self.__rot180 = rot180
+
+        self.__unit_english = None
+        self.__coord_english = None
+        self.__ext = None
+        self.__img = None
+        self.__aspect = None
 
         # Fixed value
         self.__pixels = 5600
         self.__resolution = 24.2 * u.lyr
         self.__fig = None
+
+        # preprocessing procedure
+        self.__unit_english = self.__unit.long_names[0]
+        if self.__center.unit is not None and self.__radius.unit is not None:
+            self.__center = self.__center.to(self.__unit)
+            self.__radius = self.__radius.to(self.__unit)
+
+        self.images_read()
 
     def plot(self, *args, **kwargs):
         plt.plot(*args, **kwargs)
@@ -52,7 +82,7 @@ class MWPlot:
 
     def images_read(self):
         image_filename = 'MW_bg_annotate.jpg'
-        if self.mw_annotation is False:
+        if self.__annotation is False:
             image_filename = 'MW_bg_unannotate.jpg'
 
         try:
@@ -62,32 +92,32 @@ class MWPlot:
             path = os.path.join(os.path.dirname(mw_plot.__path__[0]), 'mw_plot', image_filename)
             img = plt.imread(path)
 
-        if self.coord.lower() == 'galactic':
+        if self.__coord.lower() == 'galactic':
             # shift the coord by 8 to the new coord system
             x_shift = 8. * u.kpc
-            self.center[0] += x_shift
-            coord_english = 'Galactic Coordinates'
-        elif self.coord.lower() == 'galactocentric':
+            self.__center[0] += x_shift
+            self.__coord_english = 'Galactic Coordinates'
+        elif self.__coord.lower() == 'galactocentric':
             x_shift = 0. * u.kpc
-            coord_english = 'Galactocentric Coordinates'
+            self.__coord_english = 'Galactocentric Coordinates'
         else:
             raise ValueError("Unknown coordinates, can only be 'galactic' or 'galactocentric'")
 
-        if not type(self.center) == u.quantity.Quantity and not type(self.radius) == u.quantity.Quantity:
-            print(f"You did not specify units for center and radius, assuming the unit is {self.unit.long_names[0]}")
-            if not type(self.center) == u.quantity.Quantity:
-                self.center = self.center * self.unit
-            if not type(self.radius) == u.quantity.Quantity:
-                self.radius = self.radius * self.unit
+        if not type(self.__center) == u.quantity.Quantity and not type(self.__radius) == u.quantity.Quantity:
+            print(f"You did not specify units for center and radius, assuming the unit is {self.__unit.long_names[0]}")
+            if not type(self.__center) == u.quantity.Quantity:
+                self.__center = self.__center * self.__unit
+            if not type(self.__radius) == u.quantity.Quantity:
+                self.__radius = self.__radius * self.__unit
 
-        self.__resolution = self.__resolution.to(self.unit)
-        self.center = self.center.to(self.unit)
-        self.radius = self.radius.to(self.unit)
+        self.__resolution = self.__resolution.to(self.__unit)
+        self.__center = self.__center.to(self.__unit)
+        self.__radius = self.__radius.to(self.__unit)
 
         # convert physical unit to pixel unit
-        pixel_radius = int((self.radius / self.__resolution).value)
-        pixel_center = [int((self.__pixels / 2 + self.center[0] / self.__resolution).value),
-                        int((self.__pixels / 2 - self.center[1] / self.__resolution).value)]
+        pixel_radius = int((self.__radius / self.__resolution).value)
+        pixel_center = [int((self.__pixels / 2 + self.__center[0] / self.__resolution).value),
+                        int((self.__pixels / 2 - self.__center[1] / self.__resolution).value)]
 
         # get the pixel coordinates
         x_left_px = pixel_center[0] - pixel_radius
@@ -120,15 +150,18 @@ class MWPlot:
             # Set the images as the filled black-background image
             img = np.array(black_img)
 
-        if self.rot180:
+        if self.__rot180:
             img = np.rot90(img, 2)
-            ext = [(self.center[0] + self.radius - x_shift).value, (self.center[0] - self.radius - x_shift).value,
-                   (self.center[1] - self.radius).value, (self.center[1] + self.radius).value]
+            self.__ext = [(self.__center[0] + self.__radius - x_shift).value, (self.__center[0] - self.__radius - x_shift).value,
+                   (self.__center[1] - self.__radius).value, (self.__center[1] + self.__radius).value]
         else:
-            ext = [(self.center[0] - self.radius - x_shift).value, (self.center[0] + self.radius - x_shift).value,
-                   (self.center[1] + self.radius).value, (self.center[1] - self.radius).value]
+            self.__ext = [(self.__center[0] - self.__radius - x_shift).value, (self.__center[0] + self.__radius - x_shift).value,
+                   (self.__center[1] + self.__radius).value, (self.__center[1] - self.__radius).value]
 
-        return img, coord_english, ext
+        self.__img = img
+        self.__aspect = img.shape[0] / float(img.shape[1]) * ((self.__ext[1] - self.__ext[0]) / (self.__ext[3] - self.__ext[2]))
+
+        return None
 
     def mw_plot(self, x, y, c, title=None):
         """
@@ -141,23 +174,14 @@ class MWPlot:
         """
         cbar_flag = False
 
-        unit_english = self.unit.long_names[0]
-
         if not type(x) == u.quantity.Quantity or not type(y) == u.quantity.Quantity:
             raise TypeError("Both x and y must carry astropy's unit")
         else:
-            if x.unit is not None and y.unit is not None and self.center.unit is not None and \
-                    self.radius.unit is not None:
-                x = x.to(self.unit)
-                y = y.to(self.unit)
-                self.center = self.center.to(self.unit)
-                self.radius = self.radius.to(self.unit)
+            if x.unit is not None and y.unit is not None:
+                x = x.to(self.__unit)
+                y = y.to(self.__unit)
             else:
                 raise TypeError("Both x, y, center and radius must carry astropy's unit")
-
-        # Deal with coordinates issue, find out coordinates to the images area
-        # extract a correct area of the image according to the center and radius provided
-        img, coord_english, ext = self.images_read()
 
         # decide whether we need colorbar or not
         if isinstance(c, list):
@@ -169,14 +193,13 @@ class MWPlot:
 
         self.__fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
         plt.title(title, fontsize=self.fontsize)
-        plt.xlabel(f'{coord_english} ({unit_english})', fontsize=self.fontsize)
-        plt.ylabel(f'{coord_english} ({unit_english})', fontsize=self.fontsize)
-        aspect = img.shape[0] / float(img.shape[1]) * ((ext[1] - ext[0]) / (ext[3] - ext[2]))
+        plt.xlabel(f'{self.__coord_english} ({self.__unit_english})', fontsize=self.fontsize)
+        plt.ylabel(f'{self.__coord_english} ({self.__unit_english})', fontsize=self.fontsize)
         ax = plt.gca()
-        ax.set_aspect(aspect)
+        ax.set_aspect(self.__aspect)
         ax.set_facecolor('k')  # have a black color background for image with <1.0 alpha
         plt.scatter(x, y, zorder=1, s=self.s, c=color, cmap=plt.get_cmap(self.cmap))
-        ax.imshow(img, zorder=0, extent=ext, alpha=self.imalpha)
+        ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=self.imalpha)
 
         if cbar_flag is True:
             divider = make_axes_locatable(ax)
