@@ -183,7 +183,7 @@ Example 3: plotting Gaia DR1 observation with astroNN in Galactic coordinates
 .. image:: https://github.com/henrysky/milkyway_plot/blob/master/readme_images/example_plot_gaia.png?raw=true
 
 You can set the coord to ``galactic`` to plot observation from Gaia. Please notice if you are using astropy's
-galactocentric transformation, they will transform to a left handed frame, you have to set x = -x to flip it to
+coordinates transformation, they will transform under left handed frame, you have to set x = -x to flip it to
 right handed which is also the expectation of ``mw_plot``
 
 .. code:: python
@@ -220,8 +220,8 @@ right handed which is also the expectation of ``mw_plot``
 
    plot_instance.s = 50.0  # make the scatter points bigger
 
-   # plot
-   plot_instance.mw_plot(c.galactic.cartesian.x, c.galactic.cartesian.y, [distance_err, 'Gaia Distance Precentage Error'],
+   # plot, need to flip the sign of x because astropy is left-handed but mw_plot is right-handed
+   plot_instance.mw_plot(-c.galactic.cartesian.x, c.galactic.cartesian.y, [distance_err, 'Gaia Distance Precentage Error'],
                       'Gaia TGAS Distance with 20% error cuts')
 
    # Save the figure
