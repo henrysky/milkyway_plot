@@ -42,13 +42,13 @@ class MWPlot:
         # user should not change these values anyway
         self.__center = center
         self.__radius = radius
-        self.__unit = unit
+        self._unit = unit
         self.__coord = coord
         self.__annotation = annotation
         self.__rot180 = rot180
 
-        self.__unit_english = None
-        self.__coord_english = None
+        self._unit_english = None
+        self._coord_english = None
         self.__ext = None
         self.__img = None
         self.__aspect = None
@@ -59,10 +59,10 @@ class MWPlot:
         self.__fig = None
 
         # preprocessing procedure
-        self.__unit_english = self.__unit.long_names[0]
+        self._unit_english = self._unit.long_names[0]
         if self.__center.unit is not None and self.__radius.unit is not None:
-            self.__center = self.__center.to(self.__unit)
-            self.__radius = self.__radius.to(self.__unit)
+            self.__center = self.__center.to(self._unit)
+            self.__radius = self.__radius.to(self._unit)
 
         self.images_read()
 
@@ -96,23 +96,23 @@ class MWPlot:
             # shift the coord by 8 to the new coord system
             x_shift = 8. * u.kpc
             self.__center[0] += x_shift
-            self.__coord_english = 'Galactic Coordinates'
+            self._coord_english = 'Galactic Coordinates'
         elif self.__coord.lower() == 'galactocentric':
             x_shift = 0. * u.kpc
-            self.__coord_english = 'Galactocentric Coordinates'
+            self._coord_english = 'Galactocentric Coordinates'
         else:
             raise ValueError("Unknown coordinates, can only be 'galactic' or 'galactocentric'")
 
         if not type(self.__center) == u.quantity.Quantity and not type(self.__radius) == u.quantity.Quantity:
-            print(f"You did not specify units for center and radius, assuming the unit is {self.__unit.long_names[0]}")
+            print(f"You did not specify units for center and radius, assuming the unit is {self._unit.long_names[0]}")
             if not type(self.__center) == u.quantity.Quantity:
-                self.__center = self.__center * self.__unit
+                self.__center = self.__center * self._unit
             if not type(self.__radius) == u.quantity.Quantity:
-                self.__radius = self.__radius * self.__unit
+                self.__radius = self.__radius * self._unit
 
-        self.__resolution = self.__resolution.to(self.__unit)
-        self.__center = self.__center.to(self.__unit)
-        self.__radius = self.__radius.to(self.__unit)
+        self.__resolution = self.__resolution.to(self._unit)
+        self.__center = self.__center.to(self._unit)
+        self.__radius = self.__radius.to(self._unit)
 
         # convert physical unit to pixel unit
         pixel_radius = int((self.__radius / self.__resolution).value)
@@ -178,8 +178,8 @@ class MWPlot:
             raise TypeError("Both x and y must carry astropy's unit")
         else:
             if x.unit is not None and y.unit is not None:
-                x = x.to(self.__unit)
-                y = y.to(self.__unit)
+                x = x.to(self._unit)
+                y = y.to(self._unit)
             else:
                 raise TypeError("Both x, y, center and radius must carry astropy's unit")
 
@@ -193,8 +193,8 @@ class MWPlot:
 
         self.__fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
         plt.title(title, fontsize=self.fontsize)
-        plt.xlabel(f'{self.__coord_english} ({self.__unit_english})', fontsize=self.fontsize)
-        plt.ylabel(f'{self.__coord_english} ({self.__unit_english})', fontsize=self.fontsize)
+        plt.xlabel(f'{self._coord_english} ({self._unit_english})', fontsize=self.fontsize)
+        plt.ylabel(f'{self._coord_english} ({self._unit_english})', fontsize=self.fontsize)
         ax = plt.gca()
         ax.set_aspect(self.__aspect)
         ax.set_facecolor('k')  # have a black color background for image with <1.0 alpha
