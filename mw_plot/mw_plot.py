@@ -188,6 +188,8 @@ class MWPlot:
             color = c[0]
             cbar_label = c[1]
             cbar_flag = True
+            if type(color) == u.quantity.Quantity:
+                color = color.to(self._unit)
         else:
             color = c
 
@@ -200,6 +202,72 @@ class MWPlot:
         ax.set_facecolor('k')  # have a black color background for image with <1.0 alpha
         plt.scatter(x, y, zorder=1, s=self.s, c=color, cmap=plt.get_cmap(self.cmap))
         ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=self.imalpha)
+
+        if cbar_flag is True:
+            divider = make_axes_locatable(ax)
+            cax = divider.append_axes("right", size="5%", pad=0.05)
+            cbar = plt.colorbar(cax=cax)
+            cbar.ax.tick_params(labelsize=self.fontsize)
+            cbar.set_label(f"{cbar_label}", size=self.fontsize)
+
+        ax.tick_params(labelsize=self.fontsize)
+
+    def mw_density(self, x, y, c, title=None):
+        """
+        NAME: mw_density
+        PURPOSE:
+        INPUT:
+        OUTPUT:
+        HISTORY:
+            2018-Mar-17 - Written - Henry Leung (University of Toronto)
+        """
+        import seaborn as sns
+        import matplotlib
+
+        def transparent_cmap(cmap, N=255):
+            "Copy colormap and set alpha values"
+
+            mycmap = cmap
+            mycmap._init()
+            space = np.logspace(0, 100., N + 4)
+            space[0] = 0
+            mycmap._lut[:, -1] = space
+            return mycmap
+
+        cbar_flag = False
+
+        if not type(x) == u.quantity.Quantity or not type(y) == u.quantity.Quantity:
+            raise TypeError("Both x and y must carry astropy's unit")
+        else:
+            if x.unit is not None and y.unit is not None:
+                x = x.to(self._unit)
+                y = y.to(self._unit)
+            else:
+                raise TypeError("Both x, y, center and radius must carry astropy's unit")
+
+        # decide whether we need colorbar or not
+        if isinstance(c, list):
+            color = c[0]
+            cbar_label = c[1]
+            cbar_flag = True
+            if type(color) == u.quantity.Quantity:
+                color = color.to(self._unit)
+        else:
+            color = c
+
+        self.__fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
+        plt.title(title, fontsize=self.fontsize)
+        plt.xlabel(f'{self._coord_english} ({self._unit_english})', fontsize=self.fontsize)
+        plt.ylabel(f'{self._coord_english} ({self._unit_english})', fontsize=self.fontsize)
+        ax = plt.gca()
+        ax.set_aspect(self.__aspect)
+        ax.set_facecolor('k')  # have a black color background for image with <1.0 alpha
+        # sns.kdeplot(x.value, y.value, gridsize=1000)
+        print([self.__ext[:2], self.__ext[3], self.__ext[2]])
+        heatmap, xedges, yedges = np.histogram2d(x.value, y.value, bins=250, range=[self.__ext[:2], [self.__ext[3],
+                                                                                    self.__ext[2]]])
+        ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=self.imalpha)
+        ax.imshow(heatmap.T, extent=self.__ext, cmap=transparent_cmap(plt.get_cmap('Reds')))
 
         if cbar_flag is True:
             divider = make_axes_locatable(ax)
