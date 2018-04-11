@@ -84,6 +84,15 @@ Basic Usage
    # To save
    plot_instance.savefig('name.png')
 
+There are also some handy constants you can import
+
+.. code:: python
+
+   from mw_plot import center_coord, anti_center_coord
+   # center_coord refers to the [RA, DEC] of galactic center in deg
+   # anti_center_coord refers to the [RA, DEC] of galactic anti-center in deg
+
+
 Example 1: plotting orbit of Sun integrated by galpy
 ---------------------------------------------------------
 
