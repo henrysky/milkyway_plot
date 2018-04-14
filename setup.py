@@ -6,7 +6,7 @@ with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'README.rst')
 
 setup(
     name='mw_plot',
-    version='0.2.4',
+    version='0.2.5',
     classifiers=[
         'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: MIT License',
@@ -29,6 +29,6 @@ setup(
     license='MIT',
     author='Henry Leung',
     author_email='henrysky.leung@mail.utoronto.ca',
-    description='A handy python script to plot things on a face-on milkyway',
+    description='A handy python script to plot things on a face-on/edge-on milkyway with pylab',
     long_description=long_description
 )
