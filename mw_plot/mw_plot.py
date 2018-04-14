@@ -16,8 +16,10 @@ class MWPlot:
         2018-Mar-17 - Written - Henry Leung (University of Toronto)
     """
 
-    def __init__(self, center=(0,0)*u.kpc, radius=90750*u.lyr, unit=u.kpc, coord='galactic', annotation=True, rot180=False):
+    def __init__(self, mode='face-on', center=(0,0)*u.kpc, radius=90750*u.lyr, unit=u.kpc, coord='galactic', annotation=True, rot180=False):
         """
+        ;:param mode: whether plot edge-on or face-on milkyway
+        :type mode: string, either 'face-on' or 'edge-on'
         :param center: Coordinates of the center of the plot with astropy units
         :type center: u.quantity.Quantity
         :param radius: Radius of the plot with astropy units
@@ -54,9 +56,14 @@ class MWPlot:
         self.__aspect = None
 
         # Fixed value
-        self.__pixels = 5600
-        self.__resolution = 24.2 * u.lyr
+        if mode == 'face-on':
+            self.__pixels = 5600
+            self.__resolution = 24.2 * u.lyr
+        else:
+            self.__pixels = 6500
+            self.__resolution = 15.384615846 * u.lyr
         self.__fig = None
+        self.mode = mode
 
         # preprocessing procedure
         self._unit_english = self._unit.long_names[0]
@@ -84,6 +91,8 @@ class MWPlot:
         image_filename = 'MW_bg_annotate.jpg'
         if self.__annotation is False:
             image_filename = 'MW_bg_unannotate.jpg'
+        elif self.mode == 'edge-on':
+            image_filename = 'MW_edgeon_unannotate.jpg'
 
         try:
             img = plt.imread(image_filename)

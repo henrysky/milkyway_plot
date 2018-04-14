@@ -59,7 +59,8 @@ Basic Usage
    # or not specifying any to use default value shown below
    # center: Coordinates of the center of the plot, radius: Radius of the plot
    # coord: can be 'galactocentric' or 'galactic', annotation: whether use a milkyway background with annotation
-   plot_instance = MWPlot(center=(0, 0)*u.kpc, radius=90750*u.lyr, unit=u.kpc, coord='galactic', annotation=True, rot180=False)
+   # mode: can be 'face-on' or 'edge-on'
+   plot_instance = MWPlot(mode='face-on', center=(0, 0)*u.kpc, radius=90750*u.lyr, unit=u.kpc, coord='galactic', annotation=True, rot180=False)
 
    # Here are some setting you can set
    plot_instance.fontsize = 25  # fontsize for pylab plotting
@@ -92,9 +93,51 @@ There are also some handy constants you can import
    # center_coord refers to the [RA, DEC] of galactic center in deg
    # anti_center_coord refers to the [RA, DEC] of galactic anti-center in deg
 
+Example 1: Plot Dynamical Modeling of Tidal Stream using galpy
+-----------------------------------------------------------------
 
-Example 1: plotting orbit of Sun integrated by galpy
----------------------------------------------------------
+.. image:: https://github.com/henrysky/milkyway_plot/blob/master/readme_images/tidal_streams_plot.png?raw=true
+
+You can plot the orbit which are some scatter points on a edge-on milkyway
+
+.. code:: python
+
+   from galpy.df import streamdf
+   from galpy.orbit import Orbit
+   from galpy.potential import LogarithmicHaloPotential
+   from galpy.actionAngle import actionAngleIsochroneApprox
+   from galpy.util import bovy_conversion #for unit conversions
+   import numpy as np
+   from astropy import units as u
+   from mw_plot import MWPlot
+
+   # setup potential
+   lp= LogarithmicHaloPotential(normalize=1.,q=0.9)
+
+   # galpy tidal streams modeling
+   aAI= actionAngleIsochroneApprox(pot=lp,b=0.8)
+   obs= Orbit([1.56148083,0.35081535,-1.15481504,0.88719443,-0.47713334,0.12019596])
+   sigv= 0.365 #km/s
+   sdf=streamdf(sigv/220.,progenitor=obs,pot=lp,aA=aAI,leading=True,nTrackChunks=11,tdisrupt=100./bovy_conversion.time_in_Gyr(220.,8.))
+
+   x = sdf._parse_track_dim('x',interp=True)
+   y = sdf._parse_track_dim('y',interp=True) * u.kpc
+   z = sdf._parse_track_dim('z',interp=True) * u.kpc
+
+   # setup a MWPlot instance
+
+   plot_instance = MWPlot(mode='edge-on', radius=8.*u.kpc, unit=u.kpc, coord='galactocentric', annotation=True, rot180 = False)
+   plot_instance.s=10.  # make the scatter points bigger\
+   plot_instance.imalpha = 1.0
+
+   # plot
+   plot_instance.mw_plot(y, z, [x, 'kpc in x-coordinates'], 'Dynamical modeling of tidal streams using galpy')
+
+   # Save the figure
+   plot_instance.savefig(file='tidal_streams_plot.png')
+
+Example 2: Plot Orbit of Sun Integrated by galpy
+-------------------------------------------------------
 
 .. image:: https://github.com/henrysky/milkyway_plot/blob/master/readme_images/example_plot_1.png?raw=true
 
@@ -135,7 +178,7 @@ You can turn off the annotation by putting ``annotation=False`` when creating an
 
 .. image:: https://github.com/henrysky/milkyway_plot/blob/master/readme_images/example_plot_1_unannotation.png?raw=true
 
-Example 2: Change the center and radius of the plot
+Example 3: Change the center and radius of the plot
 ---------------------------------------------------------
 
 .. image:: https://github.com/henrysky/milkyway_plot/blob/master/readme_images/example_plot_2.png?raw=true
@@ -174,7 +217,7 @@ the milkyway is not moving.
    # Show the figure
    plot_instance.show()
 
-Example 3: plotting Gaia DR1 observation with astroNN in Galactic coordinates
+Example 4: Plot Gaia DR1 Observation with astroNN in Galactic coordinates
 ------------------------------------------------------------------------------------
 
 .. image:: https://github.com/henrysky/milkyway_plot/blob/master/readme_images/example_plot_gaia.png?raw=true
