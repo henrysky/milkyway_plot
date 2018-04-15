@@ -1,7 +1,7 @@
 mw_plot
 ========
 
-A handy python script to plot scatters (so far, will support more later) on a face-on milkyway using pylab.
+A handy python script to plot scatters (so far, will support more later) on a face-on/edge-on milkyway using pylab.
 You can set the center and radius of the plot anywhere on a milkyway galaxy image with galactic or galactocentric coordinates.
 
 Both ``MW_bg_annotate.jpg`` and ``MW_bg_unannotate.jpg`` are modified from an images by **NASA/JPL-Caltech/R. Hurt (SSC/Caltech)**
@@ -120,7 +120,7 @@ You can plot the orbit which are some scatter points on a edge-on milkyway
 
    # galpy tidal streams modeling
    aAI= actionAngleIsochroneApprox(pot=lp,b=0.8)
-   obs= Orbit([1.56148083,0.35081535,-1.15481504,0.88719443,-0.47713334,0.12019596])
+   obs= Orbit([0.16148083,0.35081535,-0.15481504,0.48719443,-0.27713334,0.12019596])
    sigv= 0.365 #km/s
    sdf=streamdf(sigv/220.,progenitor=obs,pot=lp,aA=aAI,leading=True,nTrackChunks=11,tdisrupt=100./bovy_conversion.time_in_Gyr(220.,8.))
 
@@ -182,7 +182,7 @@ You can turn off the annotation by putting ``annotation=False`` when creating an
 
 .. image:: https://github.com/henrysky/milkyway_plot/blob/master/readme_images/example_plot_1_unannotation.png?raw=true
 
-Example 3: Change the center and radius of the plot
+Example 3: Change the Center and Radius of the Plot
 ---------------------------------------------------------
 
 .. image:: https://github.com/henrysky/milkyway_plot/blob/master/readme_images/example_plot_2.png?raw=true

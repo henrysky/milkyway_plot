@@ -166,6 +166,9 @@ class MWPlot:
         else:
             self.__ext = [(self.__center[0] - self.__radius - x_shift).value, (self.__center[0] + self.__radius - x_shift).value,
                    (self.__center[1] + self.__radius).value, (self.__center[1] - self.__radius).value]
+        if self.mode == 'edge-on':
+            self.__ext[2] *= -1
+            self.__ext[3] *= -1
 
         self.__img = img
         self.__aspect = img.shape[0] / float(img.shape[1]) * ((self.__ext[1] - self.__ext[0]) / (self.__ext[3] - self.__ext[2]))
