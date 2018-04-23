@@ -106,39 +106,39 @@ You can plot the orbit which are some scatter points on a edge-on milkyway
 
 .. code:: python
 
-   from galpy.df import streamdf
-   from galpy.orbit import Orbit
-   from galpy.potential import LogarithmicHaloPotential
-   from galpy.actionAngle import actionAngleIsochroneApprox
-   from galpy.util import bovy_conversion #for unit conversions
-   import numpy as np
-   from astropy import units as u
-   from mw_plot import MWPlot
+    from galpy.df import streamdf
+    from galpy.orbit import Orbit
+    from galpy.potential import LogarithmicHaloPotential
+    from galpy.actionAngle import actionAngleIsochroneApprox
+    from galpy.util import bovy_conversion #for unit conversions
+    import numpy as np
+    from astropy import units as u
+    from mw_plot import MWPlot
 
-   # setup potential
-   lp= LogarithmicHaloPotential(normalize=1.,q=0.9)
+    # setup potential
+    lp= LogarithmicHaloPotential(normalize=1.,q=0.9)
 
-   # galpy tidal streams modeling
-   aAI= actionAngleIsochroneApprox(pot=lp,b=0.8)
-   obs= Orbit([0.16148083,0.35081535,-0.15481504,0.48719443,-0.27713334,0.12019596])
-   sigv= 0.365 #km/s
-   sdf=streamdf(sigv/220.,progenitor=obs,pot=lp,aA=aAI,leading=True,nTrackChunks=11,tdisrupt=100./bovy_conversion.time_in_Gyr(220.,8.))
+    # galpy tidal streams modeling
+    aAI= actionAngleIsochroneApprox(pot=lp,b=0.8)
+    obs= Orbit([0.16148083,0.35081535,-0.15481504,0.48719443,-0.27713334,0.12019596])
+    sigv= 0.365 #km/s
+    sdf= streamdf(sigv/220.,progenitor=obs,pot=lp,aA=aAI,leading=True,nTrackChunks=11,tdisrupt=40./bovy_conversion.time_in_Gyr(220.,8.))
 
-   x = sdf._parse_track_dim('x',interp=True)
-   y = sdf._parse_track_dim('y',interp=True) * u.kpc
-   z = sdf._parse_track_dim('z',interp=True) * u.kpc
+    x = sdf._parse_track_dim('x',interp=True, phys=True)
+    y = sdf._parse_track_dim('y',interp=True, phys=True) * u.kpc
+    z = sdf._parse_track_dim('z',interp=True, phys=True) * u.kpc
 
-   # setup a MWPlot instance
+    # setup a MWPlot instance
+    plot_instance = MWPlot(mode='edge-on', radius=8.*u.kpc, unit=u.kpc, coord='galactocentric', annotation=True, rot180 = False)
+    plot_instance.s=10.  # make the scatter points bigger
+    plot_instance.imalpha = 1.0
 
-   plot_instance = MWPlot(mode='edge-on', radius=8.*u.kpc, unit=u.kpc, coord='galactocentric', annotation=True, rot180 = False)
-   plot_instance.s=10.  # make the scatter points bigger\
-   plot_instance.imalpha = 1.0
+    # plot
+    plot_instance.mw_plot(y, z, [x, 'kpc in x-coordinates'],
+                          'Dynamical modeling of tidal streams using galpy')
 
-   # plot
-   plot_instance.mw_plot(y, z, [x, 'kpc in x-coordinates'], 'Dynamical modeling of tidal streams using galpy')
-
-   # Save the figure
-   plot_instance.savefig(file='tidal_streams_plot.png')
+    # Save the figure
+    plot_instance.savefig(file='tidal_streams_plot.png')
 
 Example 2: Plot Orbit of Sun Integrated by galpy
 -------------------------------------------------------
