@@ -175,6 +175,24 @@ class MWPlot:
 
         return None
 
+    @staticmethod
+    def transparent_cmap(cmap, N=255):
+        """
+        Copy colormap and set alpha values
+
+        :param cmap: Color map to covert to transparent color map
+        :type cmap: matplotlib.colors.ListedColormap
+        :return: Transparent color map
+        :rtype cmap: matplotlib.colors.ListedColormap
+        """
+
+        mycmap = cmap
+        mycmap._init()
+        space = np.logspace(0, 100., N + 4)
+        space[0] = 0
+        mycmap._lut[:, -1] = space
+        return mycmap
+
     def mw_plot(self, x, y, c, title=None):
         """
         NAME: mw_plot
@@ -233,19 +251,6 @@ class MWPlot:
         HISTORY:
             2018-Mar-17 - Written - Henry Leung (University of Toronto)
         """
-        import seaborn as sns
-        import matplotlib
-
-        def transparent_cmap(cmap, N=255):
-            "Copy colormap and set alpha values"
-
-            mycmap = cmap
-            mycmap._init()
-            space = np.logspace(0, 100., N + 4)
-            space[0] = 0
-            mycmap._lut[:, -1] = space
-            return mycmap
-
         cbar_flag = False
 
         if not type(x) == u.quantity.Quantity or not type(y) == u.quantity.Quantity:
@@ -279,7 +284,7 @@ class MWPlot:
         heatmap, xedges, yedges = np.histogram2d(x.value, y.value, bins=250, range=[self.__ext[:2], [self.__ext[3],
                                                                                     self.__ext[2]]])
         ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=self.imalpha)
-        ax.imshow(heatmap.T, extent=self.__ext, cmap=transparent_cmap(plt.get_cmap('Reds')))
+        ax.imshow(heatmap.T, extent=self.__ext, cmap=self.transparent_cmap(plt.get_cmap('Reds')))
 
         if cbar_flag is True:
             divider = make_axes_locatable(ax)
