@@ -71,6 +71,7 @@ Basic Usage
    plot_instance.figsize = (20, 20)
    plot_instance.dpi = 200
    plot_instance.cmap = 'viridis'  # matplotlib cmap: https://matplotlib.org/examples/color/colormaps_reference.html
+   plot_instance.clim = (vmin, vmax) # colorbar range
    plot_instance.imalpha = 0.85  # alpha value for the milkyway image
    plot_instance.s = 50.0  # make the scatter points bigger
    plot_instance.tight_layout = True # whether plt.tight_layout() will be run

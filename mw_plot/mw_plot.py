@@ -64,8 +64,9 @@ class MWPlot:
             self.__resolution = 15.384615846 * u.lyr
         self.__fig = None
         self.mode = mode
+        self.clim = None
 
-        # preprocessing procedure
+        # prepossessing procedure
         self._unit_english = self._unit.long_names[0]
         if self.__center.unit is not None and self.__radius.unit is not None:
             self.__center = self.__center.to(self._unit)
@@ -239,6 +240,8 @@ class MWPlot:
             cbar = plt.colorbar(cax=cax)
             cbar.ax.tick_params(labelsize=self.fontsize)
             cbar.set_label(f"{cbar_label}", size=self.fontsize)
+            if self.clim is not None:
+                cbar.set_clim(self.clim)
 
         ax.tick_params(labelsize=self.fontsize)
 
