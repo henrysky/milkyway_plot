@@ -65,6 +65,7 @@ class MWPlot:
         self.fig = None
         self.ax = None
         self.mode = mode
+        self.cbar_flag = False
         self.clim = None
 
         # prepossessing procedure
@@ -84,7 +85,10 @@ class MWPlot:
 
     def savefig(self, file='MWPlot.png'):
         if self.tight_layout is True:
-            self.fig.tight_layout()
+            if self.cbar_flag is False:  # if no colorbar, it will push the title in wrong place
+                self.fig.tight_layout(rect=[0, 0.00, 1, 0.96])
+            else:  # so no colorbar no problem
+                self.fig.tight_layout()
 
         # this is a pylab method
         self.fig.savefig(file)
@@ -204,8 +208,6 @@ class MWPlot:
         HISTORY:
             2018-Mar-17 - Written - Henry Leung (University of Toronto)
         """
-        cbar_flag = False
-
         if not type(x) == u.quantity.Quantity or not type(y) == u.quantity.Quantity:
             raise TypeError("Both x and y must carry astropy's unit")
         else:
@@ -219,7 +221,7 @@ class MWPlot:
         if isinstance(c, list):
             color = c[0]
             cbar_label = c[1]
-            cbar_flag = True
+            self.cbar_flag = True
             if type(color) == u.quantity.Quantity:
                 color = color.to(self._unit)
         else:
@@ -234,7 +236,7 @@ class MWPlot:
         self.ax.scatter(x, y, zorder=1, s=self.s, c=color, cmap=plt.get_cmap(self.cmap))
         mappable = self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=self.imalpha)
 
-        if cbar_flag is True:
+        if self.cbar_flag is True:
             divider = make_axes_locatable(self.ax)
             cax = divider.append_axes("right", size="5%", pad=0.05)
             cbar = self.fig.colorbar(mappable, cax=cax)
@@ -269,7 +271,7 @@ class MWPlot:
         if isinstance(c, list):
             color = c[0]
             cbar_label = c[1]
-            cbar_flag = True
+            self.cbar_flag = True
             if type(color) == u.quantity.Quantity:
                 color = color.to(self._unit)
         else:
@@ -288,7 +290,7 @@ class MWPlot:
         mappable = self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=self.imalpha)
         self.ax.imshow(heatmap.T, extent=self.__ext, cmap=self.transparent_cmap(plt.get_cmap('Reds')))
 
-        if cbar_flag is True:
+        if self.cbar_flag is True:
             divider = make_axes_locatable(self.ax)
             cax = divider.append_axes("right", size="5%", pad=0.05)
             cbar = plt.colorbar(mappable, cax=cax)
