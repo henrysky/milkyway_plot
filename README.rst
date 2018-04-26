@@ -240,7 +240,7 @@ right handed which is also the expectation of ``mw_plot``
 
    # Use astroNN to load Gaia TGAS DR1 data files
    # cuts=True to cut bad data (negative parallax and percentage error more than 20%)
-   output = tgas_load(dr=1, cuts=True)
+   output = tgas_load(cuts=True)
 
    # outout dictionary
    ra = output['ra'] * u.deg  # ra(J2015)
