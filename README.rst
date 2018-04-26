@@ -214,7 +214,7 @@ the milkyway is not moving.
    plot_instance.s = 50.0  # make the scatter points bigger
 
    # plot
-   plot_instance.mw_plot(x + 8.*u.kpc, y, 'r', 'Orbit of Sun in 10Gyr using galpy')
+   plot_instance.mw_plot(x - 8.*u.kpc, y, 'r', 'Orbit of Sun in 10Gyr using galpy')
 
    # Save the figure
    plot_instance.savefig(file='mw_plot_zoomed.png')

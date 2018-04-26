@@ -33,7 +33,7 @@ class MWPlot:
         :param rot180: whether rotate the image by 180 deg
         :type rot180: bool
         """
-        self.fontsize = 25
+        self.fontsize = 30
         self.s = 1.0
         self.figsize = (20, 20)
         self.dpi = 200
@@ -62,7 +62,8 @@ class MWPlot:
         else:
             self.__pixels = 6500
             self.__resolution = 15.384615846 * u.lyr
-        self.__fig = None
+        self.fig = None
+        self.ax = None
         self.mode = mode
         self.clim = None
 
@@ -83,10 +84,10 @@ class MWPlot:
 
     def savefig(self, file='MWPlot.png'):
         if self.tight_layout is True:
-            plt.tight_layout()
+            self.fig.tight_layout()
 
         # this is a pylab method
-        self.__fig.savefig(file)
+        self.fig.savefig(file)
 
     def images_read(self):
         image_filename = 'MW_bg_annotate.jpg'
@@ -224,30 +225,29 @@ class MWPlot:
         else:
             color = c
 
-        self.__fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
-        plt.title(title, fontsize=self.fontsize)
-        plt.xlabel(f'{self._coord_english} ({self._unit_english})', fontsize=self.fontsize)
-        plt.ylabel(f'{self._coord_english} ({self._unit_english})', fontsize=self.fontsize)
-        ax = plt.gca()
-        ax.set_aspect(self.__aspect)
-        ax.set_facecolor('k')  # have a black color background for image with <1.0 alpha
-        plt.scatter(x, y, zorder=1, s=self.s, c=color, cmap=plt.get_cmap(self.cmap))
-        ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=self.imalpha)
+        self.fig, self.ax = plt.subplots(1, figsize=self.figsize, dpi=self.dpi)
+        self.fig.suptitle(title, fontsize=self.fontsize)
+        self.ax.set_xlabel(f'{self._coord_english} ({self._unit_english})', fontsize=self.fontsize)
+        self.ax.set_ylabel(f'{self._coord_english} ({self._unit_english})', fontsize=self.fontsize)
+        self.ax.set_aspect(self.__aspect)
+        self.ax.set_facecolor('k')  # have a black color background for image with <1.0 alpha
+        self.ax.scatter(x, y, zorder=1, s=self.s, c=color, cmap=plt.get_cmap(self.cmap))
+        mappable = self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=self.imalpha)
 
         if cbar_flag is True:
-            divider = make_axes_locatable(ax)
+            divider = make_axes_locatable(self.ax)
             cax = divider.append_axes("right", size="5%", pad=0.05)
-            cbar = plt.colorbar(cax=cax)
+            cbar = self.fig.colorbar(mappable, cax=cax)
             cbar.ax.tick_params(labelsize=self.fontsize)
             cbar.set_label(f"{cbar_label}", size=self.fontsize)
             if self.clim is not None:
                 cbar.set_clim(self.clim)
 
-        ax.tick_params(labelsize=self.fontsize)
+        self.ax.tick_params(labelsize=self.fontsize)
 
     def mw_density(self, x, y, c, title=None):
         """
-        NAME: mw_density
+        NAME: mw_plot
         PURPOSE:
         INPUT:
         OUTPUT:
@@ -275,25 +275,24 @@ class MWPlot:
         else:
             color = c
 
-        self.__fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
-        plt.title(title, fontsize=self.fontsize)
-        plt.xlabel(f'{self._coord_english} ({self._unit_english})', fontsize=self.fontsize)
-        plt.ylabel(f'{self._coord_english} ({self._unit_english})', fontsize=self.fontsize)
-        ax = plt.gca()
-        ax.set_aspect(self.__aspect)
-        ax.set_facecolor('k')  # have a black color background for image with <1.0 alpha
+        self.fig, self.ax = plt.subplots(1, figsize=self.figsize, dpi=self.dpi)
+        self.fig.suptitle(title, fontsize=self.fontsize)
+        self.ax.set_xlabel(f'{self._coord_english} ({self._unit_english})', fontsize=self.fontsize)
+        self.ax.set_ylabel(f'{self._coord_english} ({self._unit_english})', fontsize=self.fontsize)
+        self.ax.set_aspect(self.__aspect)
+        self.ax.set_facecolor('k')  # have a black color background for image with <1.0 alpha
         # sns.kdeplot(x.value, y.value, gridsize=1000)
         print([self.__ext[:2], self.__ext[3], self.__ext[2]])
         heatmap, xedges, yedges = np.histogram2d(x.value, y.value, bins=250, range=[self.__ext[:2], [self.__ext[3],
                                                                                     self.__ext[2]]])
-        ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=self.imalpha)
-        ax.imshow(heatmap.T, extent=self.__ext, cmap=self.transparent_cmap(plt.get_cmap('Reds')))
+        mappable = self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=self.imalpha)
+        self.ax.imshow(heatmap.T, extent=self.__ext, cmap=self.transparent_cmap(plt.get_cmap('Reds')))
 
         if cbar_flag is True:
-            divider = make_axes_locatable(ax)
+            divider = make_axes_locatable(self.ax)
             cax = divider.append_axes("right", size="5%", pad=0.05)
-            cbar = plt.colorbar(cax=cax)
+            cbar = plt.colorbar(mappable, cax=cax)
             cbar.ax.tick_params(labelsize=self.fontsize)
             cbar.set_label(f"{cbar_label}", size=self.fontsize)
 
-        ax.tick_params(labelsize=self.fontsize)
+        self.ax.tick_params(labelsize=self.fontsize)
