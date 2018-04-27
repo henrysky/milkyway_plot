@@ -47,9 +47,7 @@ OR clone the latest commit of mw_plot from github and install
 To-do list
 ---------------------
 
-- Add lines plotting
 - Add density/contour
-- Plot multiple things at once
 
 Basic Usage
 ---------------------

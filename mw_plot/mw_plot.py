@@ -1,5 +1,5 @@
 import os
-
+import numpy as np
 import pylab as plt
 from astropy import units as u
 from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -85,8 +85,6 @@ class MWPlot:
                 y = y.to(self._unit).value
             else:
                 raise TypeError("Both x, y, center and radius must carry astropy's unit")
-        if kwargs.get('s') is None:
-            kwargs['s'] = self.s
         self.ax.plot(x, y, *args, **kwargs)
         # just want to set the loation right, we dont need image again
         self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0.)
