@@ -167,31 +167,33 @@ You can plot the orbit which are some scatter points on a edge-on milkyway
 
 .. code:: python
 
+    from mw_plot import MWPlot
+
     from galpy.df import streamdf
     from galpy.orbit import Orbit
     from galpy.potential import LogarithmicHaloPotential
     from galpy.actionAngle import actionAngleIsochroneApprox
-    from galpy.util import bovy_conversion #for unit conversions
-    import numpy as np
+    from galpy.util import bovy_conversion  # for unit conversions
     from astropy import units as u
-    from mw_plot import MWPlot
 
     # setup potential
-    lp= LogarithmicHaloPotential(normalize=1.,q=0.9)
+    lp = LogarithmicHaloPotential(normalize=1., q=0.9)
 
     # galpy tidal streams modeling
-    aAI= actionAngleIsochroneApprox(pot=lp,b=0.8)
-    obs= Orbit([0.16148083,0.35081535,-0.15481504,0.48719443,-0.27713334,0.12019596])
-    sigv= 0.365 #km/s
-    sdf= streamdf(sigv/220.,progenitor=obs,pot=lp,aA=aAI,leading=True,nTrackChunks=11,tdisrupt=40./bovy_conversion.time_in_Gyr(220.,8.))
+    aAI = actionAngleIsochroneApprox(pot=lp, b=0.8)
+    obs = Orbit([0.16148083, 0.35081535, -0.15481504, 0.48719443, -0.27713334, 0.12019596])
+    sigv = 0.365  # km/s
+    sdf = streamdf(sigv / 220., progenitor=obs, pot=lp, aA=aAI, leading=True, nTrackChunks=11,
+                   tdisrupt=40. / bovy_conversion.time_in_Gyr(220., 8.))
 
-    x = sdf._parse_track_dim('x',interp=True, phys=True)
-    y = sdf._parse_track_dim('y',interp=True, phys=True) * u.kpc
-    z = sdf._parse_track_dim('z',interp=True, phys=True) * u.kpc
+    x = sdf._parse_track_dim('x', interp=True, phys=True)
+    y = sdf._parse_track_dim('y', interp=True, phys=True) * u.kpc
+    z = sdf._parse_track_dim('z', interp=True, phys=True) * u.kpc
 
     # setup a MWPlot instance
-    plot_instance = MWPlot(mode='edge-on', radius=8.*u.kpc, unit=u.kpc, coord='galactocentric', annotation=True, rot180 = False)
-    plot_instance.s=10.  # make the scatter points bigger
+    plot_instance = MWPlot(mode='edge-on', radius=8. * u.kpc, unit=u.kpc, coord='galactocentric', annotation=True,
+                           rot180=False)
+    plot_instance.s = 10.  # make the scatter points bigger
     plot_instance.imalpha = 1.0
 
     # plot
@@ -210,31 +212,32 @@ You can plot the orbit which are some scatter points on a face-on milkyway
 
 .. code:: python
 
-   from galpy.potential import MWPotential2014
-   from galpy.orbit import Orbit
-   import numpy as np
-   from astropy import units as u
-   from mw_plot import MWPlot
+    from mw_plot import MWPlot
 
-   # Orbit Integration using galpy for the Sun
-   op= Orbit([0.,0.,0.,0.,0.,0.], radec=True, ro=8., vo=220.)
-   ts = np.linspace(0, 20, 10000)
-   op.integrate(ts, MWPotential2014)
-   x = op.x(ts) * u.kpc
-   y = op.y(ts) * u.kpc
-   z = op.z(ts)
+    from galpy.potential import MWPotential2014
+    from galpy.orbit import Orbit
+    import numpy as np
+    from astropy import units as u
 
-   # setup a MWPlot instance
-   plot_instance = MWPlot(radius=20*u.kpc, unit=u.kpc, coord='galactocentric')
-   plot_instance.imalpha = 1.0
-   plot_instance.s = 10
+    # Orbit Integration using galpy for the Sun
+    op = Orbit([0., 0., 0., 0., 0., 0.], radec=True, ro=8., vo=220.)
+    ts = np.linspace(0, 20, 10000)
+    op.integrate(ts, MWPotential2014)
+    x = op.x(ts) * u.kpc
+    y = op.y(ts) * u.kpc
+    z = op.z(ts)
 
-   # plot
-   plot_instance.mw_plot(x, y, [z, 'kpc above galactic plane'],
-   'Orbit of Sun in 20Gyr using galpy colored by kpc above galactic plane')
+    # setup a MWPlot instance
+    plot_instance = MWPlot(radius=20 * u.kpc, unit=u.kpc, coord='galactocentric')
+    plot_instance.imalpha = 1.0
+    plot_instance.s = 10
 
-   # Save the figure
-   plot_instance.savefig(file='mw_plot.png')
+    # plot
+    plot_instance.mw_plot(x, y, [z, 'kpc above galactic plane'],
+                          'Orbit of Sun in 20Gyr using galpy colored by kpc above galactic plane')
+
+    # Save the figure
+    plot_instance.savefig(file='mw_plot.png')
 
    # Show the figure
    plot_instance.show()
@@ -255,29 +258,30 @@ the milkyway is not moving.
 
 .. code:: python
 
-   from galpy.potential import MWPotential2014
-   from galpy.orbit import Orbit
-   import numpy as np
-   from astropy import units as u
-   from mw_plot import MWPlot
+    from mw_plot import MWPlot
 
-   # Orbit Integration using galpy for the Sun
-   op= Orbit([0.,0.,0.,0.,0.,0.], radec=True, ro=8., vo=220.)
-   ts = np.linspace(0, 10, 10000)
-   op.integrate(ts, MWPotential2014)
-   x = op.x(ts) * u.kpc
-   y = op.y(ts) * u.kpc
-   z = op.z(ts)
+    from galpy.potential import MWPotential2014
+    from galpy.orbit import Orbit
+    import numpy as np
+    from astropy import units as u
 
-   # setup a MWPlot instance
-   plot_instance = MWPlot(center=(-16, -2.5)*u.kpc, radius=6*u.kpc, unit=u.kpc, coord='galactic')
-   plot_instance.s = 50.0  # make the scatter points bigger
+    # Orbit Integration using galpy for the Sun
+    op = Orbit([0., 0., 0., 0., 0., 0.], radec=True, ro=8., vo=220.)
+    ts = np.linspace(0, 10, 10000)
+    op.integrate(ts, MWPotential2014)
+    x = op.x(ts) * u.kpc
+    y = op.y(ts) * u.kpc
+    z = op.z(ts)
 
-   # plot
-   plot_instance.mw_plot(x - 8.*u.kpc, y, 'r', 'Orbit of Sun in 10Gyr using galpy')
+    # setup a MWPlot instance
+    plot_instance = MWPlot(center=(-16, -2.5) * u.kpc, radius=6 * u.kpc)
+    plot_instance.s = 50.0  # make the scatter points bigger
 
-   # Save the figure
-   plot_instance.savefig(file='mw_plot_zoomed.png')
+    # plot, need to add 8kpc to shift to galactic coordinates
+    plot_instance.mw_plot(x - 8. * u.kpc, y, 'r', 'Orbit of Sun in 10Gyr using galpy')
+
+    # Save the figure
+    plot_instance.savefig(file='mw_plot_zoomed.png')
 
    # Show the figure
    plot_instance.show()
