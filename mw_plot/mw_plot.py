@@ -1,6 +1,5 @@
 import os
 
-import numpy as np
 import pylab as plt
 from astropy import units as u
 from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -16,7 +15,8 @@ class MWPlot:
         2018-Mar-17 - Written - Henry Leung (University of Toronto)
     """
 
-    def __init__(self, mode='face-on', center=(0,0)*u.kpc, radius=90750*u.lyr, unit=u.kpc, coord='galactic', annotation=True, rot180=False):
+    def __init__(self, mode='face-on', center=(0, 0) * u.kpc, radius=90750 * u.lyr, unit=u.kpc, coord='galactic',
+                 annotation=True, rot180=False):
         """
         ;:param mode: whether plot edge-on or face-on milkyway
         :type mode: string, either 'face-on' or 'edge-on'
@@ -33,7 +33,7 @@ class MWPlot:
         :param rot180: whether rotate the image by 180 deg
         :type rot180: bool
         """
-        self.fontsize = 30
+        self.fontsize = 35
         self.s = 1.0
         self.figsize = (20, 20)
         self.dpi = 200
@@ -76,8 +76,39 @@ class MWPlot:
 
         self.images_read()
 
-    def plot(self, *args, **kwargs):
-        plt.plot(*args, **kwargs)
+    def plot(self, x, y, *args, **kwargs):
+        if not type(x) == u.quantity.Quantity or not type(y) == u.quantity.Quantity:
+            raise TypeError("Both x and y must carry astropy's unit")
+        else:
+            if x.unit is not None and y.unit is not None:
+                x = x.to(self._unit).value
+                y = y.to(self._unit).value
+            else:
+                raise TypeError("Both x, y, center and radius must carry astropy's unit")
+        if kwargs.get('s') is None:
+            kwargs['s'] = self.s
+        self.ax.plot(x, y, *args, **kwargs)
+        # just want to set the loation right, we dont need image again
+        self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0.)
+        if kwargs.get('label') is not None:
+            self.ax.legend(loc='best', fontsize=self.fontsize)
+
+    def scatter(self, x, y, *args, **kwargs):
+        if not type(x) == u.quantity.Quantity or not type(y) == u.quantity.Quantity:
+            raise TypeError("Both x and y must carry astropy's unit")
+        else:
+            if x.unit is not None and y.unit is not None:
+                x = x.to(self._unit).value
+                y = y.to(self._unit).value
+            else:
+                raise TypeError("Both x, y, center and radius must carry astropy's unit")
+        if kwargs.get('s') is None:
+            kwargs['s'] = self.s
+        self.ax.scatter(x, y, *args, **kwargs)
+        # just want to set the loation right, we dont need image again
+        self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0.)
+        if kwargs.get('label') is not None:
+            self.ax.legend(loc='best', fontsize=self.fontsize, markerscale=kwargs['s'])
 
     @staticmethod
     def show(*args, **kwargs):
@@ -167,17 +198,20 @@ class MWPlot:
 
         if self.__rot180:
             img = np.rot90(img, 2)
-            self.__ext = [(self.__center[0] + self.__radius - x_shift).value, (self.__center[0] - self.__radius - x_shift).value,
-                   (self.__center[1] - self.__radius).value, (self.__center[1] + self.__radius).value]
+            self.__ext = [(self.__center[0] + self.__radius - x_shift).value,
+                          (self.__center[0] - self.__radius - x_shift).value,
+                          (self.__center[1] - self.__radius).value, (self.__center[1] + self.__radius).value]
         else:
-            self.__ext = [(self.__center[0] - self.__radius - x_shift).value, (self.__center[0] + self.__radius - x_shift).value,
-                   (self.__center[1] + self.__radius).value, (self.__center[1] - self.__radius).value]
+            self.__ext = [(self.__center[0] - self.__radius - x_shift).value,
+                          (self.__center[0] + self.__radius - x_shift).value,
+                          (self.__center[1] + self.__radius).value, (self.__center[1] - self.__radius).value]
         if self.mode == 'edge-on':
             self.__ext[2] *= -1
             self.__ext[3] *= -1
 
         self.__img = img
-        self.__aspect = img.shape[0] / float(img.shape[1]) * ((self.__ext[1] - self.__ext[0]) / (self.__ext[3] - self.__ext[2]))
+        self.__aspect = img.shape[0] / float(img.shape[1]) * (
+                    (self.__ext[1] - self.__ext[0]) / (self.__ext[3] - self.__ext[2]))
 
         return None
 
@@ -223,7 +257,7 @@ class MWPlot:
             cbar_label = c[1]
             self.cbar_flag = True
             if type(color) == u.quantity.Quantity:
-                color = color.to(self._unit)
+                color = color.to(self._unit).value
         else:
             color = c
 
@@ -233,19 +267,19 @@ class MWPlot:
         self.ax.set_ylabel(f'{self._coord_english} ({self._unit_english})', fontsize=self.fontsize)
         self.ax.set_aspect(self.__aspect)
         self.ax.set_facecolor('k')  # have a black color background for image with <1.0 alpha
-        self.ax.scatter(x, y, zorder=1, s=self.s, c=color, cmap=plt.get_cmap(self.cmap))
-        mappable = self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=self.imalpha)
+        mappable = self.ax.scatter(x, y, zorder=1, s=self.s, c=color, cmap=plt.get_cmap(self.cmap))
+        self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=self.imalpha)
 
         if self.cbar_flag is True:
             divider = make_axes_locatable(self.ax)
             cax = divider.append_axes("right", size="5%", pad=0.05)
             cbar = self.fig.colorbar(mappable, cax=cax)
-            cbar.ax.tick_params(labelsize=self.fontsize)
+            cbar.ax.tick_params(labelsize=self.fontsize * 0.8, width=self.fontsize / 10, length=self.fontsize / 2)
             cbar.set_label(f"{cbar_label}", size=self.fontsize)
             if self.clim is not None:
                 cbar.set_clim(self.clim)
 
-        self.ax.tick_params(labelsize=self.fontsize)
+        self.ax.tick_params(labelsize=self.fontsize * 0.8, width=self.fontsize / 10, length=self.fontsize / 2)
 
     def mw_density(self, x, y, c, title=None):
         """
@@ -286,9 +320,9 @@ class MWPlot:
         # sns.kdeplot(x.value, y.value, gridsize=1000)
         print([self.__ext[:2], self.__ext[3], self.__ext[2]])
         heatmap, xedges, yedges = np.histogram2d(x.value, y.value, bins=250, range=[self.__ext[:2], [self.__ext[3],
-                                                                                    self.__ext[2]]])
-        mappable = self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=self.imalpha)
-        self.ax.imshow(heatmap.T, extent=self.__ext, cmap=self.transparent_cmap(plt.get_cmap('Reds')))
+                                                                                                     self.__ext[2]]])
+        self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=self.imalpha)
+        mappable = self.ax.imshow(heatmap.T, extent=self.__ext, cmap=self.transparent_cmap(plt.get_cmap('Reds')))
 
         if self.cbar_flag is True:
             divider = make_axes_locatable(self.ax)

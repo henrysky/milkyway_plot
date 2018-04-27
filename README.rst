@@ -98,7 +98,67 @@ There are also some handy constants you can import
    # center_coord refers to the [RA, DEC] of galactic center in deg
    # anti_center_coord refers to the [RA, DEC] of galactic anti-center in deg
 
-Example 1: Plot Dynamical Modeling of Tidal Stream using galpy
+Example 1: Plot Gaia DR1 and DR2 Observation with astroNN in Galactic coordinates
+------------------------------------------------------------------------------------
+
+.. image:: https://github.com/henrysky/milkyway_plot/blob/master/readme_images/example_plot_gaia.png?raw=true
+
+You can set the coord to ``galactic`` to plot observation from Gaia. Please notice if you are using astropy's
+coordinates transformation, they will transform under left handed frame, you have to set x = -x to flip it to
+right handed which is also the expectation of ``mw_plot``
+
+.. code:: python
+
+    from mw_plot import MWPlot
+
+    from astropy import units as  u
+    import astropy.coordinates as apycoords
+    import numpy as np
+
+    from astroNN.gaia import gaiadr2_parallax
+    from astroNN.gaia import tgas_load
+
+    # To load Gaia DR2 - APOGEE DR14 matches, indices corresponds to APOGEE allstar DR14 file
+    ra, dec, parallax, parallax_error = gaiadr2_parallax(cuts=True, keepdims=False)
+    distance = 1 / parallax * u.kpc
+    ra = ra * u.deg
+    dec = dec * u.deg
+    distance_err = parallax_error / parallax
+    c = apycoords.SkyCoord(ra=ra, dec=dec, distance=distance, frame='icrs')
+
+    # Gaia DR1
+    # To load the tgas DR1 files and return a dictionary of ra(J2015), dec(J2015), pmra, pmdec, parallax, parallax error, g-band mag
+    # cuts=True to cut bad data (negative parallax and percentage error more than 20%)
+    output = tgas_load(cuts=True)
+    ra1 = output['ra'] * u.deg  # ra(J2015)
+    dec1 = output['dec'] * u.deg  # dec(J2015)
+    distance1 = 1 / output['parallax'] * u.kpc
+    distance_err1 = output['parallax_err'] / output['parallax']
+    c_dr1 = apycoords.SkyCoord(ra=ra1, dec=dec1, distance=distance1, frame='icrs')
+
+    # setup a MWPlot instance
+    plot_instance = MWPlot(radius=12 * u.kpc, unit=u.kpc, coord='galactic')
+
+    # so that the colorbar will has a better contract
+    plot_instance.clim = (5., 15.)
+
+    # alpha value for the milkyway image
+    plot_instance.imalpha = 0.5
+
+    # plot, need to flip the sign of x because astropy is left-handed but mw_plot is right-handed
+    plot_instance.mw_plot(-c.galactic.cartesian.x, c.galactic.cartesian.y,
+                          [distance_err * 100, 'Gaia DR2 Distance Precentage Error'],
+                          'Gaia DR2-APOGEE DR14 matches Distance with 20% error cuts')
+
+    # On top of the main plot for DR2, plot DR1 too, need to flip the sign of x because astropy is left-handed but mw_plot is right-handed
+    plot_instance.scatter(-c_dr1.galactic.cartesian.x, c_dr1.galactic.cartesian.y, c='r',
+                          label='Gaia DR1 with 20% distances error cut (Red)')
+
+    # Save the figure
+    plot_instance.savefig(file='gaia.png')
+
+
+Example 2: Plot Dynamical Modeling of Tidal Stream using galpy
 -----------------------------------------------------------------
 
 .. image:: https://github.com/henrysky/milkyway_plot/blob/master/readme_images/tidal_streams_plot.png?raw=true
@@ -141,7 +201,7 @@ You can plot the orbit which are some scatter points on a edge-on milkyway
     # Save the figure
     plot_instance.savefig(file='tidal_streams_plot.png')
 
-Example 2: Plot Orbit of Sun Integrated by galpy
+Example 3: Plot Orbit of Sun Integrated by galpy
 -------------------------------------------------------
 
 .. image:: https://github.com/henrysky/milkyway_plot/blob/master/readme_images/example_plot_1.png?raw=true
@@ -183,7 +243,7 @@ You can turn off the annotation by putting ``annotation=False`` when creating an
 
 .. image:: https://github.com/henrysky/milkyway_plot/blob/master/readme_images/example_plot_1_unannotation.png?raw=true
 
-Example 3: Change the Center and Radius of the Plot
+Example 4: Change the Center and Radius of the Plot
 ---------------------------------------------------------
 
 .. image:: https://github.com/henrysky/milkyway_plot/blob/master/readme_images/example_plot_2.png?raw=true
@@ -221,51 +281,6 @@ the milkyway is not moving.
 
    # Show the figure
    plot_instance.show()
-
-Example 4: Plot Gaia DR1 Observation with astroNN in Galactic coordinates
-------------------------------------------------------------------------------------
-
-.. image:: https://github.com/henrysky/milkyway_plot/blob/master/readme_images/example_plot_gaia.png?raw=true
-
-You can set the coord to ``galactic`` to plot observation from Gaia. Please notice if you are using astropy's
-coordinates transformation, they will transform under left handed frame, you have to set x = -x to flip it to
-right handed which is also the expectation of ``mw_plot``
-
-.. code:: python
-
-   from mw_plot import MWPlot
-   from astroNN.gaia import tgas_load
-   from astropy import units as  u
-   import astropy.coordinates as apycoords
-
-   # Use astroNN to load Gaia TGAS DR1 data files
-   # cuts=True to cut bad data (negative parallax and percentage error more than 20%)
-   output = tgas_load(cuts=True)
-
-   # outout dictionary
-   ra = output['ra'] * u.deg  # ra(J2015)
-   dec = output['dec'] * u.deg  # dec(J2015)
-   parallax = output['parallax']  # parallax
-   distance = 1 / parallax * u.kpc
-
-   # percentage error
-   distance_err = output['parallax_err'] / output['parallax']
-
-   # use astropy coordinates tranformation
-   c = apycoords.SkyCoord(ra=ra, dec=dec, distance=distance, frame='icrs')
-
-   # setup a MWPlot instance
-   # use galactic coordinates because Gaia observations are from Earth
-   plot_instance = MWPlot(radius=5*u.kpc, unit=u.kpc, coord='galactic')
-
-   plot_instance.s = 50.0  # make the scatter points bigger
-
-   # plot, need to flip the sign of x because astropy is left-handed but mw_plot is right-handed
-   plot_instance.mw_plot(-c.galactic.cartesian.x, c.galactic.cartesian.y, [distance_err, 'Gaia Distance Precentage Error'],
-                      'Gaia TGAS Distance with 20% error cuts')
-
-   # Save the figure
-   plot_instance.savefig(file='gaia.png')
 
 License
 ---------------------------------------------------------
