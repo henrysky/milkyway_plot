@@ -57,17 +57,21 @@ Basic Usage
    from astropy import units as u
    from mw_plot import MWPlot
 
-   # setup a MWPlot instance, you have to specify center, radius coordinates, unit with astropy unit and choice of coord
+   # setup MWPlot instance, you have to specify center, radius, unit with astropy unit and choice of coord
    # or not specifying any to use default value shown below
-   # center: Coordinates of the center of the plot, radius: Radius of the plot
-   # coord: can be 'galactocentric' or 'galactic', annotation: whether use a milkyway background with annotation
+   # center: Coordinates of the center of the plot
+   # radius: Radius of the plot
+   # coord: can be 'galactocentric' or 'galactic'
+   # annotation: whether use a milkyway background with annotation
    # mode: can be 'face-on' or 'edge-on'
-   plot_instance = MWPlot(mode='face-on', center=(0, 0)*u.kpc, radius=90750*u.lyr, unit=u.kpc, coord='galactic', annotation=True, rot180=False)
 
-   # Here are some setting you can set
-   plot_instance.fontsize = 25  # fontsize for pylab plotting
-   plot_instance.figsize = (20, 20)
-   plot_instance.dpi = 200
+   plot_instance = MWPlot(mode='face-on', center=(0, 0)*u.kpc, radius=90750*u.lyr,
+                          unit=u.kpc, coord='galactic', annotation=True, rot180=False)
+
+   # Here are some setting you can set after setting up a MWPlot instance
+   plot_instance.fontsize = 35  # fontsize for matplotlib plotting
+   plot_instance.figsize = (20, 20)  # figsize for matplotlib plotting
+   plot_instance.dpi = 200  # dpi for matplotlib plotting
    plot_instance.cmap = 'viridis'  # matplotlib cmap: https://matplotlib.org/examples/color/colormaps_reference.html
    plot_instance.clim = (vmin, vmax) # colorbar range
    plot_instance.imalpha = 0.85  # alpha value for the milkyway image

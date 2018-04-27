@@ -76,7 +76,7 @@ class MWPlot:
 
         self.images_read()
 
-    def plot(self, x, y, *args, **kwargs):
+    def xy_unit_check(self, x, y):
         if not type(x) == u.quantity.Quantity or not type(y) == u.quantity.Quantity:
             raise TypeError("Both x and y must carry astropy's unit")
         else:
@@ -85,6 +85,10 @@ class MWPlot:
                 y = y.to(self._unit).value
             else:
                 raise TypeError("Both x, y, center and radius must carry astropy's unit")
+        return x, y
+
+    def plot(self, x, y, *args, **kwargs):
+        x, y = self.xy_unit_check(x, y)
         self.ax.plot(x, y, *args, **kwargs)
         # just want to set the loation right, we dont need image again
         self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0.)
@@ -92,14 +96,7 @@ class MWPlot:
             self.ax.legend(loc='best', fontsize=self.fontsize)
 
     def scatter(self, x, y, *args, **kwargs):
-        if not type(x) == u.quantity.Quantity or not type(y) == u.quantity.Quantity:
-            raise TypeError("Both x and y must carry astropy's unit")
-        else:
-            if x.unit is not None and y.unit is not None:
-                x = x.to(self._unit).value
-                y = y.to(self._unit).value
-            else:
-                raise TypeError("Both x, y, center and radius must carry astropy's unit")
+        x, y = self.xy_unit_check(x, y)
         if kwargs.get('s') is None:
             kwargs['s'] = self.s
         self.ax.scatter(x, y, *args, **kwargs)
@@ -108,9 +105,21 @@ class MWPlot:
         if kwargs.get('label') is not None:
             self.ax.legend(loc='best', fontsize=self.fontsize, markerscale=kwargs['s'])
 
-    @staticmethod
-    def show(*args, **kwargs):
-        plt.show(*args, **kwargs)
+    def hist2d(self, x, y, *args, **kwargs):
+        x, y = self.xy_unit_check(x, y)
+        if kwargs.get('cmap') is None:
+            kwargs['cmap'] = self.cmap
+        kwargs['cmap'] = self.transparent_cmap(kwargs['cmap'])
+        if kwargs.get('range') is None:
+            kwargs['range'] = np.array([[self.__ext[0], self.__ext[1]],[self.__ext[2], self.__ext[3]]])
+        self.ax.hist2d(x, y, *args, **kwargs)
+        # just want to set the loation right, we dont need image again
+        self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0.)
+        if kwargs.get('label') is not None:
+            self.ax.legend(loc='best', fontsize=self.fontsize)
+
+    def show(self, *args, **kwargs):
+        self.fig.show(*args, **kwargs)
 
     def savefig(self, file='MWPlot.png'):
         if self.tight_layout is True:
@@ -219,19 +228,21 @@ class MWPlot:
         Copy colormap and set alpha values
 
         :param cmap: Color map to covert to transparent color map
-        :type cmap: matplotlib.colors.ListedColormap
+        :type cmap: Union([matplotlib.colors.ListedColormap, str])
+        :param N: Color map to covert to transparent color map
+        :type N: int
         :return: Transparent color map
         :rtype cmap: matplotlib.colors.ListedColormap
         """
-
-        mycmap = cmap
+        if type(cmap) == str:
+            mycmap = plt.get_cmap(cmap)
+        else:
+            mycmap = cmap
         mycmap._init()
-        space = np.logspace(0, 100., N + 4)
-        space[0] = 0
-        mycmap._lut[:, -1] = space
+        mycmap._lut[0, -1] = 0
         return mycmap
 
-    def mw_plot(self, x, y, c, title=None):
+    def mw_plot(self, x, y, c, title=None, **kwargs):
         """
         NAME: mw_plot
         PURPOSE:
@@ -240,14 +251,7 @@ class MWPlot:
         HISTORY:
             2018-Mar-17 - Written - Henry Leung (University of Toronto)
         """
-        if not type(x) == u.quantity.Quantity or not type(y) == u.quantity.Quantity:
-            raise TypeError("Both x and y must carry astropy's unit")
-        else:
-            if x.unit is not None and y.unit is not None:
-                x = x.to(self._unit)
-                y = y.to(self._unit)
-            else:
-                raise TypeError("Both x, y, center and radius must carry astropy's unit")
+        x, y = self.xy_unit_check(x, y)
 
         # decide whether we need colorbar or not
         if isinstance(c, list):
@@ -265,7 +269,7 @@ class MWPlot:
         self.ax.set_ylabel(f'{self._coord_english} ({self._unit_english})', fontsize=self.fontsize)
         self.ax.set_aspect(self.__aspect)
         self.ax.set_facecolor('k')  # have a black color background for image with <1.0 alpha
-        mappable = self.ax.scatter(x, y, zorder=1, s=self.s, c=color, cmap=plt.get_cmap(self.cmap))
+        mappable = self.ax.scatter(x, y, zorder=1, s=self.s, c=color, cmap=plt.get_cmap(self.cmap), **kwargs)
         self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=self.imalpha)
 
         if self.cbar_flag is True:
