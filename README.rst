@@ -159,6 +159,9 @@ right handed which is also the expectation of ``mw_plot``
     # Save the figure
     plot_instance.savefig(file='gaia.png')
 
+Or plotting with Gaia Source with RV catalog (No code is prvided but you should be able to modify the code above to do that)
+
+.. image:: https://github.com/henrysky/milkyway_plot/blob/master/readme_images/gaiadr2_rv_combined.png?raw=true
 
 Example 2: Plot Dynamical Modeling of Tidal Stream using galpy
 -----------------------------------------------------------------
