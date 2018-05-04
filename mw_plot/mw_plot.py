@@ -7,25 +7,19 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 class MWPlot:
     """
-    NAME: MWPlot
-    PURPOSE:
-    INPUT:
-    OUTPUT:
-    HISTORY:
-        2018-Mar-17 - Written - Henry Leung (University of Toronto)
+    MWPlot class
     """
-
     def __init__(self, mode='face-on', center=(0, 0) * u.kpc, radius=90750 * u.lyr, unit=u.kpc, coord='galactic',
                  annotation=True, rot180=False):
         """
         ;:param mode: whether plot edge-on or face-on milkyway
         :type mode: string, either 'face-on' or 'edge-on'
         :param center: Coordinates of the center of the plot with astropy units
-        :type center: u.quantity.Quantity
+        :type center: astropy.Quantity
         :param radius: Radius of the plot with astropy units
-        :type radius: u.quantity.Quantity
+        :type radius: astropy.Quantity
         :param unit: astropy units
-        :type unit: u.quantity.Quantity
+        :type unit: astropy.Quantity
         :param coord: 'galactocentric' or 'galactic'
         :type coord: str
         :param annotation: whether use a milkyway background with annotation
@@ -228,7 +222,7 @@ class MWPlot:
         Copy colormap and set alpha values
 
         :param cmap: Color map to covert to transparent color map
-        :type cmap: Union([matplotlib.colors.ListedColormap, str])
+        :type cmap: Union[matplotlib.colors.ListedColormap, str]
         :param N: Color map to covert to transparent color map
         :type N: int
         :return: Transparent color map
@@ -244,12 +238,17 @@ class MWPlot:
 
     def mw_plot(self, x, y, c, title=None, **kwargs):
         """
-        NAME: mw_plot
-        PURPOSE:
-        INPUT:
-        OUTPUT:
-        HISTORY:
-            2018-Mar-17 - Written - Henry Leung (University of Toronto)
+        Initial mw_plot with scatter points
+
+        :param x: Scatter points x-coordinates on the plot
+        :type x: astropy.Quantity
+        :param y: Scatter points y-coordinates on the plot
+        :type y: astropy.Quantity
+        :param c: Scatter points color
+        :type c: Union[str, list, ndarry]
+        :param title: Plot title
+        :type title: str
+        :History: 2018-Mar-17 - Written - Henry Leung (University of Toronto)
         """
         x, y = self.xy_unit_check(x, y)
 
@@ -285,12 +284,17 @@ class MWPlot:
 
     def mw_density(self, x, y, c, title=None):
         """
-        NAME: mw_plot
-        PURPOSE:
-        INPUT:
-        OUTPUT:
-        HISTORY:
-            2018-Mar-17 - Written - Henry Leung (University of Toronto)
+        Initial mw_plot with density points (In development)
+
+        :param x: Scatter points x-coordinates on the plot
+        :type x: astropy.Quantity
+        :param y: Scatter points y-coordinates on the plot
+        :type y: astropy.Quantity
+        :param c: Scatter points color
+        :type c: Union[str, list, ndarry]
+        :param title: Plot title
+        :type title: str
+        :History: 2018-Mar-17 - Written - Henry Leung (University of Toronto)
         """
         cbar_flag = False
 
