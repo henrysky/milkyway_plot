@@ -58,6 +58,7 @@ class MWPlot:
             self.__resolution = 15.384615846 * u.lyr
         self.fig = None
         self.ax = None
+        self.title = None
         self.mode = mode
         self.cbar_flag = False
         self.clim = None
@@ -83,6 +84,7 @@ class MWPlot:
 
     def plot(self, x, y, *args, **kwargs):
         x, y = self.xy_unit_check(x, y)
+        self.initialize_mwplot()
         self.ax.plot(x, y, *args, **kwargs)
         # just want to set the loation right, we dont need image again
         self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0.)
@@ -91,6 +93,7 @@ class MWPlot:
 
     def scatter(self, x, y, *args, **kwargs):
         x, y = self.xy_unit_check(x, y)
+        self.initialize_mwplot()
         if kwargs.get('s') is None:
             kwargs['s'] = self.s
         self.ax.scatter(x, y, *args, **kwargs)
@@ -101,6 +104,7 @@ class MWPlot:
 
     def hist2d(self, x, y, *args, **kwargs):
         x, y = self.xy_unit_check(x, y)
+        self.initialize_mwplot()
         if kwargs.get('cmap') is None:
             kwargs['cmap'] = self.cmap
         kwargs['cmap'] = self.transparent_cmap(kwargs['cmap'])
@@ -113,15 +117,22 @@ class MWPlot:
             self.ax.legend(loc='best', fontsize=self.fontsize)
 
     def show(self, *args, **kwargs):
-        self.fig.show(*args, **kwargs)
+        if self.fig is None:
+            raise AttributeError('Nothing to show, please plot some data first')
+        else:
+            if self.tight_layout is True:
+                if self.cbar_flag is False:  # if no colorbar, it will push the title in wrong place
+                    self.fig.tight_layout(rect=[0, 0.00, 1, 0.96])
+                else:  # so no colorbar no problem
+                    self.fig.tight_layout(rect=[0, 0.00, 1, 1.05])
+            self.fig.show(*args, **kwargs)
 
     def savefig(self, file='MWPlot.png'):
         if self.tight_layout is True:
             if self.cbar_flag is False:  # if no colorbar, it will push the title in wrong place
                 self.fig.tight_layout(rect=[0, 0.00, 1, 0.96])
             else:  # so no colorbar no problem
-                self.fig.tight_layout()
-
+                self.fig.tight_layout(rect=[0, 0.00, 1, 1.05])
         # this is a pylab method
         self.fig.savefig(file)
 
@@ -236,9 +247,63 @@ class MWPlot:
         mycmap._lut[0, -1] = 0
         return mycmap
 
-    def mw_plot(self, x, y, c, title=None, **kwargs):
+    def initialize_mwplot(self):
         """
-        Initial mw_plot with scatter points
+        Initial mw_plot images and plot
+
+        :return: None
+        """
+        if self.fig is None:
+            self.fig, self.ax = plt.subplots(1, figsize=self.figsize, dpi=self.dpi)
+            if self.title is not None:
+                self.fig.suptitle(self.title, fontsize=self.fontsize)
+            self.ax.set_xlabel(f'{self._coord_english} ({self._unit_english})', fontsize=self.fontsize)
+            self.ax.set_ylabel(f'{self._coord_english} ({self._unit_english})', fontsize=self.fontsize)
+            self.ax.set_aspect(self.__aspect)
+            self.ax.set_facecolor('k')  # have a black color background for image with <1.0 alpha
+            self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=self.imalpha)
+            self.ax.tick_params(labelsize=self.fontsize * 0.8, width=self.fontsize / 10, length=self.fontsize / 2)
+
+    def mw_scatter(self, x, y, c, **kwargs):
+        """
+        Plot scatter points with colorbar
+
+        :param x: Scatter points x-coordinates on the plot
+        :type x: astropy.Quantity
+        :param y: Scatter points y-coordinates on the plot
+        :type y: astropy.Quantity
+        :param c: Scatter points color
+        :type c: Union[str, list, ndarry]
+        :History: 2018-Mar-17 - Written - Henry Leung (University of Toronto)
+        """
+        x, y = self.xy_unit_check(x, y)
+        self.initialize_mwplot()
+
+        # decide whether we need colorbar or not
+        if isinstance(c, list):
+            color = c[0]
+            cbar_label = c[1]
+            self.cbar_flag = True
+            if type(color) == u.quantity.Quantity:
+                color = color.to(self._unit).value
+        else:
+            color = c
+
+        mappable = self.ax.scatter(x, y, zorder=1, s=self.s, c=color, cmap=plt.get_cmap(self.cmap), **kwargs)
+        self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0.)
+
+        if self.cbar_flag is True:
+            divider = make_axes_locatable(self.ax)
+            cax = divider.append_axes("right", size="5%", pad=0.05)
+            cbar = self.fig.colorbar(mappable, cax=cax)
+            cbar.ax.tick_params(labelsize=self.fontsize * 0.8, width=self.fontsize / 10, length=self.fontsize / 2)
+            cbar.set_label(f"{cbar_label}", size=self.fontsize)
+            if self.clim is not None:
+                cbar.set_clim(self.clim)
+
+    def mw_density(self, x, y, c, **kwargs):
+        """
+        Plot desnity with colorbar
 
         :param x: Scatter points x-coordinates on the plot
         :type x: astropy.Quantity
@@ -251,52 +316,7 @@ class MWPlot:
         :History: 2018-Mar-17 - Written - Henry Leung (University of Toronto)
         """
         x, y = self.xy_unit_check(x, y)
-
-        # decide whether we need colorbar or not
-        if isinstance(c, list):
-            color = c[0]
-            cbar_label = c[1]
-            self.cbar_flag = True
-            if type(color) == u.quantity.Quantity:
-                color = color.to(self._unit).value
-        else:
-            color = c
-
-        self.fig, self.ax = plt.subplots(1, figsize=self.figsize, dpi=self.dpi)
-        self.fig.suptitle(title, fontsize=self.fontsize)
-        self.ax.set_xlabel(f'{self._coord_english} ({self._unit_english})', fontsize=self.fontsize)
-        self.ax.set_ylabel(f'{self._coord_english} ({self._unit_english})', fontsize=self.fontsize)
-        self.ax.set_aspect(self.__aspect)
-        self.ax.set_facecolor('k')  # have a black color background for image with <1.0 alpha
-        mappable = self.ax.scatter(x, y, zorder=1, s=self.s, c=color, cmap=plt.get_cmap(self.cmap), **kwargs)
-        self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=self.imalpha)
-
-        if self.cbar_flag is True:
-            divider = make_axes_locatable(self.ax)
-            cax = divider.append_axes("right", size="5%", pad=0.05)
-            cbar = self.fig.colorbar(mappable, cax=cax)
-            cbar.ax.tick_params(labelsize=self.fontsize * 0.8, width=self.fontsize / 10, length=self.fontsize / 2)
-            cbar.set_label(f"{cbar_label}", size=self.fontsize)
-            if self.clim is not None:
-                cbar.set_clim(self.clim)
-
-        self.ax.tick_params(labelsize=self.fontsize * 0.8, width=self.fontsize / 10, length=self.fontsize / 2)
-
-    def mw_density(self, x, y, c, title=None):
-        """
-        Initial mw_plot with density points (In development)
-
-        :param x: Scatter points x-coordinates on the plot
-        :type x: astropy.Quantity
-        :param y: Scatter points y-coordinates on the plot
-        :type y: astropy.Quantity
-        :param c: Scatter points color
-        :type c: Union[str, list, ndarry]
-        :param title: Plot title
-        :type title: str
-        :History: 2018-Mar-17 - Written - Henry Leung (University of Toronto)
-        """
-        cbar_flag = False
+        self.initialize_mwplot()
 
         if not type(x) == u.quantity.Quantity or not type(y) == u.quantity.Quantity:
             raise TypeError("Both x and y must carry astropy's unit")
@@ -317,24 +337,16 @@ class MWPlot:
         else:
             color = c
 
-        self.fig, self.ax = plt.subplots(1, figsize=self.figsize, dpi=self.dpi)
-        self.fig.suptitle(title, fontsize=self.fontsize)
-        self.ax.set_xlabel(f'{self._coord_english} ({self._unit_english})', fontsize=self.fontsize)
-        self.ax.set_ylabel(f'{self._coord_english} ({self._unit_english})', fontsize=self.fontsize)
-        self.ax.set_aspect(self.__aspect)
-        self.ax.set_facecolor('k')  # have a black color background for image with <1.0 alpha
-        # sns.kdeplot(x.value, y.value, gridsize=1000)
-        print([self.__ext[:2], self.__ext[3], self.__ext[2]])
         heatmap, xedges, yedges = np.histogram2d(x.value, y.value, bins=250, range=[self.__ext[:2], [self.__ext[3],
                                                                                                      self.__ext[2]]])
-        self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=self.imalpha)
         mappable = self.ax.imshow(heatmap.T, extent=self.__ext, cmap=self.transparent_cmap(plt.get_cmap('Reds')))
+        self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0.0)
 
         if self.cbar_flag is True:
             divider = make_axes_locatable(self.ax)
             cax = divider.append_axes("right", size="5%", pad=0.05)
-            cbar = plt.colorbar(mappable, cax=cax)
-            cbar.ax.tick_params(labelsize=self.fontsize)
+            cbar = self.fig.colorbar(mappable, cax=cax)
+            cbar.ax.tick_params(labelsize=self.fontsize * 0.8, width=self.fontsize / 10, length=self.fontsize / 2)
             cbar.set_label(f"{cbar_label}", size=self.fontsize)
-
-        self.ax.tick_params(labelsize=self.fontsize)
+            if self.clim is not None:
+                cbar.set_clim(self.clim)

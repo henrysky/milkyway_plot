@@ -1,7 +1,7 @@
 mw_plot
 ========
 
-A handy python script to plot scatters (so far, will support more later) on a face-on/edge-on milkyway using pylab.
+A handy python package to do plotting on a face-on/edge-on milkyway with matplotlib.
 You can set the center and radius of the plot anywhere on a milkyway galaxy image with galactic or galactocentric coordinates.
 
 Both ``MW_bg_annotate.jpg`` and ``MW_bg_unannotate.jpg`` are modified from an images by **NASA/JPL-Caltech/R. Hurt (SSC/Caltech)**
@@ -37,6 +37,12 @@ To install via ``pip``
 
    $ pip install mw_plot
 
+If something is not working properly, try to upgrade first and then report it as an issue
+
+.. code-block:: bash
+
+   $ pip install mw_plot --upgrade
+
 OR clone the latest commit of mw_plot from github and install
 
 .. code-block:: bash
@@ -69,6 +75,7 @@ Basic Usage
                           unit=u.kpc, coord='galactic', annotation=True, rot180=False)
 
    # Here are some setting you can set after setting up a MWPlot instance
+   plot_instance.title = 'you title here'  # plot title, or it can be None to show no title
    plot_instance.fontsize = 35  # fontsize for matplotlib plotting
    plot_instance.figsize = (20, 20)  # figsize for matplotlib plotting
    plot_instance.dpi = 200  # dpi for matplotlib plotting
@@ -78,13 +85,9 @@ Basic Usage
    plot_instance.s = 50.0  # make the scatter points bigger
    plot_instance.tight_layout = True # whether plt.tight_layout() will be run
 
-   # Here is the mw_plot if you have an array to color the point
+   # Here is the mw_scatter if you have an array to color the point
    # x and y must both carry astropy unit
-   plot_instance.mw_plot(x, y, [z, 'colorbar_title'], 'Title of the plot here')
-
-   # Here is the mw_plot if you do not have array to color the point
-   # x and y must both carry astropy unit
-   plot_instance.mw_plot(x, y, 'scatter_point_color_here', 'Title of the plot here')
+   plot_instance.mw_scatter(x, y, [z, 'colorbar_title'])
 
    # To show
    plot_instance.show()
@@ -129,7 +132,8 @@ right handed which is also the expectation of ``mw_plot``
     c = apycoords.SkyCoord(ra=ra, dec=dec, distance=distance, frame='icrs')
 
     # Gaia DR1
-    # To load the tgas DR1 files and return a dictionary of ra(J2015), dec(J2015), pmra, pmdec, parallax, parallax error, g-band mag
+    # To load the tgas DR1 files and return a dictionary of ra(J2015), dec(J2015), pmra, pmdec,
+    # parallax, parallax error, g-band mag
     # cuts=True to cut bad data (negative parallax and percentage error more than 20%)
     output = tgas_load(cuts=True)
     ra1 = output['ra'] * u.deg  # ra(J2015)
@@ -147,12 +151,16 @@ right handed which is also the expectation of ``mw_plot``
     # alpha value for the milkyway image
     plot_instance.imalpha = 0.5
 
-    # plot, need to flip the sign of x because astropy is left-handed but mw_plot is right-handed
-    plot_instance.mw_plot(-c.galactic.cartesian.x, c.galactic.cartesian.y,
-                          [distance_err * 100, 'Gaia DR2 Distance Precentage Error'],
-                          'Gaia DR2-APOGEE DR14 matches Distance with 20% error cuts')
+    # set up plot title
+    plot_instance.title = 'Gaia DR2-APOGEE DR14 matches Distance with 20% error cuts'
 
-    # On top of the main plot for DR2, plot DR1 too, need to flip the sign of x because astropy is left-handed but mw_plot is right-handed
+    # use mw_scatter instead of scatter because we want a colorbar
+    # need to flip the sign of x because astropy is left-handed but mw_plot is right-handed
+    plot_instance.mw_scatter(-c.galactic.cartesian.x, c.galactic.cartesian.y,
+                             [distance_err * 100, 'Gaia DR2 Distance Precentage Error'])
+
+    # On top of the main plot for DR2, plot DR1 too, need to flip the sign of x because astropy is l
+    # eft-handed but mw_plot is right-handed
     plot_instance.scatter(-c_dr1.galactic.cartesian.x, c_dr1.galactic.cartesian.y, c='r',
                           label='Gaia DR1 with 20% distances error cut (Red)')
 
@@ -196,14 +204,15 @@ You can plot the orbit which are some scatter points on a edge-on milkyway
     z = sdf._parse_track_dim('z', interp=True, phys=True) * u.kpc
 
     # setup a MWPlot instance
-    plot_instance = MWPlot(mode='edge-on', radius=8. * u.kpc, unit=u.kpc, coord='galactocentric', annotation=True,
-                           rot180=False)
+    plot_instance = MWPlot(mode='edge-on', radius=8. * u.kpc, unit=u.kpc, coord='galactocentric')
     plot_instance.s = 10.  # make the scatter points bigger
     plot_instance.imalpha = 1.0
 
-    # plot
-    plot_instance.mw_plot(y, z, [x, 'kpc in x-coordinates'],
-                          'Dynamical modeling of tidal streams using galpy')
+    # set up plot title
+    plot_instance.title = 'Orbit of Sun in 20Gyr using galpy colored by kpc above galactic plane'
+
+    # plot line of the orbit with red color and thicker line
+    plot_instance.plot(y, z, c='r', linewidth=4.0)
 
     # Save the figure
     plot_instance.savefig(file='tidal_streams_plot.png')
@@ -233,19 +242,21 @@ You can plot the orbit which are some scatter points on a face-on milkyway
     z = op.z(ts)
 
     # setup a MWPlot instance
-    plot_instance = MWPlot(radius=20 * u.kpc, unit=u.kpc, coord='galactocentric')
+    plot_instance = MWPlot(radius=20 * u.kpc, unit=u.kpc, coord='galactocentric', annotation=True)
     plot_instance.imalpha = 1.0
-    plot_instance.s = 10
+    plot_instance.s = 10  # make the scatter points bigger
 
-    # plot
-    plot_instance.mw_plot(x, y, [z, 'kpc above galactic plane'],
-                          'Orbit of Sun in 20Gyr using galpy colored by kpc above galactic plane')
+    # set up plot title
+    plot_instance.title = 'Orbit of Sun in 20Gyr using galpy colored by kpc above galactic plane'
+
+    # use mw_scatter instead of scatter because we want a colorbar
+    plot_instance.mw_scatter(x, y, [z, 'kpc above galactic plane'])
 
     # Save the figure
     plot_instance.savefig(file='mw_plot.png')
 
-   # Show the figure
-   plot_instance.show()
+    # Show the figure
+    plot_instance.show()
 
 You can turn off the annotation by putting ``annotation=False`` when creating an instance
 
@@ -278,18 +289,20 @@ the milkyway is not moving.
     y = op.y(ts) * u.kpc
     z = op.z(ts)
 
-    # setup a MWPlot instance
-    plot_instance = MWPlot(center=(-16, -2.5) * u.kpc, radius=6 * u.kpc)
-    plot_instance.s = 50.0  # make the scatter points bigger
+    # setup a MWPlot instance with a certain center and radius
+    plot_instance = MWPlot(center=(-16, -2.5) * u.kpc, radius=5 * u.kpc)
 
-    # plot, need to add 8kpc to shift to galactic coordinates
-    plot_instance.mw_plot(x - 8. * u.kpc, y, 'r', 'Orbit of Sun in 10Gyr using galpy')
+    # set up plot title
+    plot_instance.title = 'Orbit of Sun in 10Gyr using galpy'
+
+    # plot, need to subtract 8kpc to shift to galactic coordinates in right hands frame
+    plot_instance.mw_scatter(x - 8. * u.kpc, y, 'r')
 
     # Save the figure
     plot_instance.savefig(file='mw_plot_zoomed.png')
 
-   # Show the figure
-   plot_instance.show()
+    # Show the figure
+    plot_instance.show()
 
 License
 ---------------------------------------------------------
