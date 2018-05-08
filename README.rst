@@ -296,7 +296,7 @@ the milkyway is not moving.
     plot_instance.title = 'Orbit of Sun in 10Gyr using galpy'
 
     # plot, need to subtract 8kpc to shift to galactic coordinates in right hands frame
-    plot_instance.mw_scatter(x - 8. * u.kpc, y, 'r')
+    plot_instance.plot(x - 8. * u.kpc, y, c='r', linewidth=8.0)
 
     # Save the figure
     plot_instance.savefig(file='mw_plot_zoomed.png')
