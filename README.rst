@@ -167,7 +167,7 @@ right handed which is also the expectation of ``mw_plot``
     # Save the figure
     plot_instance.savefig(file='gaia.png')
 
-Or plotting with Gaia Source with RV catalog (No code is prvided but you should be able to modify the code above to do that)
+Or plotting with Gaia Source with RV catalog (No code is provided but you should be able to modify the code above to do that)
 
 .. image:: https://github.com/henrysky/milkyway_plot/blob/master/readme_images/gaiadr2_rv_combined.png?raw=true
 
@@ -235,7 +235,7 @@ You can plot the orbit which are some scatter points on a face-on milkyway
 
     # Orbit Integration using galpy for the Sun
     op = Orbit([0., 0., 0., 0., 0., 0.], radec=True, ro=8., vo=220.)
-    ts = np.linspace(0, 20, 10000)
+    ts = np.linspace(0, 5, 10000) * u.Gyr
     op.integrate(ts, MWPotential2014)
     x = op.x(ts) * u.kpc
     y = op.y(ts) * u.kpc
@@ -247,7 +247,7 @@ You can plot the orbit which are some scatter points on a face-on milkyway
     plot_instance.s = 10  # make the scatter points bigger
 
     # set up plot title
-    plot_instance.title = 'Orbit of Sun in 20Gyr using galpy colored by kpc above galactic plane'
+    plot_instance.title = 'Orbit of Sun in 5Gyr using galpy colored by kpc above galactic plane'
 
     # use mw_scatter instead of scatter because we want a colorbar
     plot_instance.mw_scatter(x, y, [z, 'kpc above galactic plane'])
@@ -267,7 +267,7 @@ Example 4: Change the Center and Radius of the Plot
 
 .. image:: https://github.com/henrysky/milkyway_plot/blob/master/readme_images/example_plot_2.png?raw=true
 
-You can set the center point and radius of the plot. In this case, we set (16, -3) in galactic coordinates
+You can set the center point and radius of the plot. In this case, we set (-16, -2.5) in galactic coordinates
 such that the plot centered at the Sun at the end of 10Gyr orbit, and set the radius as 6 kpc to close up. We will
 just set the color to red without color bar title because there is no color bar needed. Please notice the plot assumed
 the milkyway is not moving.
@@ -283,7 +283,7 @@ the milkyway is not moving.
 
     # Orbit Integration using galpy for the Sun
     op = Orbit([0., 0., 0., 0., 0., 0.], radec=True, ro=8., vo=220.)
-    ts = np.linspace(0, 10, 10000)
+    ts = np.linspace(0, 0.5, 10000) * u.Gyr
     op.integrate(ts, MWPotential2014)
     x = op.x(ts) * u.kpc
     y = op.y(ts) * u.kpc
@@ -293,7 +293,7 @@ the milkyway is not moving.
     plot_instance = MWPlot(center=(-16, -2.5) * u.kpc, radius=5 * u.kpc)
 
     # set up plot title
-    plot_instance.title = 'Orbit of Sun in 10Gyr using galpy'
+    plot_instance.title = 'Orbit of Sun in 0.5 Gyr using galpy'
 
     # plot, need to subtract 8kpc to shift to galactic coordinates in right hands frame
     plot_instance.plot(x - 8. * u.kpc, y, c='r', linewidth=8.0)
