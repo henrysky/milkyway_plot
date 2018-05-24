@@ -138,11 +138,10 @@ class MWPlot:
 
     def images_read(self):
         image_filename = 'MW_bg_annotate.jpg'
-        if self.__annotation is False:
-            image_filename = 'MW_bg_unannotate.jpg'
-        elif self.mode == 'edge-on':
+        if self.mode == 'edge-on':
             image_filename = 'MW_edgeon_unannotate.jpg'
-
+        elif self.__annotation is False:
+            image_filename = 'MW_bg_unannotate.jpg'
         try:
             img = plt.imread(image_filename)
         except FileNotFoundError:
