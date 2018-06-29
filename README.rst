@@ -7,8 +7,8 @@ You can set the center and radius of the plot anywhere on a milkyway galaxy imag
 Both ``MW_bg_annotate.jpg`` and ``MW_bg_unannotate.jpg`` are modified from an images by **NASA/JPL-Caltech/R. Hurt (SSC/Caltech)**
 Both images are 5600x5600px with resolution of 24.2 light years per pixel.
 
-``MW_edgeon_unannotate.jpg`` is modified from an images by **2MASS/J. Carpenter, T. H. Jarrett, & R. Hurt**.
-The image is 6500x6500px with resolution of 15.38 light years per pixel
+``MW_edgeon_unannotate.jpg`` is modified from an images by **ESA/Gaia/DPAC**.
+The image is 6500x6500px with resolution of 15.38 light years per pixel taken by ESA Gaia DR2.
 
 mw_plot will fill black pixel for region outside the pre-compiled images.
 
