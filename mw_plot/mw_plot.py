@@ -2,9 +2,13 @@ import os
 import numpy as np
 import pylab as plt
 from astropy import units as u
+import astropy.coordinates as coord
+
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+import mw_plot
 
 
+# noinspection PyUnresolvedReferences
 class MWPlot:
     """
     MWPlot class
@@ -142,12 +146,9 @@ class MWPlot:
             image_filename = 'MW_edgeon_unannotate.jpg'
         elif self.__annotation is False:
             image_filename = 'MW_bg_unannotate.jpg'
-        try:
-            img = plt.imread(image_filename)
-        except FileNotFoundError:
-            import mw_plot
-            path = os.path.join(os.path.dirname(mw_plot.__path__[0]), 'mw_plot', image_filename)
-            img = plt.imread(path)
+
+        path = os.path.join(os.path.dirname(mw_plot.__path__[0]), 'mw_plot', image_filename)
+        img = plt.imread(path)
 
         if self.__coord.lower() == 'galactic':
             # shift the coord by 8 to the new coord system
@@ -349,3 +350,141 @@ class MWPlot:
             cbar.set_label(f"{cbar_label}", size=self.fontsize)
             if self.clim is not None:
                 cbar.set_clim(self.clim)
+
+
+# --noinspection PyUnresolvedReferences
+class MWSkyMap:
+    """
+    MWSkyMap class
+    """
+    def __init__(self, grid='galactic'):
+        self._unit = u.degree
+        self.fontsize = 30
+        self.s = 1.
+        self.figsize = (20, 11)
+        self.dpi = 200
+        self.cmap = "viridis"
+        self.imalpha = 0.85
+        self.tight_layout = True
+        self.__grid = grid
+        self.__ext = None
+
+        self.fig = None
+        self.ax = None
+        self.title = None
+        self.cbar_flag = False
+        self.clim = None
+
+        self.images_read()
+
+    def radec_unit_check(self, ra, dec):
+        if not type(ra) == u.quantity.Quantity or not type(dec) == u.quantity.Quantity:
+            raise TypeError("Both RA and DEC must carry astropy's unit")
+        else:
+            if ra.unit is not None and dec.unit is not None:
+                ra = ra.to(self._unit)
+                dec = dec.to(self._unit)
+                if self.__grid == 'galactic':
+                    c_icrs = coord.SkyCoord(ra=ra, dec=dec, frame='icrs')
+
+                    ra = coord.Angle(-c_icrs.galactic.l).wrap_at(180 * u.degree).value
+                    dec = coord.Angle(c_icrs.galactic.b).value
+            else:
+                raise TypeError("Both x, y, center and radius must carry astropy's unit")
+
+        return ra, dec
+
+    def initialize_mwplot(self):
+        """
+        Initial mw_plot images and plot
+
+        :return: None
+        """
+        if self.fig is None:
+            self.fig, self.ax = plt.subplots(1, figsize=self.figsize, dpi=self.dpi)
+            if self.title is not None:
+                self.fig.suptitle(self.title, fontsize=self.fontsize)
+            if self.__grid == 'galactic':
+                self.ax.set_xlabel('Galactic Longitude (Degree)', fontsize=self.fontsize)
+                self.ax.set_ylabel('Galactic Latitude (Degree)', fontsize=self.fontsize)
+                self.__ext = [-180, 180, -90, 90]
+            self.ax.set_facecolor('k')  # have a black color background for image with <1.0 alpha
+            self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=self.imalpha)
+            self.ax.tick_params(labelsize=self.fontsize * 0.8, width=self.fontsize / 10, length=self.fontsize / 2)
+
+    def show(self, *args, **kwargs):
+        if self.fig is None:
+            raise AttributeError('Nothing to show, please plot some data first')
+        else:
+            if self.tight_layout is True:
+                if self.cbar_flag is False:  # if no colorbar, it will push the title in wrong place
+                    self.fig.tight_layout(rect=[0, 0.00, 1, 0.96])
+                else:  # so no colorbar no problem
+                    self.fig.tight_layout(rect=[0, 0.00, 1, 1.05])
+            self.fig.show(*args, **kwargs)
+
+    def savefig(self, file='MWSkyMap.png'):
+        if self.tight_layout is True:
+            if self.cbar_flag is False:  # if no colorbar, it will push the title in wrong place
+                self.fig.tight_layout(rect=[0, 0.00, 1, 0.96])
+            else:  # so no colorbar no problem
+                self.fig.tight_layout(rect=[0, 0.00, 1, 1.05])
+        # this is a pylab method
+        self.fig.savefig(file)
+
+    def mw_scatter(self, ra, dec, c, **kwargs):
+        """
+        Plot scatter points with colorbar
+
+        :param x: Scatter points x-coordinates on the plot
+        :type x: astropy.Quantity
+        :param y: Scatter points y-coordinates on the plot
+        :type y: astropy.Quantity
+        :param c: Scatter points color
+        :type c: Union[str, list, ndarry]
+        :History: 2018-Mar-17 - Written - Henry Leung (University of Toronto)
+        """
+        ra, dec = self.radec_unit_check(ra, dec)
+        self.initialize_mwplot()
+
+        # decide whether we need colorbar or not
+        if isinstance(c, list):
+            color = c[0]
+            cbar_label = c[1]
+            self.cbar_flag = True
+            if type(color) == u.quantity.Quantity:
+                color = color.to(self._unit).value
+        else:
+            color = c
+
+        mappable = self.ax.scatter(ra, dec, zorder=1, s=self.s, c=color, cmap=plt.get_cmap(self.cmap), **kwargs)
+        self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0.)
+
+        if self.cbar_flag is True:
+            divider = make_axes_locatable(self.ax)
+            cax = divider.append_axes("right", size="5%", pad=0.05)
+            cbar = self.fig.colorbar(mappable, cax=cax)
+            cbar.ax.tick_params(labelsize=self.fontsize * 0.8, width=self.fontsize / 10, length=self.fontsize / 2)
+            cbar.set_label(f"{cbar_label}", size=self.fontsize)
+            if self.clim is not None:
+                cbar.set_clim(self.clim)
+
+    def scatter(self, ra, dec, *args, **kwargs):
+        ra, dec = self.radec_unit_check(ra, dec)
+        self.initialize_mwplot()
+        if kwargs.get('s') is None:
+            kwargs['s'] = self.s
+        self.ax.scatter(ra, dec, *args, **kwargs)
+        # just want to set the loation right, we dont need image again
+        self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0.)
+        if kwargs.get('label') is not None:
+            self.ax.legend(loc='best', fontsize=self.fontsize, markerscale=kwargs['s'])
+
+    def images_read(self):
+        if self.__grid == 'galactic':
+            image_filename = 'MW_edgeon_unannotate.jpg'
+            path = os.path.join(os.path.dirname(mw_plot.__path__[0]), 'mw_plot', image_filename)
+            img = plt.imread(path)
+            self.__img = img[1625:4875]
+
+        return None

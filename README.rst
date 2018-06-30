@@ -50,11 +50,6 @@ OR clone the latest commit of mw_plot from github and install
    $ git clone --depth=1 git://github.com/henrysky/milkyway_plot
    $ python setup.py install
 
-To-do list
----------------------
-
-- Add density/contour
-
 Basic Usage
 ---------------------
 
@@ -303,6 +298,50 @@ the milkyway is not moving.
 
     # Show the figure
     plot_instance.show()
+
+Example 5: Plot all sky map
+---------------------------------------------------------
+
+.. image:: https://github.com/henrysky/milkyway_plot/blob/master/readme_images/adr14_gdr2_skymap.png?raw=true
+
+You can also plot all sky map with mw_plot's MWSkyMap class
+
+.. code:: python
+
+    from mw_plot import MWSkyMap
+
+    import numpy as np
+    from astropy import units as  u
+    import astropy.coordinates as apycoords
+    from astroNN.gaia import gaiadr2_parallax
+
+    ra, dec, parallax, parallax_error = gaiadr2_parallax(cuts=.20, keepdims=False, offset=0.00)
+
+    # setup a MWSkyMap instance
+    plot_instance = MWSkyMap(grid='galactic')
+
+    parallax[parallax>1] = 1.
+
+    # so that the colorbar will has a better contract
+    # plot_instance.clim = (5., 15.)
+
+    # alpha value for the milkyway image
+    plot_instance.imalpha = 1.
+
+    # setup colormap
+    plot_instance.cmap='jet'
+
+    # set up plot title
+    plot_instance.title = 'APOGEE DR14 coloured by 20% error cuts Gaia Parallax'
+
+    # use mw_scatter instead of scatter because we want a colorbar
+    plot_instance.mw_scatter(ra * u.degree, dec * u.degree, [parallax, 'Gaia DR2 Parallax'])
+
+    plot_instance.savefig(file='adr14_gdr2_skymap.png')
+
+    # Show the figure
+    plot_instance.show()
+
 
 License
 ---------------------------------------------------------
