@@ -53,6 +53,11 @@ OR clone the latest commit of mw_plot from github and install
 Basic Usage
 ---------------------
 
+This python package consists of 2 classes - `MWPlot` and `MWSkyMap`. `MWPlot` is used to plot things on a face-on/edge-on milkyway
+with galactic/galactocentric coordinates. `MWSkyMap` is used to plot skymap with milkyway background with RA/DEC.
+
+For `MWPlot`:
+
 .. code:: python
 
    from astropy import units as u
@@ -83,6 +88,38 @@ Basic Usage
    # Here is the mw_scatter if you have an array to color the point
    # x and y must both carry astropy unit
    plot_instance.mw_scatter(x, y, [z, 'colorbar_title'])
+
+   # To show
+   plot_instance.show()
+
+   # To save
+   plot_instance.savefig('name.png')
+
+For `MWSkyMap`:
+
+.. code:: python
+
+   from astropy import units as u
+   from mw_plot import MWSkyMap
+
+   # setup MWSkyMap instance, you have to specify grid
+
+   plot_instance = MWSkyMap(grid='galactic')
+
+   # Here are some setting you can set after setting up a MWPlot instance
+   plot_instance.title = 'you title here'  # plot title, or it can be None to show no title
+   plot_instance.fontsize = 35  # fontsize for matplotlib plotting
+   plot_instance.figsize = (20, 20)  # figsize for matplotlib plotting
+   plot_instance.dpi = 200  # dpi for matplotlib plotting
+   plot_instance.cmap = 'viridis'  # matplotlib cmap: https://matplotlib.org/examples/color/colormaps_reference.html
+   plot_instance.clim = (vmin, vmax) # colorbar range
+   plot_instance.imalpha = 0.85  # alpha value for the milkyway image
+   plot_instance.s = 50.0  # make the scatter points bigger
+   plot_instance.tight_layout = True # whether plt.tight_layout() will be run
+
+   # Here is the mw_scatter if you have an array to color the point
+   # ra and dec must both carry astropy unit
+   plot_instance.mw_scatter(ra, dec, [z, 'colorbar_title'])
 
    # To show
    plot_instance.show()
