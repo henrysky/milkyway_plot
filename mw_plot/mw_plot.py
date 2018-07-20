@@ -91,7 +91,7 @@ class MWPlot:
         self.initialize_mwplot()
         self.ax.plot(x, y, *args, **kwargs)
         # just want to set the loation right, we dont need image again
-        self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0.)
+        self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0., rasterized=True)
         if kwargs.get('label') is not None:
             self.ax.legend(loc='best', fontsize=self.fontsize)
 
@@ -100,9 +100,9 @@ class MWPlot:
         self.initialize_mwplot()
         if kwargs.get('s') is None:
             kwargs['s'] = self.s
-        self.ax.scatter(x, y, *args, **kwargs)
+        self.ax.scatter(x, y, rasterized=True, *args, **kwargs)
         # just want to set the loation right, we dont need image again
-        self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0.)
+        self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0., rasterized=True)
         if kwargs.get('label') is not None:
             self.ax.legend(loc='best', fontsize=self.fontsize, markerscale=kwargs['s'])
 
@@ -116,7 +116,7 @@ class MWPlot:
             kwargs['range'] = np.array([[self.__ext[0], self.__ext[1]],[self.__ext[2], self.__ext[3]]])
         self.ax.hist2d(x, y, *args, **kwargs)
         # just want to set the loation right, we dont need image again
-        self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0.)
+        self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0., rasterized=True)
         if kwargs.get('label') is not None:
             self.ax.legend(loc='best', fontsize=self.fontsize)
 
@@ -261,7 +261,7 @@ class MWPlot:
             self.ax.set_ylabel(f'{self._coord_english} ({self._unit_english})', fontsize=self.fontsize)
             self.ax.set_aspect(self.__aspect)
             self.ax.set_facecolor('k')  # have a black color background for image with <1.0 alpha
-            self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=self.imalpha)
+            self.ax.imshow(self.__img, zorder=2, extent=self.__ext, alpha=self.imalpha, rasterized=True)
             self.ax.tick_params(labelsize=self.fontsize * 0.8, width=self.fontsize / 10, length=self.fontsize / 2)
 
     def mw_scatter(self, x, y, c, **kwargs):
@@ -289,8 +289,9 @@ class MWPlot:
         else:
             color = c
 
-        mappable = self.ax.scatter(x, y, zorder=1, s=self.s, c=color, cmap=plt.get_cmap(self.cmap), **kwargs)
-        self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0.)
+        mappable = self.ax.scatter(x, y, zorder=3, s=self.s, c=color, cmap=plt.get_cmap(self.cmap), rasterized=True,
+                                   **kwargs)
+        self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0., rasterized=True)
 
         if self.cbar_flag is True:
             divider = make_axes_locatable(self.ax)
@@ -339,8 +340,9 @@ class MWPlot:
 
         heatmap, xedges, yedges = np.histogram2d(x.value, y.value, bins=250, range=[self.__ext[:2], [self.__ext[3],
                                                                                                      self.__ext[2]]])
-        mappable = self.ax.imshow(heatmap.T, extent=self.__ext, cmap=self.transparent_cmap(plt.get_cmap('Reds')))
-        self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0.0)
+        mappable = self.ax.imshow(heatmap.T, extent=self.__ext, cmap=self.transparent_cmap(plt.get_cmap('Reds')),
+                                  rasterized=True)
+        self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0.0, rasterized=True)
 
         if self.cbar_flag is True:
             divider = make_axes_locatable(self.ax)
@@ -409,7 +411,7 @@ class MWSkyMap:
                 self.ax.set_ylabel('Galactic Latitude (Degree)', fontsize=self.fontsize)
                 self.__ext = [-180, 180, -90, 90]
             self.ax.set_facecolor('k')  # have a black color background for image with <1.0 alpha
-            self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=self.imalpha)
+            self.ax.imshow(self.__img, zorder=2, extent=self.__ext, alpha=self.imalpha, rasterized=True)
             self.ax.tick_params(labelsize=self.fontsize * 0.8, width=self.fontsize / 10, length=self.fontsize / 2)
 
     def show(self, *args, **kwargs):
@@ -457,8 +459,9 @@ class MWSkyMap:
         else:
             color = c
 
-        mappable = self.ax.scatter(ra, dec, zorder=1, s=self.s, c=color, cmap=plt.get_cmap(self.cmap), **kwargs)
-        self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0.)
+        mappable = self.ax.scatter(ra, dec, zorder=3, s=self.s, c=color, cmap=plt.get_cmap(self.cmap), rasterized=True,
+                                   **kwargs)
+        self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0., rasterized=True)
 
         if self.cbar_flag is True:
             divider = make_axes_locatable(self.ax)
@@ -474,9 +477,9 @@ class MWSkyMap:
         self.initialize_mwplot()
         if kwargs.get('s') is None:
             kwargs['s'] = self.s
-        self.ax.scatter(ra, dec, *args, **kwargs)
+        self.ax.scatter(ra, dec, rasterized=True, *args, **kwargs)
         # just want to set the loation right, we dont need image again
-        self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0.)
+        self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0., rasterized=True)
         if kwargs.get('label') is not None:
             self.ax.legend(loc='best', fontsize=self.fontsize, markerscale=kwargs['s'])
 
