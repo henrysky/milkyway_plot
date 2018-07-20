@@ -379,6 +379,9 @@ You can also plot all sky map with mw_plot's MWSkyMap class
     # Show the figure
     plot_instance.show()
 
+Or plotting with Gaia Source with RV catalog for APOGEE DR15 (No code is provided but you should be able to modify the code above to do that)
+
+.. image:: https://github.com/henrysky/milkyway_plot/blob/master/readme_images/adr15_gdr2_skymap.png?raw=true
 
 License
 ---------------------------------------------------------
