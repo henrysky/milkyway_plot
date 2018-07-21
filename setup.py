@@ -19,7 +19,7 @@ setup(
         'mw_plot': ['*.png']},
     python_requires='>=3.6',
     install_requires=[
-        'numpy', 'astropy', 'matplotlib'],
+        'numpy', 'astropy', 'matplotlib', 'Pillow'],
     url='https://github.com/henrysky/milkyway_plot',
     project_urls={
         "Bug Tracker": "https://github.com/henrysky/milkyway_plot/issues",

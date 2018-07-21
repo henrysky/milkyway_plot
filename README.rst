@@ -27,6 +27,7 @@ System Requirement
 -  | **astropy** 2.0 or above
 -  | **Numpy** 1.12.0 or above
 -  | **Matplotlib** 2.1.0 above
+-  | **Pillow** 5.0.0 above
 
 Install
 ---------------------
