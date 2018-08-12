@@ -1,8 +1,9 @@
 mw_plot
 ========
 
-A handy python package to do plotting on a face-on/edge-on milkyway with matplotlib.
-You can set the center and radius of the plot anywhere on a milkyway galaxy image with galactic or galactocentric coordinates.
+A handy python package to do plotting on a face-on/edge-on milkyway/skymap with matplotlib.
+You can set the center and radius of the plot anywhere on a milkyway galaxy image with galactic or
+galactocentric coordinates.
 
 Both ``MW_bg_annotate.jpg`` and ``MW_bg_unannotate.jpg`` are modified from an images by **NASA/JPL-Caltech/R. Hurt (SSC/Caltech)**
 Both images are 5600x5600px with resolution of 24.2 light years per pixel.
@@ -10,7 +11,9 @@ Both images are 5600x5600px with resolution of 24.2 light years per pixel.
 ``MW_edgeon_unannotate.jpg`` is modified from an images by **ESA/Gaia/DPAC**.
 The image is 6500x6500px with resolution of 15.38 light years per pixel taken by ESA Gaia DR2.
 
-mw_plot will fill black pixel for region outside the pre-compiled images.
+``mw_plot`` will fill black pixel for region outside the pre-compiled images. No acknowledgement* to ``mw_plot``
+is required if you generate plots for your non-commerical publication, you **must acknowledgement the origin of
+the background images** provided above.
 
 Author
 ---------------
@@ -66,8 +69,8 @@ For `MWPlot`:
 
    # setup MWPlot instance, you have to specify center, radius, unit with astropy unit and choice of coord
    # or not specifying any to use default value shown below
-   # center: Coordinates of the center of the plot
-   # radius: Radius of the plot
+   # center: Coordinates of the center of the plot, you cannot change this after creating the instance
+   # radius: Radius of the plot, you cannot change this after creating the instance
    # coord: can be 'galactocentric' or 'galactic'
    # annotation: whether use a milkyway background with annotation
    # mode: can be 'face-on' or 'edge-on'
@@ -105,7 +108,7 @@ For `MWSkyMap`:
 
    # setup MWSkyMap instance, you have to specify grid
 
-   plot_instance = MWSkyMap(grid='galactic')
+   plot_instance = MWSkyMap(grid='galactic', center=(0, 0) * u.deg, radius = (180, 90) * u.deg)
 
    # Here are some setting you can set after setting up a MWPlot instance
    plot_instance.title = 'you title here'  # plot title, or it can be None to show no title
@@ -376,6 +379,95 @@ You can also plot all sky map with mw_plot's MWSkyMap class
     plot_instance.mw_scatter(ra * u.degree, dec * u.degree, [parallax, 'Gaia DR2 Parallax'])
 
     plot_instance.savefig(file='adr14_gdr2_skymap.png')
+
+    # Show the figure
+    plot_instance.show()
+
+Example 6: Change the Center and Radius of the all sky map
+-------------------------------------------------------------
+
+You can set the center point and radius of the plot. In this case, we set galactic longitude and latitude to kepler field
+and galactic center.
+
+.. image:: https://github.com/henrysky/milkyway_plot/blob/master/readme_images/adr14_gdr2_skymap_kepler.png?raw=true
+
+.. code:: python
+
+    from mw_plot import MWSkyMap
+
+    import numpy as np
+    from astropy import units as  u
+    import astropy.coordinates as apycoords
+    from astroNN.gaia import gaiadr2_parallax
+
+    ra, dec, parallax, parallax_error = gaiadr2_parallax(cuts=.20, keepdims=False, offset=0.00)
+
+    # setup a MWSkyMap instance
+    plot_instance = MWSkyMap(grid='galactic', center=(-76, 13) * u.deg, radius = (40, 20) * u.deg)
+
+    # plot_instance = MWSkyMap(grid='galactic')
+
+    parallax[parallax>1] = 1.
+
+    # so that the colorbar will has a better contract
+    # plot_instance.clim = (5., 15.)
+
+    # alpha value for the milkyway image
+    plot_instance.imalpha = 1.
+    plot_instance.s = 10.  # make the scatter points bigger
+
+    # setup colormap
+    plot_instance.cmap='jet'
+
+    # set up plot title
+    plot_instance.title = 'APOGEE DR14 coloured by 20% error cuts Gaia Parallax'
+
+    # use mw_scatter instead of scatter because we want a colorbar
+    plot_instance.mw_scatter(ra * u.degree, dec * u.degree, [parallax, 'Gaia DR2 Parallax'])
+
+    plot_instance.savefig(file='adr14_gdr2_skymap_kepler.png')
+
+    # Show the figure
+    plot_instance.show()
+
+.. image:: https://github.com/henrysky/milkyway_plot/blob/master/readme_images/adr14_gdr2_skymap_core.png?raw=true
+
+.. code:: python
+
+    from mw_plot import MWSkyMap
+
+    import numpy as np
+    from astropy import units as  u
+    import astropy.coordinates as apycoords
+    from astroNN.gaia import gaiadr2_parallax
+
+    ra, dec, parallax, parallax_error = gaiadr2_parallax(cuts=.20, keepdims=False, offset=0.00)
+
+    # setup a MWSkyMap instance
+    plot_instance = MWSkyMap(grid='galactic', center=(0, 0) * u.deg, radius = (30, 30) * u.deg)
+    plot_instance.figsize = (20, 20)
+
+    # plot_instance = MWSkyMap(grid='galactic')
+
+    parallax[parallax>1] = 1.
+
+    # so that the colorbar will has a better contract
+    # plot_instance.clim = (5., 15.)
+
+    # alpha value for the milkyway image
+    plot_instance.imalpha = 0.6
+    plot_instance.s = 10.  # make the scatter points bigger
+
+    # setup colormap
+    plot_instance.cmap='jet'
+
+    # set up plot title
+    plot_instance.title = 'APOGEE DR14 coloured by 20% error cuts Gaia Parallax'
+
+    # use mw_scatter instead of scatter because we want a colorbar
+    plot_instance.mw_scatter(ra * u.degree, dec * u.degree, [parallax, 'Gaia DR2 Parallax'])
+
+    plot_instance.savefig(file='adr14_gdr2_skymap_core.png')
 
     # Show the figure
     plot_instance.show()

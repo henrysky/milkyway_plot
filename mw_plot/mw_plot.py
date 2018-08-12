@@ -354,12 +354,21 @@ class MWPlot:
                 cbar.set_clim(self.clim)
 
 
-# --noinspection PyUnresolvedReferences
+# noinspection PyUnresolvedReferences
 class MWSkyMap:
     """
     MWSkyMap class
     """
-    def __init__(self, grid='galactic'):
+    def __init__(self, grid='galactic', center=(0, 0) * u.deg, radius=(180, 90) * u.deg):
+        """
+
+        :param grid: coordinates system of the plot, currently only support 'galactic'
+        :type grid: string, currently only support 'galactic'
+        :param center: Coordinates of the center of the plot with astropy degree/radian units
+        :type center: astropy.Quantity
+        :param radius: Radius of the plot with astropy degree/radian units
+        :type radius: astropy.Quantity
+        """
         self._unit = u.degree
         self.fontsize = 30
         self.s = 1.
@@ -371,11 +380,26 @@ class MWSkyMap:
         self.__grid = grid
         self.__ext = None
 
+        self.__center = center
+        self.__radius = radius
+
         self.fig = None
         self.ax = None
         self.title = None
         self.cbar_flag = False
         self.clim = None
+
+        #preprocessing
+        if self.__center.unit is not None and self.__radius.unit is not None:
+            self.__center = self.__center.to(self._unit)
+            self.__radius = self.__radius.to(self._unit)
+
+        if (self.__center[0] + self.__radius[0]).value > 180 or (self.__center[0] - self.__radius[0]).value < -180:
+            raise ValueError("The border of the width will be outside the range of -180 to 180 which is not allowed\n")
+        if (self.__center[1] + self.__radius[1]).value > 90 or (self.__center[1] - self.__radius[1]).value < -90:
+            raise ValueError("The border of the height will be outside the range of -90 to 90 which is not allowed")
+        if self.__radius[0] <= 0 or self.__radius[0] <= 0:
+            raise ValueError("Radius cannot be negative or 0")
 
         self.images_read()
 
@@ -409,7 +433,8 @@ class MWSkyMap:
             if self.__grid == 'galactic':
                 self.ax.set_xlabel('Galactic Longitude (Degree)', fontsize=self.fontsize)
                 self.ax.set_ylabel('Galactic Latitude (Degree)', fontsize=self.fontsize)
-                self.__ext = [-180, 180, -90, 90]
+                self.__ext = [(self.__center[0] - self.__radius[0]).value, (self.__center[0] + self.__radius[0]).value,
+                              (self.__center[1] - self.__radius[1]).value, (self.__center[1] + self.__radius[1]).value]
             self.ax.set_facecolor('k')  # have a black color background for image with <1.0 alpha
             self.ax.imshow(self.__img, zorder=2, extent=self.__ext, alpha=self.imalpha, rasterized=True)
             self.ax.tick_params(labelsize=self.fontsize * 0.8, width=self.fontsize / 10, length=self.fontsize / 2)
@@ -488,6 +513,15 @@ class MWSkyMap:
             image_filename = 'MW_edgeon_unannotate.jpg'
             path = os.path.join(os.path.dirname(mw_plot.__path__[0]), 'mw_plot', image_filename)
             img = plt.imread(path)
-            self.__img = img[1625:4875]
+            self.__img = img[1625:4875]  # so there are 3250px there
+
+            # find center pixel and radius pixel
+            y_img_center = 1625 - int((3250 / 180) * self.__center[1].value)
+            y_radious_px = int((3250 / 180) * self.__radius[1].value)
+            x_img_center = int((6500 / 360) * self.__center[0].value) + 3250
+            x_radious_px = int((6500 / 360) * self.__radius[0].value)
+
+            self.__img = self.__img[(y_img_center - y_radious_px):(y_img_center + y_radious_px),
+                         (x_img_center - x_radious_px):(x_img_center + x_radious_px), :]
 
         return None
