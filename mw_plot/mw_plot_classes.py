@@ -1,11 +1,13 @@
 import os
 import numpy as np
-import pylab as plt
-from astropy import units as u
+
+import astropy.units as u
 import astropy.coordinates as coord
 
+import pylab as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-import mw_plot
+
+__all__ = ["MWPlot", "MWSkyMap"]
 
 
 # noinspection PyUnresolvedReferences
@@ -147,7 +149,7 @@ class MWPlot:
         elif self.__annotation is False:
             image_filename = 'MW_bg_unannotate.jpg'
 
-        path = os.path.join(os.path.dirname(mw_plot.__path__[0]), 'mw_plot', image_filename)
+        path = path = os.path.join(__file__, image_filename)
         img = plt.imread(path)
 
         if self.__coord.lower() == 'galactic':
@@ -511,7 +513,7 @@ class MWSkyMap:
     def images_read(self):
         if self.__grid == 'galactic':
             image_filename = 'MW_edgeon_unannotate.jpg'
-            path = os.path.join(os.path.dirname(mw_plot.__path__[0]), 'mw_plot', image_filename)
+            path = os.path.join(__file__, image_filename)
             img = plt.imread(path)
             self.__img = img[1625:4875]  # so there are 3250px there
 
