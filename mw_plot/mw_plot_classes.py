@@ -361,11 +361,11 @@ class MWSkyMap:
     """
     MWSkyMap class
     """
-    def __init__(self, grid='galactic', center=(0, 0) * u.deg, radius=(180, 90) * u.deg):
+    def __init__(self, projection='equirectangular', center=(0, 0) * u.deg, radius=(180, 90) * u.deg):
         """
 
-        :param grid: coordinates system of the plot, currently only support 'galactic'
-        :type grid: string, currently only support 'galactic'
+        :param projection: projection system of the plot
+        :type projection: string(["equirectangular", "aitoff", "hammer", "lambert", "mollweide"])
         :param center: Coordinates of the center of the plot with astropy degree/radian units
         :type center: astropy.Quantity
         :param radius: Radius of the plot with astropy degree/radian units
@@ -379,7 +379,10 @@ class MWSkyMap:
         self.cmap = "viridis"
         self.imalpha = 0.85
         self.tight_layout = True
-        self.__grid = grid
+        if projection in ["equirectangular", "aitoff", "hammer", "lambert", "mollweide"]:
+            self.__projection = projection
+        else:
+            raise ValueError("Unknown projection")
         self.__ext = None
 
         self.__center = center
@@ -392,9 +395,15 @@ class MWSkyMap:
         self.clim = None
 
         #preprocessing
-        if self.__center.unit is not None and self.__radius.unit is not None:
-            self.__center = self.__center.to(self._unit)
-            self.__radius = self.__radius.to(self._unit)
+        if self.__projection != 'equirectangular':  # other projections do not support zoom in
+            if not np.all(self.__center == (0, 0) * u.deg) or not np.all(self.__radius == (180, 90) * u.deg):
+                print("Projections other than equirectangular does not support custom center and radius, using default!")
+                self.__center = (0, 0) * u.deg
+                self.__radius = (180, 90) * u.deg
+        else:
+            if self.__center.unit is not None and self.__radius.unit is not None:
+                self.__center = self.__center.to(self._unit)
+                self.__radius = self.__radius.to(self._unit)
 
         if (self.__center[0] + self.__radius[0]).value > 180 or (self.__center[0] - self.__radius[0]).value < -180:
             raise ValueError("The border of the width will be outside the range of -180 to 180 which is not allowed\n")
@@ -412,11 +421,13 @@ class MWSkyMap:
             if ra.unit is not None and dec.unit is not None:
                 ra = ra.to(self._unit)
                 dec = dec.to(self._unit)
-                if self.__grid == 'galactic':
-                    c_icrs = coord.SkyCoord(ra=ra, dec=dec, frame='icrs')
-
+                c_icrs = coord.SkyCoord(ra=ra, dec=dec, frame='icrs')
+                if self.__projection == 'equirectangular':
                     ra = coord.Angle(-c_icrs.galactic.l).wrap_at(180 * u.degree).value
                     dec = coord.Angle(c_icrs.galactic.b).value
+                else:
+                    ra = coord.Angle(-c_icrs.galactic.l).wrap_at(180 * u.degree).to(u.radian).value
+                    dec = coord.Angle(c_icrs.galactic.b).to(u.radian).value
             else:
                 raise TypeError("Both x, y, center and radius must carry astropy's unit")
 
@@ -429,16 +440,24 @@ class MWSkyMap:
         :return: None
         """
         if self.fig is None:
-            self.fig, self.ax = plt.subplots(1, figsize=self.figsize, dpi=self.dpi)
+            if self.__projection == 'equirectangular':
+                self.fig, self.ax = plt.subplots(1, figsize=self.figsize, dpi=self.dpi)
+            else:
+                self.fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
+                self.ax = self.fig.add_subplot(111, projection=self.__projection)
             if self.title is not None:
                 self.fig.suptitle(self.title, fontsize=self.fontsize)
-            if self.__grid == 'galactic':
+            if self.__projection == 'equirectangular':
                 self.ax.set_xlabel('Galactic Longitude (Degree)', fontsize=self.fontsize)
                 self.ax.set_ylabel('Galactic Latitude (Degree)', fontsize=self.fontsize)
                 self.__ext = [(self.__center[0] - self.__radius[0]).value, (self.__center[0] + self.__radius[0]).value,
                               (self.__center[1] - self.__radius[1]).value, (self.__center[1] + self.__radius[1]).value]
+                self.ax.imshow(self.__img, zorder=2, extent=self.__ext, alpha=self.imalpha, rasterized=True)
+            else:
+                self.__ext = [0, 1, 0, 1]
+                self.ax.imshow(self.__img, zorder=2, extent=self.__ext, alpha=self.imalpha, rasterized=True,
+                               aspect=self.ax.get_aspect(), transform=self.ax.transAxes)
             self.ax.set_facecolor('k')  # have a black color background for image with <1.0 alpha
-            self.ax.imshow(self.__img, zorder=2, extent=self.__ext, alpha=self.imalpha, rasterized=True)
             self.ax.tick_params(labelsize=self.fontsize * 0.8, width=self.fontsize / 10, length=self.fontsize / 2)
 
     def show(self, *args, **kwargs):
@@ -511,19 +530,18 @@ class MWSkyMap:
             self.ax.legend(loc='best', fontsize=self.fontsize, markerscale=kwargs['s'])
 
     def images_read(self):
-        if self.__grid == 'galactic':
-            image_filename = 'MW_edgeon_unannotate.jpg'
-            path = os.path.join(os.path.dirname(__file__), image_filename)
-            img = plt.imread(path)
-            self.__img = img[1625:4875]  # so there are 3250px there
+        image_filename = 'MW_edgeon_unannotate.jpg'
+        path = os.path.join(os.path.dirname(__file__), image_filename)
+        img = plt.imread(path)
+        self.__img = img[1625:4875]  # so there are 3250px there
 
-            # find center pixel and radius pixel
-            y_img_center = 1625 - int((3250 / 180) * self.__center[1].value)
-            y_radious_px = int((3250 / 180) * self.__radius[1].value)
-            x_img_center = int((6500 / 360) * self.__center[0].value) + 3250
-            x_radious_px = int((6500 / 360) * self.__radius[0].value)
+        # find center pixel and radius pixel
+        y_img_center = 1625 - int((3250 / 180) * self.__center[1].value)
+        y_radious_px = int((3250 / 180) * self.__radius[1].value)
+        x_img_center = int((6500 / 360) * self.__center[0].value) + 3250
+        x_radious_px = int((6500 / 360) * self.__radius[0].value)
 
-            self.__img = self.__img[(y_img_center - y_radious_px):(y_img_center + y_radious_px),
-                         (x_img_center - x_radious_px):(x_img_center + x_radious_px), :]
+        self.__img = self.__img[(y_img_center - y_radious_px):(y_img_center + y_radious_px),
+                     (x_img_center - x_radious_px):(x_img_center + x_radious_px), :]
 
         return None

@@ -57,7 +57,7 @@ OR clone the latest commit of mw_plot from github and install
 Basic Usage
 ---------------------
 
-This python package consists of 2 classes - `MWPlot` and `MWSkyMap`. `MWPlot` is used to plot things on a face-on/edge-on milkyway
+This python package consists of two classes - `MWPlot` and `MWSkyMap`. `MWPlot` is used to plot things on a face-on/edge-on milkyway
 with galactic/galactocentric coordinates. `MWSkyMap` is used to plot skymap with milkyway background with RA/DEC.
 
 For `MWPlot`:
@@ -106,9 +106,8 @@ For `MWSkyMap`:
    from astropy import units as u
    from mw_plot import MWSkyMap
 
-   # setup MWSkyMap instance, you have to specify grid
-
-   plot_instance = MWSkyMap(grid='galactic', center=(0, 0) * u.deg, radius = (180, 90) * u.deg)
+   # setup MWSkyMap instance, you have to specify projection: ["equirectangular", "aitoff", "hammer", "lambert", "mollweide"]
+   plot_instance = MWSkyMap(projection='equirectangular', center=(0, 0) * u.deg, radius = (180, 90) * u.deg)
 
    # Here are some setting you can set after setting up a MWPlot instance
    plot_instance.title = 'you title here'  # plot title, or it can be None to show no title
@@ -359,7 +358,7 @@ You can also plot all sky map with mw_plot's MWSkyMap class
     ra, dec, parallax, parallax_error = gaiadr2_parallax(cuts=.20, keepdims=False, offset=0.00)
 
     # setup a MWSkyMap instance
-    plot_instance = MWSkyMap(grid='galactic')
+    plot_instance = MWSkyMap(projection='equirectangular')
 
     parallax[parallax>1] = 1.
 
@@ -403,9 +402,7 @@ and galactic center.
     ra, dec, parallax, parallax_error = gaiadr2_parallax(cuts=.20, keepdims=False, offset=0.00)
 
     # setup a MWSkyMap instance
-    plot_instance = MWSkyMap(grid='galactic', center=(-76, 13) * u.deg, radius = (40, 20) * u.deg)
-
-    # plot_instance = MWSkyMap(grid='galactic')
+    plot_instance = MWSkyMap(projection='equirectangular', center=(-76, 13) * u.deg, radius = (40, 20) * u.deg)
 
     parallax[parallax>1] = 1.
 
@@ -444,10 +441,8 @@ and galactic center.
     ra, dec, parallax, parallax_error = gaiadr2_parallax(cuts=.20, keepdims=False, offset=0.00)
 
     # setup a MWSkyMap instance
-    plot_instance = MWSkyMap(grid='galactic', center=(0, 0) * u.deg, radius = (30, 30) * u.deg)
+    plot_instance = MWSkyMap(projection='equirectangular', center=(0, 0) * u.deg, radius = (30, 30) * u.deg)
     plot_instance.figsize = (20, 20)
-
-    # plot_instance = MWSkyMap(grid='galactic')
 
     parallax[parallax>1] = 1.
 
