@@ -39,6 +39,7 @@ class MWPlot:
         self.dpi = 200
         self.cmap = "viridis"
         self.imalpha = 0.85
+        self.facecolor = 'k'
         self.tight_layout = True
 
         # user should not change these values anyway
@@ -262,7 +263,7 @@ class MWPlot:
             self.ax.set_xlabel(f'{self._coord_english} ({self._unit_english})', fontsize=self.fontsize)
             self.ax.set_ylabel(f'{self._coord_english} ({self._unit_english})', fontsize=self.fontsize)
             self.ax.set_aspect(self.__aspect)
-            self.ax.set_facecolor('k')  # have a black color background for image with <1.0 alpha
+            self.ax.set_facecolor(self.facecolor)  # have a black color background for image with <1.0 alpha
             self.ax.imshow(self.__img, zorder=2, extent=self.__ext, alpha=self.imalpha, rasterized=True)
             self.ax.tick_params(labelsize=self.fontsize * 0.8, width=self.fontsize / 10, length=self.fontsize / 2)
 
@@ -425,7 +426,7 @@ class MWSkyMap:
                 if self.__projection == 'equirectangular':
                     ra = coord.Angle(-c_icrs.galactic.l).wrap_at(180 * u.degree).value
                     dec = coord.Angle(c_icrs.galactic.b).value
-                else:
+                else:  # projection requires radian instead of degree
                     ra = coord.Angle(-c_icrs.galactic.l).wrap_at(180 * u.degree).to(u.radian).value
                     dec = coord.Angle(c_icrs.galactic.b).to(u.radian).value
             else:
@@ -442,23 +443,22 @@ class MWSkyMap:
         if self.fig is None:
             if self.__projection == 'equirectangular':
                 self.fig, self.ax = plt.subplots(1, figsize=self.figsize, dpi=self.dpi)
-            else:
-                self.fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
-                self.ax = self.fig.add_subplot(111, projection=self.__projection)
-            if self.title is not None:
-                self.fig.suptitle(self.title, fontsize=self.fontsize)
-            if self.__projection == 'equirectangular':
                 self.ax.set_xlabel('Galactic Longitude (Degree)', fontsize=self.fontsize)
                 self.ax.set_ylabel('Galactic Latitude (Degree)', fontsize=self.fontsize)
                 self.__ext = [(self.__center[0] - self.__radius[0]).value, (self.__center[0] + self.__radius[0]).value,
                               (self.__center[1] - self.__radius[1]).value, (self.__center[1] + self.__radius[1]).value]
                 self.ax.imshow(self.__img, zorder=2, extent=self.__ext, alpha=self.imalpha, rasterized=True)
             else:
+                self.fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
+                self.ax = self.fig.add_subplot(111, projection=self.__projection)
                 self.__ext = [0, 1, 0, 1]
                 self.ax.imshow(self.__img, zorder=2, extent=self.__ext, alpha=self.imalpha, rasterized=True,
                                aspect=self.ax.get_aspect(), transform=self.ax.transAxes)
+
             self.ax.set_facecolor('k')  # have a black color background for image with <1.0 alpha
             self.ax.tick_params(labelsize=self.fontsize * 0.8, width=self.fontsize / 10, length=self.fontsize / 2)
+            if self.title is not None:
+                self.fig.suptitle(self.title, fontsize=self.fontsize)
 
     def show(self, *args, **kwargs):
         if self.fig is None:
@@ -507,12 +507,18 @@ class MWSkyMap:
 
         mappable = self.ax.scatter(ra, dec, zorder=3, s=self.s, c=color, cmap=plt.get_cmap(self.cmap), rasterized=True,
                                    **kwargs)
-        self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0., rasterized=True)
-
+        if self.__projection == 'equirectangular':
+            self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0., rasterized=True)
+        else:
+            self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=self.imalpha, rasterized=True,
+                           aspect=self.ax.get_aspect(), transform=self.ax.transAxes)
         if self.cbar_flag is True:
             divider = make_axes_locatable(self.ax)
             cax = divider.append_axes("right", size="5%", pad=0.05)
-            cbar = self.fig.colorbar(mappable, cax=cax)
+            if self.__projection == 'equirectangular':
+                cbar = self.fig.colorbar(mappable, cax=cax)
+            else:
+                cbar = self.fig.colorbar(mappable, ax=self.ax)
             cbar.ax.tick_params(labelsize=self.fontsize * 0.8, width=self.fontsize / 10, length=self.fontsize / 2)
             cbar.set_label(f"{cbar_label}", size=self.fontsize)
             if self.clim is not None:
@@ -525,7 +531,11 @@ class MWSkyMap:
             kwargs['s'] = self.s
         self.ax.scatter(ra, dec, rasterized=True, *args, **kwargs)
         # just want to set the loation right, we dont need image again
-        self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0., rasterized=True)
+        if self.__projection == 'equirectangular':
+            self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0., rasterized=True)
+        else:
+            self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=self.imalpha, rasterized=True,
+                           aspect=self.ax.get_aspect(), transform=self.ax.transAxes)
         if kwargs.get('label') is not None:
             self.ax.legend(loc='best', fontsize=self.fontsize, markerscale=kwargs['s'])
 
