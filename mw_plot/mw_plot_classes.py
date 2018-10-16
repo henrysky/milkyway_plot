@@ -92,8 +92,8 @@ class MWPlot:
     def plot(self, x, y, *args, **kwargs):
         x, y = self.xy_unit_check(x, y)
         self.initialize_mwplot()
-        self.ax.plot(x, y, *args, **kwargs)
-        # just want to set the loation right, we dont need image again
+        self.ax.plot(x, y, zorder=3, *args, **kwargs)
+        # just want to set the location right, we dont need image again
         self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0., rasterized=True)
         if kwargs.get('label') is not None:
             self.ax.legend(loc='best', fontsize=self.fontsize)
@@ -104,7 +104,7 @@ class MWPlot:
         if kwargs.get('s') is None:
             kwargs['s'] = self.s
         self.ax.scatter(x, y, rasterized=True, *args, **kwargs)
-        # just want to set the loation right, we dont need image again
+        # just want to set the location right, we dont need image again
         self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0., rasterized=True)
         if kwargs.get('label') is not None:
             self.ax.legend(loc='best', fontsize=self.fontsize, markerscale=kwargs['s'])
@@ -117,8 +117,8 @@ class MWPlot:
         kwargs['cmap'] = self.transparent_cmap(kwargs['cmap'])
         if kwargs.get('range') is None:
             kwargs['range'] = np.array([[self.__ext[0], self.__ext[1]],[self.__ext[2], self.__ext[3]]])
-        self.ax.hist2d(x, y, *args, **kwargs)
-        # just want to set the loation right, we dont need image again
+        self.ax.hist2d(x, y, zorder=3, *args, **kwargs)
+        # just want to set the location right, we dont need image again
         self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0., rasterized=True)
         if kwargs.get('label') is not None:
             self.ax.legend(loc='best', fontsize=self.fontsize)
@@ -529,8 +529,8 @@ class MWSkyMap:
         self.initialize_mwplot()
         if kwargs.get('s') is None:
             kwargs['s'] = self.s
-        self.ax.scatter(ra, dec, rasterized=True, *args, **kwargs)
-        # just want to set the loation right, we dont need image again
+        self.ax.scatter(ra, dec, zorder=3, rasterized=True, *args, **kwargs)
+        # just want to set the location right, we dont need image again
         if self.__projection == 'equirectangular':
             self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0., rasterized=True)
         else:
