@@ -5,6 +5,7 @@ import astropy.units as u
 import astropy.coordinates as coord
 
 import pylab as plt
+import matplotlib
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 __all__ = ["MWPlot", "MWSkyMap"]
@@ -451,9 +452,18 @@ class MWSkyMap:
             else:
                 self.fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
                 self.ax = self.fig.add_subplot(111, projection=self.__projection)
-                self.__ext = [0, 1, 0, 1]
-                self.ax.imshow(self.__img, zorder=2, extent=self.__ext, alpha=self.imalpha, rasterized=True,
-                               aspect=self.ax.get_aspect(), transform=self.ax.transAxes)
+                # color
+                # cmap_red = matplotlib.colors.LinearSegmentedColormap.from_list("", ["black", "red"], N=256)
+                # cmap_grn = matplotlib.colors.LinearSegmentedColormap.from_list("", ["black", "green"], N=256)
+                # cmap_blue = matplotlib.colors.LinearSegmentedColormap.from_list("", ["black", "blue"], N=256)
+
+                # coordinates
+                lon = np.linspace(-np.pi, np.pi, 6500)
+                lat = np.linspace(np.pi / 2., -np.pi / 2., 3250)
+                Lon, Lat = np.meshgrid(lon, lat)
+                imr = self.ax.pcolormesh(Lon, Lat, self.__img[:, :, 0], cmap='gray', zorder=2, alpha=self.imalpha, rasterized=True)
+                # img = self.ax.pcolormesh(Lon, Lat, self.__img[:, :, 1], cmap=cmap_grn, zorder=2, alpha=0.2)
+                # imb = self.ax.pcolormesh(Lon, Lat, self.__img[:, :, 2], cmap=cmap_blue, zorder=2, alpha=0.2)
 
             self.ax.set_facecolor('k')  # have a black color background for image with <1.0 alpha
             self.ax.tick_params(labelsize=self.fontsize * 0.8, width=self.fontsize / 10, length=self.fontsize / 2)
