@@ -12,7 +12,7 @@ Both images are 5600x5600px with resolution of 24.2 light years per pixel.
 The image is 6500x6500px with resolution of 15.38 light years per pixel taken by ESA Gaia DR2.
 
 ``mw_plot`` will fill black pixel for region outside the pre-compiled images. No acknowledgement to ``mw_plot``
-is required if you generate plots for your non-commerical publication, you **must acknowledgement the origin of
+is required if you generate plots for your non-commerical publication, but you **must acknowledgement the origin of
 the background images** provided above.
 
 Author
@@ -31,6 +31,8 @@ System Requirement
 -  | **Numpy** 1.12.0 or above
 -  | **Matplotlib** 2.1.0 above
 -  | **Pillow** 5.0.0 above
+
+Matplotlib 2.2.3 has trouble to save pdf plot with this package. Please use Matplotlib >3.0 if you experience issue
 
 Install
 ---------------------
@@ -463,6 +465,46 @@ and galactic center.
     plot_instance.mw_scatter(ra * u.degree, dec * u.degree, [parallax, 'Gaia DR2 Parallax'])
 
     plot_instance.savefig(file='adr14_gdr2_skymap_core.png')
+
+    # Show the figure
+    plot_instance.show()
+
+Example 7: Plot all sky map with projection
+---------------------------------------------------------
+
+You can also plot all sky map with mw_plot's MWSkyMap class with projection
+
+.. image:: https://github.com/henrysky/milkyway_plot/blob/master/readme_images/lmc_smc_projection.png?raw=true
+
+.. code:: python
+
+    import numpy as np
+    from astropy import units as  u
+    import astropy.coordinates as apycoords
+    from galpy.orbit import Orbit
+    from mw_plot import MWSkyMap
+
+    # setup a MWSkyMap instance with projection, other projection can be 'hammer', 'mollweide' etc
+    plot_instance = MWSkyMap(projection='aitoff')
+
+    # so that the colorbar will has a better contract
+    # plot_instance.clim = (5., 15.)
+
+    # alpha value for the milkyway image
+    plot_instance.imalpha = 1.
+
+    # set up plot title
+    plot_instance.title = 'LMC and SMC in red dots'
+    plot_instance.s = 200
+
+    # LMC and SMC coordinates, get coordinates with galpy from_name
+    lsmc_ra = [Orbit.from_name('LMC').ra(), Orbit.from_name('SMC').ra()] * u.degree
+    lsmc_dec = [Orbit.from_name('LMC').dec(), Orbit.from_name('SMC').dec()] * u.degree
+
+    # use mw_scatter instead of scatter
+    plot_instance.mw_scatter(lsmc_ra, lsmc_dec, 'r')
+
+    plot_instance.savefig(file='lmc_smc_projection.png')
 
     # Show the figure
     plot_instance.show()
