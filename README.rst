@@ -19,7 +19,7 @@ Author
 ---------------
 
 -  | **Henry Leung** - *Initial work and developer* - henrysky_
-   | Contact Henry: henrysky.leung [at] mail.utoronto.ca
+   | Contact Henry: henrysky.leung [at] utoronto.ca
 
 .. _henrysky: https://github.com/henrysky
 
@@ -27,9 +27,9 @@ System Requirement
 ---------------------
 
 -  | **Python** 3.6 or above
--  | **astropy** 2.0 or above
--  | **Numpy** 1.12.0 or above
--  | **Matplotlib** 2.1.0 above
+-  | **astropy** 3.0 or above
+-  | **Numpy** 1.16.0 or above
+-  | **Matplotlib** 3.1.0 above
 -  | **Pillow** 5.0.0 above
 
 Matplotlib 2.2.3 has trouble to save pdf plot with this package. Please use Matplotlib >3.0 if you experience issue
@@ -76,9 +76,11 @@ For `MWPlot`:
    # coord: can be 'galactocentric' or 'galactic'
    # annotation: whether use a milkyway background with annotation
    # mode: can be 'face-on' or 'edge-on'
+   # rot180: whether to rotate the plot by 180degree, putting Earth location from left hand (-8, 0)kpc to right side (8, 0)kpc
+   # grayscale: whether to turn the background image to grayscale
 
    plot_instance = MWPlot(mode='face-on', center=(0, 0)*u.kpc, radius=90750*u.lyr,
-                          unit=u.kpc, coord='galactic', annotation=True, rot180=False)
+                          unit=u.kpc, coord='galactic', annotation=True, rot180=False, grayscale=False)
 
    # Here are some setting you can set after setting up a MWPlot instance
    plot_instance.title = 'you title here'  # plot title, or it can be None to show no title
@@ -299,6 +301,10 @@ You can turn off the annotation by putting ``annotation=False`` when creating an
 
 .. image:: https://github.com/henrysky/milkyway_plot/blob/master/readme_images/example_plot_1_unannotation.png?raw=true
 
+You can also turn the background image to grayscale by ``grayscale=True`` when creating an instance
+
+.. image:: https://github.com/henrysky/milkyway_plot/blob/master/readme_images/example_plot_1_unannotation_grayscale.png?raw=true
+
 Example 4: Change the Center and Radius of the Plot
 ---------------------------------------------------------
 
@@ -485,7 +491,8 @@ You can also plot all sky map with mw_plot's MWSkyMap class with projection
     from mw_plot import MWSkyMap
 
     # setup a MWSkyMap instance with projection, other projection can be 'hammer', 'mollweide' etc
-    plot_instance = MWSkyMap(projection='aitoff')
+    # grayscale: whether to turn the background image to grayscale
+    plot_instance = MWSkyMap(projection='aitoff', grayscale=False)
 
     # so that the colorbar will has a better contract
     # plot_instance.clim = (5., 15.)

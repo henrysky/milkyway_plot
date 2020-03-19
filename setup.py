@@ -6,7 +6,7 @@ with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'README.rst')
 
 setup(
     name='mw_plot',
-    version='0.5.3',
+    version='0.6.0',
     classifiers=[
         'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: MIT License',
@@ -28,7 +28,7 @@ setup(
     },
     license='MIT',
     author='Henry Leung',
-    author_email='henrysky.leung@mail.utoronto.ca',
+    author_email='henrysky.leung@utoronto.ca',
     description='A handy python package to do plotting on a face-on/edge-on/allsky map milkyway with matplotlib',
     long_description=long_description
 )

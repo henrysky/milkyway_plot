@@ -11,13 +11,25 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 __all__ = ["MWPlot", "MWSkyMap"]
 
 
+def rgb2gray(rgb):
+    """
+    Change RGB color image into grayscale in RGB representation
+
+    :param rgb: NumPy array of the RGB image
+    :return: NumPy array of grayscale image, same shape as input
+    """
+    r, g, b = rgb[:, :, 0], rgb[:, :, 1], rgb[:, :, 2]
+    gray = np.atleast_3d(255.-(0.2989 * r + 0.5870 * g + 0.1140 * b))
+    return np.repeat(gray, 3, axis=2).astype(int)
+
+
 # noinspection PyUnresolvedReferences
 class MWPlot:
     """
     MWPlot class
     """
     def __init__(self, mode='face-on', center=(0, 0) * u.kpc, radius=90750 * u.lyr, unit=u.kpc, coord='galactic',
-                 annotation=True, rot180=False):
+                 annotation=True, rot180=False, grayscale=False):
         """
         ;:param mode: whether plot edge-on or face-on milkyway
         :type mode: string, either 'face-on' or 'edge-on'
@@ -33,6 +45,8 @@ class MWPlot:
         :type annotation: bool
         :param rot180: whether rotate the image by 180 deg
         :type rot180: bool
+        :param grayscale: whether to use grayscale background
+        :type grayscale: bool
         """
         self.fontsize = 35
         self.s = 1.0
@@ -50,6 +64,7 @@ class MWPlot:
         self.__coord = coord
         self.__annotation = annotation
         self.__rot180 = rot180
+        self.__grayscale = grayscale
 
         self._unit_english = None
         self._coord_english = None
@@ -153,6 +168,9 @@ class MWPlot:
 
         path = os.path.join(os.path.dirname(__file__), image_filename)
         img = plt.imread(path)
+
+        if self.__grayscale:
+            img = rgb2gray(img)
 
         if self.__coord.lower() == 'galactic':
             # shift the coord by 8 to the new coord system
@@ -363,7 +381,7 @@ class MWSkyMap:
     """
     MWSkyMap class
     """
-    def __init__(self, projection='equirectangular', center=(0, 0) * u.deg, radius=(180, 90) * u.deg):
+    def __init__(self, projection='equirectangular', center=(0, 0) * u.deg, radius=(180, 90) * u.deg, grayscale=False):
         """
 
         :param projection: projection system of the plot
@@ -372,6 +390,8 @@ class MWSkyMap:
         :type center: astropy.Quantity
         :param radius: Radius of the plot with astropy degree/radian units
         :type radius: astropy.Quantity
+        :param grayscale: whether to use grayscale background
+        :type grayscale: bool
         """
         self._unit = u.degree
         self.fontsize = 30
@@ -389,6 +409,7 @@ class MWSkyMap:
 
         self.__center = center
         self.__radius = radius
+        self.__grayscale = grayscale
 
         self.fig = None
         self.ax = None
@@ -563,5 +584,8 @@ class MWSkyMap:
 
         self.__img = self.__img[(y_img_center - y_radious_px):(y_img_center + y_radious_px),
                      (x_img_center - x_radious_px):(x_img_center + x_radious_px), :]
+
+        if self.__grayscale:
+            self.__img = rgb2gray(self.__img)
 
         return None
