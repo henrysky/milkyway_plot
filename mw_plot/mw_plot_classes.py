@@ -209,8 +209,11 @@ class MWPlot:
         if np.all(np.array([x_left_px, self.__pixels - x_right_px, y_top_px, self.__pixels - y_bottom_px]) >= 0):
             img = img[y_top_px:y_bottom_px, x_left_px:x_right_px]
         else:
-            # create a black image first with 3 channel with the same data type
-            black_img = np.zeros((pixel_radius * 2, pixel_radius * 2, 3), dtype=img.dtype)
+            # create a black/white image first with 3 channel with the same data type
+            if self.__grayscale:
+                black_img = np.ones((pixel_radius * 2, pixel_radius * 2, 3), dtype=img.dtype) * 255
+            else:
+                black_img = np.zeros((pixel_radius * 2, pixel_radius * 2, 3), dtype=img.dtype)
 
             # assign them to temp value
             # just in case the area is outside the images, will fill black pixel
@@ -224,7 +227,7 @@ class MWPlot:
             # Extract available area from pre-compiled first
             img = img[temp_y_top_px:temp_y_bottom_px, temp_x_left_px:temp_x_right_px]
 
-            # fill the black image with the background image
+            # fill the black/white image with the background image
             black_img[top_exceed_px:top_exceed_px + img.shape[0], left_exceed_px:left_exceed_px + img.shape[1], :] = img
 
             # Set the images as the filled black-background image
