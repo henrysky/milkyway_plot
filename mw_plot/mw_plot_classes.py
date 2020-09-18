@@ -29,7 +29,7 @@ class MWPlot:
     MWPlot class
     """
     def __init__(self, mode='face-on', center=(0, 0) * u.kpc, radius=90750 * u.lyr, unit=u.kpc, coord='galactic',
-                 annotation=True, rot180=False, grayscale=False):
+                 annotation=True, rot90=0, grayscale=False):
         """
         ;:param mode: whether plot edge-on or face-on milkyway
         :type mode: string, either 'face-on' or 'edge-on'
@@ -43,8 +43,8 @@ class MWPlot:
         :type coord: str
         :param annotation: whether use a milkyway background with annotation
         :type annotation: bool
-        :param rot180: whether rotate the image by 180 deg
-        :type rot180: bool
+        :param rot90: number of 90 degree rotation
+        :type rot90: int
         :param grayscale: whether to use grayscale background
         :type grayscale: bool
         """
@@ -63,7 +63,7 @@ class MWPlot:
         self._unit = unit
         self.__coord = coord
         self.__annotation = annotation
-        self.__rot180 = rot180
+        self.__rot90 = rot90
         self.__grayscale = grayscale
 
         self._unit_english = None
@@ -233,15 +233,11 @@ class MWPlot:
             # Set the images as the filled black-background image
             img = np.array(black_img)
 
-        if self.__rot180:
-            img = np.rot90(img, 2)
-            self.__ext = [(self.__center[0] + self.__radius - x_shift).value,
-                          (self.__center[0] - self.__radius - x_shift).value,
-                          (self.__center[1] - self.__radius).value, (self.__center[1] + self.__radius).value]
-        else:
-            self.__ext = [(self.__center[0] - self.__radius - x_shift).value,
-                          (self.__center[0] + self.__radius - x_shift).value,
-                          (self.__center[1] + self.__radius).value, (self.__center[1] - self.__radius).value]
+        img = np.rot90(img, self.__rot90)
+        self.__ext = [(self.__center[0] + self.__radius - x_shift).value,
+                      (self.__center[0] - self.__radius - x_shift).value,
+                      (self.__center[1] - self.__radius).value, (self.__center[1] + self.__radius).value]
+
         if self.mode == 'edge-on':
             self.__ext[2] *= -1
             self.__ext[3] *= -1

@@ -76,11 +76,11 @@ For `MWPlot`:
    # coord: can be 'galactocentric' or 'galactic'
    # annotation: whether use a milkyway background with annotation
    # mode: can be 'face-on' or 'edge-on'
-   # rot180: whether to rotate the plot by 180degree, putting Earth location from left hand (-8, 0)kpc to right side (8, 0)kpc
+   # rot90: number of 90deg rotation, 0 for no to rotation, 1 for 90deg, 2 for 180deg which puts Earth location from left hand (-8, 0)kpc to right side (8, 0)kpc, 3 for 270deg
    # grayscale: whether to turn the background image to grayscale
 
    plot_instance = MWPlot(mode='face-on', center=(0, 0)*u.kpc, radius=90750*u.lyr,
-                          unit=u.kpc, coord='galactic', annotation=True, rot180=False, grayscale=False)
+                          unit=u.kpc, coord='galactic', annotation=True, rot90=0, grayscale=False)
 
    # Here are some setting you can set after setting up a MWPlot instance
    plot_instance.title = 'you title here'  # plot title, or it can be None to show no title
