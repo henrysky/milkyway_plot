@@ -59,7 +59,7 @@ OR clone the latest commit of mw_plot from github and install
 Basic Usage
 ---------------------
 
-This python package consists of two classes - `MWPlot` and `MWSkyMap`. `MWPlot` is used to plot things on a face-on/edge-on milkyway
+This python package consists of two classes - `MWPlot` and `MWSkyMap` and a few useful utilities. `MWPlot` is used to plot things on a face-on/edge-on milkyway
 with galactic/galactocentric coordinates. `MWSkyMap` is used to plot skymap with milkyway background with RA/DEC.
 
 For `MWPlot`:
@@ -134,13 +134,21 @@ For `MWSkyMap`:
    # To save
    plot_instance.savefig('name.png')
 
-There are also some handy constants you can import
+There are also some handy constants and utilities you can import
 
 .. code:: python
 
-   from mw_plot import center_coord, anti_center_coord
-   # center_coord refers to the [RA, DEC] of galactic center in deg
-   # anti_center_coord refers to the [RA, DEC] of galactic anti-center in deg
+   from mw_plot import center_radec, anti_center_radec, northpole_radec, southpole_radec  # constants
+   from mw_plot import mw_radec # milkyway plane in RA/DEC
+
+   # center_radec refers to the [RA, DEC] of galactic center in deg
+   # anti_center_radec refers to the [RA, DEC] of galactic anti-center in deg
+   # northpole_radec refers to the [RA, DEC] of galactic north pole in deg
+   # southpole_radec refers to the [RA, DEC] of galactic south pole in deg
+
+   mw_plane_ra, mw_plane_dec = mw_radec(deg=True)  # RA/DEC arrays of milkyway plane
+
+.. image:: https://github.com/henrysky/milkyway_plot/blob/master/readme_images/const_utils.png?raw=true
 
 Example 1: Plot Gaia DR1 and DR2 Observation with astroNN in Galactic coordinates
 ------------------------------------------------------------------------------------
