@@ -162,12 +162,14 @@ class MWPlot:
     def images_read(self):
         image_filename = 'MW_bg_annotate.jpg'
         if self.mode == 'edge-on':
-            image_filename = 'MW_edgeon_unannotate.jpg'
+            image_filename = 'MW_edgeon_edr3_unannotate.jpg'
+            path = os.path.join(os.path.dirname(__file__), image_filename)
+            img = np.zeros((6500, 6500, 3), dtype=int)
+            img[1625:4875, :, :] = plt.imread(path)
         elif self.__annotation is False:
-            image_filename = 'MW_bg_unannotate.jpg'
-
-        path = os.path.join(os.path.dirname(__file__), image_filename)
-        img = plt.imread(path)
+            image_filename = 'MW_bg_unannotate.jpg'          
+            path = os.path.join(os.path.dirname(__file__), image_filename)
+            img = plt.imread(path)
 
         if self.__grayscale:
             img = rgb2gray(img)
@@ -570,10 +572,10 @@ class MWSkyMap:
             self.ax.legend(loc='best', fontsize=self.fontsize, markerscale=kwargs['s'])
 
     def images_read(self):
-        image_filename = 'MW_edgeon_unannotate.jpg'
+        image_filename = 'MW_edgeon_edr3_unannotate.jpg'
         path = os.path.join(os.path.dirname(__file__), image_filename)
         img = plt.imread(path)
-        self.__img = img[1625:4875]  # so there are 3250px there
+        self.__img = img
 
         # find center pixel and radius pixel
         y_img_center = 1625 - int((3250 / 180) * self.__center[1].value)
