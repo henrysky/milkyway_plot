@@ -29,7 +29,7 @@ class MWPlot:
     MWPlot class
     """
     def __init__(self, mode='face-on', center=(0, 0) * u.kpc, radius=90750 * u.lyr, unit=u.kpc, coord='galactic',
-                 annotation=True, rot90=0, grayscale=False):
+                 annotation=True, rot90=0, grayscale=False, r0=8.125):
         """
         ;:param mode: whether plot edge-on or face-on milkyway
         :type mode: string, either 'face-on' or 'edge-on'
@@ -47,6 +47,8 @@ class MWPlot:
         :type rot90: int
         :param grayscale: whether to use grayscale background
         :type grayscale: bool
+        :param r0: distance to galactic center in kpc
+        :type r0: float
         """
         self.fontsize = 35
         self.s = 1.0
@@ -65,6 +67,7 @@ class MWPlot:
         self.__annotation = annotation
         self.__rot90 = rot90
         self.__grayscale = grayscale
+        self.r0 = r0 * u.kpc
 
         self._unit_english = None
         self._coord_english = None
@@ -75,7 +78,7 @@ class MWPlot:
         # Fixed value
         if mode == 'face-on':
             self.__pixels = 5600
-            self.__resolution = 24.2 * u.lyr
+            self.__resolution = (self.r0 / 1078).to(u.lyr)
         else:
             self.__pixels = 6500
             self.__resolution = 15.384615846 * u.lyr
@@ -103,7 +106,21 @@ class MWPlot:
                 y = y.to(self._unit).value
             else:
                 raise TypeError("Both x, y, center and radius must carry astropy's unit")
+        
+        # check if rotation is 90deg or 270deg
+        if self.__rot90%2==1:
+            x, y = y, x
         return x, y
+    
+    def lrbt_rot(self):
+        """This function rotate matplolti's extent ordered LRBT """
+        l, r, b, t = self.__ext[0], self.__ext[1], self.__ext[2], self.__ext[3]
+        if self.__rot90%4==1:  # -90deg
+            self.__ext = [b, t, l, r]
+        elif self.__rot90%4==2:  # -180deg
+            self.__ext = [r, l, t, b]
+        elif self.__rot90%4==3:  # -270deg
+            self.__ext = [t, b, r, l]
 
     def plot(self, x, y, *args, **kwargs):
         x, y = self.xy_unit_check(x, y)
@@ -170,13 +187,16 @@ class MWPlot:
             image_filename = 'MW_bg_unannotate.jpg'          
             path = os.path.join(os.path.dirname(__file__), image_filename)
             img = plt.imread(path)
+        else:
+            path = os.path.join(os.path.dirname(__file__), image_filename)
+            img = plt.imread(path)
 
         if self.__grayscale:
             img = rgb2gray(img)
 
         if self.__coord.lower() == 'galactic':
-            # shift the coord by 8 to the new coord system
-            x_shift = 8. * u.kpc
+            # shift the coord by r0 to the new coord system
+            x_shift = self.r0
             self.__center[0] += x_shift
             self._coord_english = 'Galactic Coordinates'
         elif self.__coord.lower() == 'galactocentric':
@@ -193,7 +213,11 @@ class MWPlot:
                 self.__radius = self.__radius * self._unit
 
         self.__resolution = self.__resolution.to(self._unit)
-        self.__center = self.__center.to(self._unit)
+        # print(self.__center)
+        # if self.__rot90%2==1:
+        #     self.__center[0], self.__center[1] = self.__center[1], self.__center[0]
+        # print(self.__center)
+
         self.__radius = self.__radius.to(self._unit)
 
         # convert physical unit to pixel unit
@@ -236,10 +260,11 @@ class MWPlot:
             img = np.array(black_img)
 
         img = np.rot90(img, self.__rot90)
-        self.__ext = [(self.__center[0] + self.__radius - x_shift).value,
-                      (self.__center[0] - self.__radius - x_shift).value,
-                      (self.__center[1] - self.__radius).value, (self.__center[1] + self.__radius).value]
-
+        self.__ext = [(self.__center[0] - self.__radius - x_shift).value,
+                      (self.__center[0] + self.__radius - x_shift).value,
+                      (self.__center[1] - self.__radius).value, 
+                      (self.__center[1] + self.__radius).value]
+                
         if self.mode == 'edge-on':
             self.__ext[2] *= -1
             self.__ext[3] *= -1
@@ -247,6 +272,8 @@ class MWPlot:
         self.__img = img
         self.__aspect = img.shape[0] / float(img.shape[1]) * (
                     (self.__ext[1] - self.__ext[0]) / (self.__ext[3] - self.__ext[2]))
+        
+        self.lrbt_rot()
 
         return None
 
@@ -311,8 +338,11 @@ class MWPlot:
                 color = color.to(self._unit).value
         else:
             color = c
+            
+        if kwargs.get('s') is None:
+            kwargs['s'] = self.s
 
-        mappable = self.ax.scatter(x, y, zorder=3, s=self.s, c=color, cmap=plt.get_cmap(self.cmap), rasterized=True,
+        mappable = self.ax.scatter(x, y, zorder=3, c=color, cmap=plt.get_cmap(self.cmap), rasterized=True,
                                    **kwargs)
         self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0., rasterized=True)
 
