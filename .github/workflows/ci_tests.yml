@@ -14,9 +14,9 @@ jobs:
           python-version: 3.8
       - name: Install dependencies
         run: |
-          pip install coveralls pydot graphviz pytest pytest-cov
+          pip install coveralls pydot graphviz pytest pytest-cov galpy
           python setup.py install
-      - name: Test astroNN
+      - name: Test mw-plot
         if: ${{ matrix.PAPER_MODELS == false}}
         run: >
           python -m pytest --cov mw_plot --cov-report=xml tests/test_mwplot.py
