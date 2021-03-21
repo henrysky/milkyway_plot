@@ -1,6 +1,14 @@
 mw_plot
 ========
 
+.. image:: https://readthedocs.org/projects/milkyway-plot/badge/?version=latest
+   :target: https://milkyway-plot.readthedocs.io/en/latest/
+   :alt: Documentation Status
+
+.. image:: https://img.shields.io/github/license/henrysky/milkyway_plot.svg
+   :target: https://github.com/henrysky/milkyway_plot/blob/master/LICENSE
+   :alt: GitHub license
+
 A handy python package to do plotting on a face-on/edge-on milkyway/skymap with matplotlib.
 You can set the center and radius of the plot anywhere on a milkyway galaxy image with galactic or
 galactocentric coordinates.
