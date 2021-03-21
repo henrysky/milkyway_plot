@@ -1,0 +1,10 @@
+numpy
+astropy
+matplotlib
+astroquery
+pandas
+pillow
+
+sphinx
+nbsphinx
+ipykernel
