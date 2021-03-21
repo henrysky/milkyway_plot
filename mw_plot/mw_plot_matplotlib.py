@@ -2,31 +2,20 @@ import os
 import numpy as np
 
 import astropy.units as u
-import astropy.coordinates as coord
+import astropy.coordinates as apycoords
 
-import pylab as plt
 import matplotlib
+import pylab as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+from .mw_plot_masters import MWPlotMaster, MWSkyMapMaster, rgb2gray
+
 
 __all__ = ["MWPlot", "MWSkyMap"]
 
 
-def rgb2gray(rgb):
+class MWPlot(MWPlotMaster):
     """
-    Change RGB color image into grayscale in RGB representation
-
-    :param rgb: NumPy array of the RGB image
-    :return: NumPy array of grayscale image, same shape as input
-    """
-    r, g, b = rgb[:, :, 0], rgb[:, :, 1], rgb[:, :, 2]
-    gray = np.atleast_3d(255.-(0.2989 * r + 0.5870 * g + 0.1140 * b))
-    return np.repeat(gray, 3, axis=2).astype(int)
-
-
-# noinspection PyUnresolvedReferences
-class MWPlot:
-    """
-    MWPlot class
+    MWPlot class plotting with Matplotlib
     """
     def __init__(self, mode='face-on', center=(0, 0) * u.kpc, radius=90750 * u.lyr, unit=u.kpc, coord='galactic',
                  annotation=True, rot90=0, grayscale=False, r0=8.125):
@@ -50,6 +39,15 @@ class MWPlot:
         :param r0: distance to galactic center in kpc
         :type r0: float
         """
+        super().__init__(grayscale=grayscale, 
+                         annotation=annotation, 
+                         rot90=rot90, 
+                         coord=coord, 
+                         mode=mode, 
+                         r0=r0, 
+                         center=center, 
+                         radius=radius, 
+                         unit=unit)
         self.fontsize = 35
         self.s = 1.0
         self.figsize = (20, 20)
@@ -59,75 +57,32 @@ class MWPlot:
         self.facecolor = 'k'
         self.tight_layout = True
 
-        # user should not change these values anyway
-        self.__center = center
-        self.__radius = radius
-        self._unit = unit
-        self.__coord = coord
-        self.__annotation = annotation
-        self.__rot90 = rot90
-        self.__grayscale = grayscale
-        self.r0 = r0 * u.kpc
-
         self._unit_english = None
         self._coord_english = None
-        self.__ext = None
-        self.__img = None
-        self.__aspect = None
+        self._ext = None
+        self._img = None
+        self._aspect = None
 
-        # Fixed value
-        if mode == 'face-on':
-            self.__pixels = 5600
-            self.__resolution = (self.r0 / 1078).to(u.lyr)
-        else:
-            self.__pixels = 6500
-            self.__resolution = 15.384615846 * u.lyr
         self.fig = None
         self.ax = None
         self.title = None
-        self.mode = mode
         self.cbar_flag = False
         self.clim = None
 
         # prepossessing procedure
         self._unit_english = self._unit.long_names[0]
-        if self.__center.unit is not None and self.__radius.unit is not None:
-            self.__center = self.__center.to(self._unit)
-            self.__radius = self.__radius.to(self._unit)
+        if self._center.unit is not None and self._radius.unit is not None:
+            self._center = self._center.to(self._unit)
+            self._radius = self._radius.to(self._unit)
 
         self.images_read()
-
-    def xy_unit_check(self, x, y):
-        if not type(x) == u.quantity.Quantity or not type(y) == u.quantity.Quantity:
-            raise TypeError("Both x and y must carry astropy's unit")
-        else:
-            if x.unit is not None and y.unit is not None:
-                x = x.to(self._unit).value
-                y = y.to(self._unit).value
-            else:
-                raise TypeError("Both x, y, center and radius must carry astropy's unit")
-        
-        # check if rotation is 90deg or 270deg
-        if self.__rot90%2==1:
-            x, y = y, x
-        return x, y
     
-    def lrbt_rot(self):
-        """This function rotate matplolti's extent ordered LRBT """
-        l, r, b, t = self.__ext[0], self.__ext[1], self.__ext[2], self.__ext[3]
-        if self.__rot90%4==1:  # -90deg
-            self.__ext = [b, t, l, r]
-        elif self.__rot90%4==2:  # -180deg
-            self.__ext = [r, l, t, b]
-        elif self.__rot90%4==3:  # -270deg
-            self.__ext = [t, b, r, l]
-
     def plot(self, x, y, *args, **kwargs):
         x, y = self.xy_unit_check(x, y)
         self.initialize_mwplot()
         self.ax.plot(x, y, zorder=3, *args, **kwargs)
         # just want to set the location right, we dont need image again
-        self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0., rasterized=True)
+        self.ax.imshow(self._img, zorder=0, extent=self._ext, alpha=0., rasterized=True)
         if kwargs.get('label') is not None:
             self.ax.legend(loc='best', fontsize=self.fontsize)
 
@@ -138,7 +93,7 @@ class MWPlot:
             kwargs['s'] = self.s
         self.ax.scatter(x, y, rasterized=True, *args, **kwargs)
         # just want to set the location right, we dont need image again
-        self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0., rasterized=True)
+        self.ax.imshow(self._img, zorder=0, extent=self._ext, alpha=0., rasterized=True)
         if kwargs.get('label') is not None:
             self.ax.legend(loc='best', fontsize=self.fontsize, markerscale=kwargs['s'])
 
@@ -149,10 +104,10 @@ class MWPlot:
             kwargs['cmap'] = self.cmap
         kwargs['cmap'] = self.transparent_cmap(kwargs['cmap'])
         if kwargs.get('range') is None:
-            kwargs['range'] = np.array([[self.__ext[0], self.__ext[1]],[self.__ext[2], self.__ext[3]]])
+            kwargs['range'] = np.array([[self._ext[0], self._ext[1]],[self._ext[2], self._ext[3]]])
         self.ax.hist2d(x, y, zorder=3, *args, **kwargs)
         # just want to set the location right, we dont need image again
-        self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0., rasterized=True)
+        self.ax.imshow(self._img, zorder=0, extent=self._ext, alpha=0., rasterized=True)
         if kwargs.get('label') is not None:
             self.ax.legend(loc='best', fontsize=self.fontsize)
 
@@ -175,107 +130,6 @@ class MWPlot:
                 self.fig.tight_layout(rect=[0, 0.00, 1, 1.05])
         # this is a pylab method
         self.fig.savefig(file)
-
-    def images_read(self):
-        image_filename = 'MW_bg_annotate.jpg'
-        if self.mode == 'edge-on':
-            image_filename = 'MW_edgeon_edr3_unannotate.jpg'
-            path = os.path.join(os.path.dirname(__file__), image_filename)
-            img = np.zeros((6500, 6500, 3), dtype=int)
-            img[1625:4875, :, :] = plt.imread(path)
-        elif self.__annotation is False:
-            image_filename = 'MW_bg_unannotate.jpg'          
-            path = os.path.join(os.path.dirname(__file__), image_filename)
-            img = plt.imread(path)
-        else:
-            path = os.path.join(os.path.dirname(__file__), image_filename)
-            img = plt.imread(path)
-
-        if self.__grayscale:
-            img = rgb2gray(img)
-
-        if self.__coord.lower() == 'galactic':
-            # shift the coord by r0 to the new coord system
-            x_shift = self.r0
-            self.__center[0] += x_shift
-            self._coord_english = 'Galactic Coordinates'
-        elif self.__coord.lower() == 'galactocentric':
-            x_shift = 0. * u.kpc
-            self._coord_english = 'Galactocentric Coordinates'
-        else:
-            raise ValueError("Unknown coordinates, can only be 'galactic' or 'galactocentric'")
-
-        if not type(self.__center) == u.quantity.Quantity and not type(self.__radius) == u.quantity.Quantity:
-            print(f"You did not specify units for center and radius, assuming the unit is {self._unit.long_names[0]}")
-            if not type(self.__center) == u.quantity.Quantity:
-                self.__center = self.__center * self._unit
-            if not type(self.__radius) == u.quantity.Quantity:
-                self.__radius = self.__radius * self._unit
-
-        self.__resolution = self.__resolution.to(self._unit)
-        # print(self.__center)
-        # if self.__rot90%2==1:
-        #     self.__center[0], self.__center[1] = self.__center[1], self.__center[0]
-        # print(self.__center)
-
-        self.__radius = self.__radius.to(self._unit)
-
-        # convert physical unit to pixel unit
-        pixel_radius = int((self.__radius / self.__resolution).value)
-        pixel_center = [int((self.__pixels / 2 + self.__center[0] / self.__resolution).value),
-                        int((self.__pixels / 2 - self.__center[1] / self.__resolution).value)]
-
-        # get the pixel coordinates
-        x_left_px = pixel_center[0] - pixel_radius
-        x_right_px = pixel_center[0] + pixel_radius
-        y_top_px = self.__pixels - pixel_center[1] - pixel_radius
-        y_bottom_px = self.__pixels - pixel_center[1] + pixel_radius
-
-        # decide whether it needs to fill black pixels because the range outside the pre-compiled images
-        if np.all(np.array([x_left_px, self.__pixels - x_right_px, y_top_px, self.__pixels - y_bottom_px]) >= 0):
-            img = img[y_top_px:y_bottom_px, x_left_px:x_right_px]
-        else:
-            # create a black/white image first with 3 channel with the same data type
-            if self.__grayscale:
-                black_img = np.ones((pixel_radius * 2, pixel_radius * 2, 3), dtype=img.dtype) * 255
-            else:
-                black_img = np.zeros((pixel_radius * 2, pixel_radius * 2, 3), dtype=img.dtype)
-
-            # assign them to temp value
-            # just in case the area is outside the images, will fill black pixel
-            temp_x_left_px = max(x_left_px, 0)
-            temp_x_right_px = min(x_right_px, self.__pixels)
-            temp_y_top_px = max(y_top_px, 0)
-            temp_y_bottom_px = min(y_bottom_px, self.__pixels)
-
-            left_exceed_px = abs(min(x_left_px, 0))
-            top_exceed_px = abs(min(y_top_px, 0))
-            # Extract available area from pre-compiled first
-            img = img[temp_y_top_px:temp_y_bottom_px, temp_x_left_px:temp_x_right_px]
-
-            # fill the black/white image with the background image
-            black_img[top_exceed_px:top_exceed_px + img.shape[0], left_exceed_px:left_exceed_px + img.shape[1], :] = img
-
-            # Set the images as the filled black-background image
-            img = np.array(black_img)
-
-        img = np.rot90(img, self.__rot90)
-        self.__ext = [(self.__center[0] - self.__radius - x_shift).value,
-                      (self.__center[0] + self.__radius - x_shift).value,
-                      (self.__center[1] - self.__radius).value, 
-                      (self.__center[1] + self.__radius).value]
-                
-        if self.mode == 'edge-on':
-            self.__ext[2] *= -1
-            self.__ext[3] *= -1
-
-        self.__img = img
-        self.__aspect = img.shape[0] / float(img.shape[1]) * (
-                    (self.__ext[1] - self.__ext[0]) / (self.__ext[3] - self.__ext[2]))
-        
-        self.lrbt_rot()
-
-        return None
 
     @staticmethod
     def transparent_cmap(cmap, N=255):
@@ -309,9 +163,9 @@ class MWPlot:
                 self.fig.suptitle(self.title, fontsize=self.fontsize)
             self.ax.set_xlabel(f'{self._coord_english} ({self._unit_english})', fontsize=self.fontsize)
             self.ax.set_ylabel(f'{self._coord_english} ({self._unit_english})', fontsize=self.fontsize)
-            self.ax.set_aspect(self.__aspect)
+            self.ax.set_aspect(self._aspect)
             self.ax.set_facecolor(self.facecolor)  # have a black color background for image with <1.0 alpha
-            self.ax.imshow(self.__img, zorder=2, extent=self.__ext, alpha=self.imalpha, rasterized=True)
+            self.ax.imshow(self._img, zorder=2, extent=self._ext, alpha=self.imalpha, rasterized=True)
             self.ax.tick_params(labelsize=self.fontsize * 0.8, width=self.fontsize / 10, length=self.fontsize / 2)
 
     def mw_scatter(self, x, y, c, **kwargs):
@@ -344,7 +198,7 @@ class MWPlot:
 
         mappable = self.ax.scatter(x, y, zorder=3, c=color, cmap=plt.get_cmap(self.cmap), rasterized=True,
                                    **kwargs)
-        self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0., rasterized=True)
+        self.ax.imshow(self._img, zorder=0, extent=self._ext, alpha=0., rasterized=True)
 
         if self.cbar_flag is True:
             divider = make_axes_locatable(self.ax)
@@ -391,11 +245,11 @@ class MWPlot:
         else:
             color = c
 
-        heatmap, xedges, yedges = np.histogram2d(x.value, y.value, bins=250, range=[self.__ext[:2], [self.__ext[3],
-                                                                                                     self.__ext[2]]])
-        mappable = self.ax.imshow(heatmap.T, extent=self.__ext, cmap=self.transparent_cmap(plt.get_cmap('Reds')),
+        heatmap, xedges, yedges = np.histogram2d(x.value, y.value, bins=250, range=[self._ext[:2], [self._ext[3],
+                                                                                                     self._ext[2]]])
+        mappable = self.ax.imshow(heatmap.T, extent=self._ext, cmap=self.transparent_cmap(plt.get_cmap('Reds')),
                                   rasterized=True)
-        self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0.0, rasterized=True)
+        self.ax.imshow(self._img, zorder=0, extent=self._ext, alpha=0.0, rasterized=True)
 
         if self.cbar_flag is True:
             divider = make_axes_locatable(self.ax)
@@ -407,10 +261,9 @@ class MWPlot:
                 cbar.set_clim(self.clim)
 
 
-# noinspection PyUnresolvedReferences
-class MWSkyMap:
+class MWSkyMap(MWSkyMapMaster):
     """
-    MWSkyMap class
+    MWSkyMap class plotting with Matplotlib
     """
     def __init__(self, projection='equirectangular', center=(0, 0) * u.deg, radius=(180, 90) * u.deg, grayscale=False):
         """
@@ -424,6 +277,10 @@ class MWSkyMap:
         :param grayscale: whether to use grayscale background
         :type grayscale: bool
         """
+        super().__init__(grayscale=grayscale, 
+                         projection=projection, 
+                         center=center, 
+                         radius=radius)
         self._unit = u.degree
         self.fontsize = 30
         self.s = 1.
@@ -432,15 +289,7 @@ class MWSkyMap:
         self.cmap = "viridis"
         self.imalpha = 0.85
         self.tight_layout = True
-        if projection in ["equirectangular", "aitoff", "hammer", "lambert", "mollweide"]:
-            self.__projection = projection
-        else:
-            raise ValueError("Unknown projection")
-        self.__ext = None
-
-        self.__center = center
-        self.__radius = radius
-        self.__grayscale = grayscale
+        self._ext = None
 
         self.fig = None
         self.ax = None
@@ -449,43 +298,24 @@ class MWSkyMap:
         self.clim = None
 
         #preprocessing
-        if self.__projection != 'equirectangular':  # other projections do not support zoom in
-            if not np.all(self.__center == (0, 0) * u.deg) or not np.all(self.__radius == (180, 90) * u.deg):
+        if self._projection != 'equirectangular':  # other projections do not support zoom in
+            if not np.all(self._center == (0, 0) * u.deg) or not np.all(self._radius == (180, 90) * u.deg):
                 print("Projections other than equirectangular does not support custom center and radius, using default!")
-                self.__center = (0, 0) * u.deg
-                self.__radius = (180, 90) * u.deg
+                self._center = (0, 0) * u.deg
+                self._radius = (180, 90) * u.deg
         else:
-            if self.__center.unit is not None and self.__radius.unit is not None:
-                self.__center = self.__center.to(self._unit)
-                self.__radius = self.__radius.to(self._unit)
+            if self._center.unit is not None and self._radius.unit is not None:
+                self._center = self._center.to(self._unit)
+                self._radius = self._radius.to(self._unit)
 
-        if (self.__center[0] + self.__radius[0]).value > 180 or (self.__center[0] - self.__radius[0]).value < -180:
+        if (self._center[0] + self._radius[0]).value > 180 or (self._center[0] - self._radius[0]).value < -180:
             raise ValueError("The border of the width will be outside the range of -180 to 180 which is not allowed\n")
-        if (self.__center[1] + self.__radius[1]).value > 90 or (self.__center[1] - self.__radius[1]).value < -90:
+        if (self._center[1] + self._radius[1]).value > 90 or (self._center[1] - self._radius[1]).value < -90:
             raise ValueError("The border of the height will be outside the range of -90 to 90 which is not allowed")
-        if self.__radius[0] <= 0 or self.__radius[0] <= 0:
+        if self._radius[0] <= 0 or self._radius[0] <= 0:
             raise ValueError("Radius cannot be negative or 0")
 
         self.images_read()
-
-    def radec_unit_check(self, ra, dec):
-        if not type(ra) == u.quantity.Quantity or not type(dec) == u.quantity.Quantity:
-            raise TypeError("Both RA and DEC must carry astropy's unit")
-        else:
-            if ra.unit is not None and dec.unit is not None:
-                ra = ra.to(self._unit)
-                dec = dec.to(self._unit)
-                c_icrs = coord.SkyCoord(ra=ra, dec=dec, frame='icrs')
-                if self.__projection == 'equirectangular':
-                    ra = coord.Angle(-c_icrs.galactic.l).wrap_at(180 * u.degree).value
-                    dec = coord.Angle(c_icrs.galactic.b).value
-                else:  # projection requires radian instead of degree
-                    ra = coord.Angle(-c_icrs.galactic.l).wrap_at(180 * u.degree).to(u.radian).value
-                    dec = coord.Angle(c_icrs.galactic.b).to(u.radian).value
-            else:
-                raise TypeError("Both x, y, center and radius must carry astropy's unit")
-
-        return ra, dec
 
     def initialize_mwplot(self):
         """
@@ -494,28 +324,29 @@ class MWSkyMap:
         :return: None
         """
         if self.fig is None:
-            if self.__projection == 'equirectangular':
+            if self._projection == 'equirectangular':
                 self.fig, self.ax = plt.subplots(1, figsize=self.figsize, dpi=self.dpi)
                 self.ax.set_xlabel('Galactic Longitude (Degree)', fontsize=self.fontsize)
                 self.ax.set_ylabel('Galactic Latitude (Degree)', fontsize=self.fontsize)
-                self.__ext = [(self.__center[0] - self.__radius[0]).value, (self.__center[0] + self.__radius[0]).value,
-                              (self.__center[1] - self.__radius[1]).value, (self.__center[1] + self.__radius[1]).value]
-                self.ax.imshow(self.__img, zorder=2, extent=self.__ext, alpha=self.imalpha, rasterized=True)
+                self._ext = [(self._center[0] - self._radius[0]).value, (self._center[0] + self._radius[0]).value,
+                              (self._center[1] - self._radius[1]).value, (self._center[1] + self._radius[1]).value]
+                self.ax.imshow(self._img, zorder=2, extent=self._ext, alpha=self.imalpha, rasterized=True)
             else:
                 self.fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
-                self.ax = self.fig.add_subplot(111, projection=self.__projection)
+                self.ax = self.fig.add_subplot(111, projection=self._projection)
                 # color
-                # cmap_red = matplotlib.colors.LinearSegmentedColormap.from_list("", ["black", "red"], N=256)
-                # cmap_grn = matplotlib.colors.LinearSegmentedColormap.from_list("", ["black", "green"], N=256)
-                # cmap_blue = matplotlib.colors.LinearSegmentedColormap.from_list("", ["black", "blue"], N=256)
+                cmap_red = matplotlib.colors.LinearSegmentedColormap.from_list("", ["black", "red"], N=256)
+                cmap_grn = matplotlib.colors.LinearSegmentedColormap.from_list("", ["black", "green"], N=256)
+                cmap_blue = matplotlib.colors.LinearSegmentedColormap.from_list("", ["black", "blue"], N=256)
 
                 # coordinates
-                lon = np.linspace(-np.pi, np.pi, 6500)
-                lat = np.linspace(np.pi / 2., -np.pi / 2., 3250)
+                lon = np.linspace(-np.pi, np.pi, 6501)
+                lat = np.linspace(np.pi / 2., -np.pi / 2., 3251)
                 Lon, Lat = np.meshgrid(lon, lat)
-                imr = self.ax.pcolormesh(Lon, Lat, self.__img[:, :, 0], cmap='gray', zorder=2, alpha=self.imalpha, rasterized=True)
-                # img = self.ax.pcolormesh(Lon, Lat, self.__img[:, :, 1], cmap=cmap_grn, zorder=2, alpha=0.2)
-                # imb = self.ax.pcolormesh(Lon, Lat, self.__img[:, :, 2], cmap=cmap_blue, zorder=2, alpha=0.2)
+                im = self.ax.pcolormesh(Lon, Lat, rgb2gray(self._img)[:, :, 0], cmap='gray_r', zorder=2, alpha=self.imalpha, rasterized=True)
+                # imr = self.ax.pcolormesh(Lon, Lat, self._img[:, :, 0], cmap=cmap_red, zorder=2, alpha=0.33)
+                # img = self.ax.pcolormesh(Lon, Lat, self._img[:, :, 1], cmap=cmap_grn, zorder=2, alpha=0.33)
+                # imb = self.ax.pcolormesh(Lon, Lat, self._img[:, :, 2], cmap=cmap_blue, zorder=2, alpha=0.33)
 
             self.ax.set_facecolor('k')  # have a black color background for image with <1.0 alpha
             self.ax.tick_params(labelsize=self.fontsize * 0.8, width=self.fontsize / 10, length=self.fontsize / 2)
@@ -569,15 +400,15 @@ class MWSkyMap:
 
         mappable = self.ax.scatter(ra, dec, zorder=3, s=self.s, c=color, cmap=plt.get_cmap(self.cmap), rasterized=True,
                                    **kwargs)
-        if self.__projection == 'equirectangular':
-            self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0., rasterized=True)
+        if self._projection == 'equirectangular':
+            self.ax.imshow(self._img, zorder=0, extent=self._ext, alpha=0., rasterized=True)
         else:
-            self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=self.imalpha, rasterized=True,
+            self.ax.imshow(self._img, zorder=0, extent=self._ext, alpha=self.imalpha, rasterized=True,
                            aspect=self.ax.get_aspect(), transform=self.ax.transAxes)
         if self.cbar_flag is True:
             divider = make_axes_locatable(self.ax)
             cax = divider.append_axes("right", size="5%", pad=0.05)
-            if self.__projection == 'equirectangular':
+            if self._projection == 'equirectangular':
                 cbar = self.fig.colorbar(mappable, cax=cax)
             else:
                 cbar = self.fig.colorbar(mappable, ax=self.ax)
@@ -593,30 +424,10 @@ class MWSkyMap:
             kwargs['s'] = self.s
         self.ax.scatter(ra, dec, zorder=3, rasterized=True, *args, **kwargs)
         # just want to set the location right, we dont need image again
-        if self.__projection == 'equirectangular':
-            self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=0., rasterized=True)
+        if self._projection == 'equirectangular':
+            self.ax.imshow(self._img, zorder=0, extent=self._ext, alpha=0., rasterized=True)
         else:
-            self.ax.imshow(self.__img, zorder=0, extent=self.__ext, alpha=self.imalpha, rasterized=True,
+            self.ax.imshow(self._img, zorder=0, extent=self._ext, alpha=self.imalpha, rasterized=True,
                            aspect=self.ax.get_aspect(), transform=self.ax.transAxes)
         if kwargs.get('label') is not None:
             self.ax.legend(loc='best', fontsize=self.fontsize, markerscale=kwargs['s'])
-
-    def images_read(self):
-        image_filename = 'MW_edgeon_edr3_unannotate.jpg'
-        path = os.path.join(os.path.dirname(__file__), image_filename)
-        img = plt.imread(path)
-        self.__img = img
-
-        # find center pixel and radius pixel
-        y_img_center = 1625 - int((3250 / 180) * self.__center[1].value)
-        y_radious_px = int((3250 / 180) * self.__radius[1].value)
-        x_img_center = int((6500 / 360) * self.__center[0].value) + 3250
-        x_radious_px = int((6500 / 360) * self.__radius[0].value)
-
-        self.__img = self.__img[(y_img_center - y_radious_px):(y_img_center + y_radious_px),
-                     (x_img_center - x_radious_px):(x_img_center + x_radious_px), :]
-
-        if self.__grayscale:
-            self.__img = rgb2gray(self.__img)
-
-        return None

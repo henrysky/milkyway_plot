@@ -1,4 +1,4 @@
-from .mw_plot_classes import *
+from .mw_plot_matplotlib import *
 from pkg_resources import get_distribution
 from astropy.coordinates import SkyCoord, ICRS
 import astropy.units as u
@@ -34,3 +34,16 @@ def mw_radec(deg=True, size=3600):
         return c.ra.to(u.deg).value[idx], c.dec.to(u.deg).value[idx]
     else:
         return c.ra.to(u.rad).value[idx], c.dec.to(u.rad).value[idx]
+
+
+def to_bokeh_img(imgarray):
+    M, N, _ = imgarray.shape
+    img = np.empty((M, N), dtype=np.uint32)
+    view = img.view(dtype=np.uint8).reshape((M, N, 4))
+    view[:,:,0] = imgarray[:,:,0] # copy red channel
+    view[:,:,1] = imgarray[:,:,1] # copy blue channel
+    view[:,:,2] = imgarray[:,:,2] # copy green channel
+    view[:,:,3] = 255
+
+    img = img[::-1] # flip for Bokeh
+    return img
