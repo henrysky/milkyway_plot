@@ -207,7 +207,10 @@ class MWSkyMapMaster(ABC):
         y_radious_px = int((3250 / 180) * self._radius[1].value)
         x_img_center = int((6500 / 360) * self._center[0].value) + 3250
         x_radious_px = int((6500 / 360) * self._radius[0].value)
-
+        
+        self._ext = [(self._center[0] - self._radius[0]).value, (self._center[0] + self._radius[0]).value,
+                (self._center[1] - self._radius[1]).value, (self._center[1] + self._radius[1]).value]
+                        
         self._img = self._img[(y_img_center - y_radious_px):(y_img_center + y_radious_px),
                      (x_img_center - x_radious_px):(x_img_center + x_radious_px), :]
 

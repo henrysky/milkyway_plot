@@ -9,7 +9,13 @@ mw_plot
    :target: https://github.com/henrysky/milkyway_plot/blob/master/LICENSE
    :alt: GitHub license
 
-A handy python package to do plotting on a face-on/edge-on milkyway/skymap with matplotlib.
+.. image:: https://github.com/henrysky/astroNN/workflows/CI/badge.svg
+   :target: https://github.com/henrysky/astroNN/actions
+   :alt: Build Status
+
+A handy python package to do plotting on a face-on/edge-on milkyway/skymap with `matplotlib` (https://matplotlib.org/) for 
+static plots or `bokeh` (https://bokeh.org/) for interactive plots (`bokeh` module under develop).
+
 You can set the center and radius of the plot anywhere on a milkyway galaxy image with galactic or
 galactocentric coordinates.
 

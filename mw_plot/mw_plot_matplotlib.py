@@ -7,7 +7,7 @@ import astropy.coordinates as apycoords
 import matplotlib
 import pylab as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-from .mw_plot_masters import MWPlotMaster, MWSkyMapMaster, rgb2gray
+from mw_plot.mw_plot_masters import MWPlotMaster, MWSkyMapMaster, rgb2gray
 
 
 __all__ = ["MWPlot", "MWSkyMap"]

@@ -6,7 +6,13 @@
 Welcome to milkyway_plot's documentation!
 =========================================
 
-A handy python package to do plotting on a face-on/edge-on milkyway/skymap with matplotlib.
+.. note::
+
+    Documentation on readthedocs is still under construction, refers to Github readme for now
+
+A handy python package to do plotting on a face-on/edge-on milkyway/skymap with `matplotlib` (https://matplotlib.org/) for 
+static plots or `bokeh` (https://bokeh.org/) for interactive plots (`bokeh` module under develop).
+
 You can set the center and radius of the plot anywhere on a milkyway galaxy image with galactic or
 galactocentric coordinates.
 
