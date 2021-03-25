@@ -1,7 +1,7 @@
 .. raw:: html
 
     <p align="center">
-        <img width="25%" src="https://raw.githubusercontent.com/henrysky/milkyway_plot/master/mw-plot-logo-b.png" />
+        <img width="50%" src="https://raw.githubusercontent.com/henrysky/milkyway_plot/master/mw-plot-logo-b.png" />
     </p>
 
 |
