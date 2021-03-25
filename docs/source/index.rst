@@ -35,6 +35,7 @@ Author
 ---------------
 
 -  | **Henry Leung** - *Initial work and developer* - henrysky_
+   | Department of Astronomy & Astrophysics, University of Toronto
    | Contact Henry: henrysky.leung [at] utoronto.ca
 
 .. _henrysky: https://github.com/henrysky

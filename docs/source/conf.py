@@ -14,15 +14,18 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+import mw_plot
 
 # -- Project information -----------------------------------------------------
 
-project = 'milkyway_plot'
+project = 'mw-plot'
 copyright = '2021, Henry Leung'
 author = 'Henry Leung'
 
-# The full version, including alpha/beta/rc tags
-release = '0.8.0'
+# The short X.Y version.
+version = mw_plot.__version__
+# The full version, including alpha/beta/rc tags.
+release = mw_plot.__version__
 
 
 # -- General configuration ---------------------------------------------------
@@ -40,6 +43,15 @@ extensions = ['sphinx.ext.autodoc',
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
+# The suffix(es) of source filenames.
+# You can specify multiple suffix as a list of string:
+#
+# source_suffix = ['.rst', '.md']
+source_suffix = '.rst'
+
+# The master toctree document.
+master_doc = 'index'
+
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
@@ -51,7 +63,14 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'bizstyle'
+html_theme = 'sphinx_rtd_theme'
+
+# Theme options are theme-specific and customize the look and feel of a theme
+# further.  For a list of options available for each theme, see the
+# documentation.
+#
+html_theme_options = {
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -61,3 +80,66 @@ html_static_path = ['_static']
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
 html_last_updated_fmt = '%d %b %Y'
+
+# -- Options for HTMLHelp output ------------------------------------------
+
+# Output file base name for HTML help builder.
+htmlhelp_basename = 'mw-plotdoc'
+
+# -- Options for LaTeX output ---------------------------------------------
+
+latex_elements = {
+    # The paper size ('letterpaper' or 'a4paper').
+    #
+    # 'papersize': 'letterpaper',
+
+    # The font size ('10pt', '11pt' or '12pt').
+    #
+    # 'pointsize': '10pt',
+
+    # Additional stuff for the LaTeX preamble.
+    #
+    # 'preamble': '',
+
+    # Latex figure (float) alignment
+    #
+    # 'figure_align': 'htbp',
+}
+
+# Grouping the document tree into LaTeX files. List of tuples
+# (source start file, target name, title,
+#  author, documentclass [howto, manual, or own class]).
+latex_documents = [
+    (master_doc, 'mwplot.tex', 'mw-plot Documentation',
+     'Henry Leung', 'manual'),
+]
+
+# -- Options for manual page output ---------------------------------------
+
+# One entry per manual page. List of tuples
+# (source start file, name, description, authors, manual section).
+man_pages = [
+    (master_doc, 'mw-plot', 'mw-plot Documentation',
+     [author], 1)
+]
+
+# -- Options for Texinfo output -------------------------------------------
+
+# Grouping the document tree into Texinfo files. List of tuples
+# (source start file, target name, title, author,
+#  dir menu entry, description, category)
+texinfo_documents = [
+    (master_doc, 'mw-plot', 'mw-plot Documentation',
+     author, 'mw-plot', 'A handy python package to do plotting on a face-on/edge-on/allsky map milkyway',
+     'Miscellaneous'),
+]
+
+# Example configuration for intersphinx: refer to the Python standard library.
+intersphinx_mapping = {'https://docs.python.org/': None}
+
+html_show_sourcelink = True
+
+# inheritance diagram
+inheritance_graph_attrs = dict(dpi=144)
+
+inheritance_node_attrs = dict(dpi=144)
