@@ -64,12 +64,15 @@ exclude_patterns = []
 # a list of builtin themes.
 #
 html_theme = 'sphinx_rtd_theme'
+html_favicon = 'favicon.png'
+html_logo = 'mw-plot-logo.png'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
 html_theme_options = {
+    'logo_only': True
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,

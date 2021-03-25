@@ -1,5 +1,10 @@
-mw_plot
-========
+.. raw:: html
+
+    <p align="center">
+        <img width="25%" src="https://raw.githubusercontent.com/henrysky/milkyway_plot/master/mw-plot-logo-b.png" />
+    </p>
+
+|
 
 .. image:: https://readthedocs.org/projects/milkyway-plot/badge/?version=latest
    :target: https://milkyway-plot.readthedocs.io/en/latest/
@@ -13,7 +18,11 @@ mw_plot
    :target: https://github.com/henrysky/astroNN/actions
    :alt: Build Status
 
-A handy python package to do plotting on a face-on/edge-on milkyway/skymap with `matplotlib` (https://matplotlib.org/) for 
+
+Getting Started
+=================
+
+mw-plot handy python package to do plotting on a face-on/edge-on milkyway/skymap with `matplotlib` (https://matplotlib.org/) for 
 static plots or `bokeh` (https://bokeh.org/) for interactive plots (`bokeh` module under develop).
 
 You can set the center and radius of the plot anywhere on a milkyway galaxy image with galactic or
