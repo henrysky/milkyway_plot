@@ -1,0 +1,19 @@
+{% extends "!layout.html" %}
+  {% block footer %} {{ super() }}
+
+  <style>
+         .wy-nav-content { max-width: 100% }
+
+         .wy-nav-side { 
+           width: 400px }
+           @media screen and (max-width: 768px) {.wy-nav-side {left: -400px }}
+         .wy-nav-content-wrap  { 
+           margin-left: 400px }
+           @media screen and (max-width: 768px) {.wy-nav-content-wrap {margin-left: 0px }}
+         .wy-side-scroll { width: 420px }
+         .wy-side-nav-search { width: 400px }
+         .wy-menu-vertical { width: 400px }
+         
+  </style>
+
+{% endblock %}
