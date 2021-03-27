@@ -8,14 +8,17 @@ import warnings
 
 def rgb2gray(rgb):
     """
-    Change RGB color image into grayscale in RGB representation
+    Change RGB color image into grayscale in RGB representation using colorimetric (perceptual luminance-preserving) conversion
 
     :param rgb: NumPy array of the RGB image
     :return: NumPy array of grayscale image, same shape as input
     """
-    r, g, b = rgb[:, :, 0], rgb[:, :, 1], rgb[:, :, 2]
-    gray = np.atleast_3d(255.-(0.2989 * r + 0.5870 * g + 0.1140 * b))
-    return np.repeat(gray, 3, axis=2).astype(int)
+    r, g, b = rgb[:, :, 0]/255, rgb[:, :, 1]/255, rgb[:, :, 2]/255
+    r = np.where(r<=0.04045, r/12.92, ((r+0.055)/1.055)**2.4)
+    g = np.where(g<=0.04045, g/12.92, ((g+0.055)/1.055)**2.4)
+    b = np.where(b<=0.04045, b/12.92, ((b+0.055)/1.055)**2.4)
+    gray = np.atleast_3d((0.2126 * r + 0.7152 * g + 0.0722 * b))
+    return np.repeat(gray, 3, axis=2)
 
 
 class MWPlotMaster(ABC):
@@ -35,7 +38,7 @@ class MWPlotMaster(ABC):
         self.__coord = coord
         self.__annotation = annotation
         self.__rot90 = rot90
-        self.__grayscale = grayscale
+        self._grayscale = grayscale
         self.r0 = r0 * u.kpc
         self.mode = mode
         
@@ -95,7 +98,7 @@ class MWPlotMaster(ABC):
             path = os.path.join(os.path.dirname(__file__), image_filename)
             img = plt.imread(path)
             
-        if self.__grayscale:
+        if self._grayscale:
             img = rgb2gray(img)
 
         if self.__coord.lower() == 'galactic':
@@ -135,7 +138,7 @@ class MWPlotMaster(ABC):
             img = img[y_top_px:y_bottom_px, x_left_px:x_right_px]
         else:
             # create a black/white image first with 3 channel with the same data type
-            if self.__grayscale:
+            if self._grayscale:
                 black_img = np.ones((pixel_radius * 2, pixel_radius * 2, 3), dtype=img.dtype) * 255
             else:
                 black_img = np.zeros((pixel_radius * 2, pixel_radius * 2, 3), dtype=img.dtype)
