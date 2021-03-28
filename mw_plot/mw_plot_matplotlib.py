@@ -1,10 +1,15 @@
 import os
+import warnings
+from astropy.coordinates.calculation import HumanError
 import numpy as np
 
 import astropy.units as u
 import astropy.coordinates as apycoords
 
 import matplotlib
+from matplotlib.figure import Figure
+from matplotlib.axes._subplots import Axes
+
 import pylab as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mw_plot.mw_plot_masters import MWPlotMaster, MWSkyMapMaster, rgb2gray
@@ -53,8 +58,8 @@ class MWPlot(MWPlotMaster):
         self.figsize = (20, 20)
         self.dpi = 200
         self.cmap = "viridis"
-        self.imalpha = 0.85
-        self.facecolor = 'k'
+        self.imalpha = 1.
+        self.facecolor = 'k' if not grayscale else 'w'
         self.tight_layout = True
 
         self._unit_english = None
@@ -70,12 +75,32 @@ class MWPlot(MWPlotMaster):
         self.clim = None
 
         # prepossessing procedure
-        self._unit_english = self._unit.long_names[0]
+        self._unit_english = self._unit.short_names[0]
         if self._center.unit is not None and self._radius.unit is not None:
             self._center = self._center.to(self._unit)
             self._radius = self._radius.to(self._unit)
 
         self.images_read()
+        
+    def transform(self, x):
+        """
+        Transform matplotlib figure or a single axes
+        """
+        if isinstance(x, Figure):
+            if len(x.axes) > 1: 
+                warnings.warn("More than 1 axes in the figure, mw-plot will populate to all axes")
+            fig = x
+            ax = fig.axes
+        elif isinstance(x, Axes):
+            fig = x.figure
+            ax = [x]
+        elif (isinstance(x, list) or isinstance(x, np.ndarray)) and isinstance(x[0], Axes):
+            fig = x[0].figure
+            ax = x
+        else:
+            raise TypeError(f"Your input type {type(x)} is unsupported, can only be matplotlib figure or axes")
+        for _ax in ax:
+            self.initialize_mwplot(fig, _ax)
     
     def plot(self, x, y, *args, **kwargs):
         x, y = self.xy_unit_check(x, y)
@@ -151,22 +176,30 @@ class MWPlot(MWPlotMaster):
         mycmap._lut[0, -1] = 0
         return mycmap
 
-    def initialize_mwplot(self):
+    def initialize_mwplot(self, fig=None, ax=None):
         """
-        Initial mw_plot images and plot
+        Internal method to initial mw_plot images and plot
 
         :return: None
         """
-        if self.fig is None:
-            self.fig, self.ax = plt.subplots(1, figsize=self.figsize, dpi=self.dpi)
-            if self.title is not None:
-                self.fig.suptitle(self.title, fontsize=self.fontsize)
-            self.ax.set_xlabel(f'{self._coord_english} ({self._unit_english})', fontsize=self.fontsize)
-            self.ax.set_ylabel(f'{self._coord_english} ({self._unit_english})', fontsize=self.fontsize)
-            self.ax.set_aspect(self._aspect)
-            self.ax.set_facecolor(self.facecolor)  # have a black color background for image with <1.0 alpha
-            self.ax.imshow(self._img, zorder=2, extent=self._ext, alpha=self.imalpha, rasterized=True)
-            self.ax.tick_params(labelsize=self.fontsize * 0.8, width=self.fontsize / 10, length=self.fontsize / 2)
+        if self.fig is None and fig is None:
+            fig, ax = plt.subplots(1, figsize=self.figsize, dpi=self.dpi)
+        elif fig is not None:
+            pass
+        else:
+            raise HumanError("Something is wrong duh")
+        if self.title is not None:
+            ax.set_title(self.title, fontsize=self.fontsize)
+        ax.set_xlabel(f'{self._coord_english} ({self._unit_english})', fontsize=self.fontsize)
+        ax.set_ylabel(f'{self._coord_english} ({self._unit_english})', fontsize=self.fontsize)
+        ax.set_aspect(self._aspect)
+        ax.set_facecolor(self.facecolor)  # have a black color background for image with <1.0 alpha
+        if not self._grayscale:
+            ax.imshow(self._img, extent=self._ext, zorder=0, alpha=self.imalpha, rasterized=True)
+        else:
+            ax.imshow(self._img[:, :, 0], extent=self._ext, zorder=0, alpha=self.imalpha, rasterized=True, cmap='gray')
+        ax.tick_params(labelsize=self.fontsize * 0.8, width=self.fontsize / 10, length=self.fontsize / 2)
+        self.fig, self.ax = fig, ax
 
     def mw_scatter(self, x, y, c, **kwargs):
         """
@@ -317,41 +350,78 @@ class MWSkyMap(MWSkyMapMaster):
 
         self.images_read()
 
-    def initialize_mwplot(self):
+    def transform(self, x):
+        """
+        Transform matplotlib figure or a single axes
+        """
+        if isinstance(x, Figure):
+            if len(x.axes) > 1: 
+                warnings.warn("More than 1 axes in the figure, mw-plot will populate to all axes")
+            fig = x
+            ax = fig.axes
+        elif isinstance(x, Axes):
+            fig = x.figure
+            ax = [x]
+        elif (isinstance(x, list) or isinstance(x, np.ndarray)) and isinstance(x[0], Axes):
+            fig = x[0].figure
+            ax = x
+        else:
+            raise TypeError(f"Your input type {type(x)} is unsupported, can only be matplotlib figure or axes")
+        for _ax in ax:
+            self.initialize_mwplot(fig, _ax)
+
+    def initialize_mwplot(self, fig, ax):
         """
         Initial mw_plot images and plot
 
         :return: None
         """
-        if self.fig is None:
-            if self._projection == 'equirectangular':
-                self.fig, self.ax = plt.subplots(1, figsize=self.figsize, dpi=self.dpi)
-                self.ax.set_xlabel('Galactic Longitude (Degree)', fontsize=self.fontsize)
-                self.ax.set_ylabel('Galactic Latitude (Degree)', fontsize=self.fontsize)
-                self._ext = [(self._center[0] - self._radius[0]).value, (self._center[0] + self._radius[0]).value,
-                              (self._center[1] - self._radius[1]).value, (self._center[1] + self._radius[1]).value]
-                self.ax.imshow(self._img, zorder=2, extent=self._ext, alpha=self.imalpha, rasterized=True)
+        # if self.fig is None and fig is None:
+        #     fig, ax = plt.subplots(1, figsize=self.figsize, dpi=self.dpi)
+        # elif fig is not None:
+        #     pass
+        # else:
+        #     raise HumanError("Something is wrong duh")
+        
+        if self._projection == 'equirectangular':
+            if self.fig is None and fig is None:
+                fig, ax = plt.subplots(1, figsize=self.figsize, dpi=self.dpi)
+            elif fig is not None:
+                pass
             else:
+                raise HumanError("Something is wrong duh")
+            ax.set_xlabel('Galactic Longitude (Degree)', fontsize=self.fontsize)
+            ax.set_ylabel('Galactic Latitude (Degree)', fontsize=self.fontsize)
+            self._ext = [(self._center[0] - self._radius[0]).value, (self._center[0] + self._radius[0]).value,
+                            (self._center[1] - self._radius[1]).value, (self._center[1] + self._radius[1]).value]
+            ax.imshow(self._img, zorder=2, extent=self._ext, alpha=self.imalpha, rasterized=True)
+        else:  # those cases if there is non-trivial projection
+            if self.fig is None and fig is None:
                 self.fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
                 self.ax = self.fig.add_subplot(111, projection=self._projection)
-                # color
-                cmap_red = matplotlib.colors.LinearSegmentedColormap.from_list("", ["black", "red"], N=256)
-                cmap_grn = matplotlib.colors.LinearSegmentedColormap.from_list("", ["black", "green"], N=256)
-                cmap_blue = matplotlib.colors.LinearSegmentedColormap.from_list("", ["black", "blue"], N=256)
+            elif fig is not None:
+                pass
+            else:
+                raise HumanError("Something is wrong duh")
+            # color
+            cmap_red = matplotlib.colors.LinearSegmentedColormap.from_list("", ["black", "red"], N=256)
+            cmap_grn = matplotlib.colors.LinearSegmentedColormap.from_list("", ["black", "green"], N=256)
+            cmap_blue = matplotlib.colors.LinearSegmentedColormap.from_list("", ["black", "blue"], N=256)
 
-                # coordinates
-                lon = np.linspace(-np.pi, np.pi, 6501)
-                lat = np.linspace(np.pi / 2., -np.pi / 2., 3251)
-                Lon, Lat = np.meshgrid(lon, lat)
-                im = self.ax.pcolormesh(Lon, Lat, rgb2gray(self._img)[:, :, 0], cmap='gray_r', zorder=2, alpha=self.imalpha, rasterized=True)
-                # imr = self.ax.pcolormesh(Lon, Lat, self._img[:, :, 0], cmap=cmap_red, zorder=2, alpha=0.33)
-                # img = self.ax.pcolormesh(Lon, Lat, self._img[:, :, 1], cmap=cmap_grn, zorder=2, alpha=0.33)
-                # imb = self.ax.pcolormesh(Lon, Lat, self._img[:, :, 2], cmap=cmap_blue, zorder=2, alpha=0.33)
+            # coordinates
+            lon = np.linspace(-np.pi, np.pi, 6501)
+            lat = np.linspace(np.pi / 2., -np.pi / 2., 3251)
+            Lon, Lat = np.meshgrid(lon, lat)
+            im = ax.pcolormesh(Lon, Lat, rgb2gray(self._img)[:, :, 0], cmap='gray_r', zorder=2, alpha=self.imalpha, rasterized=True)
+            # imr = self.ax.pcolormesh(Lon, Lat, self._img[:, :, 0], cmap=cmap_red, zorder=2, alpha=0.33)
+            # img = self.ax.pcolormesh(Lon, Lat, self._img[:, :, 1], cmap=cmap_grn, zorder=2, alpha=0.33)
+            # imb = self.ax.pcolormesh(Lon, Lat, self._img[:, :, 2], cmap=cmap_blue, zorder=2, alpha=0.33)
 
-            self.ax.set_facecolor('k')  # have a black color background for image with <1.0 alpha
-            self.ax.tick_params(labelsize=self.fontsize * 0.8, width=self.fontsize / 10, length=self.fontsize / 2)
-            if self.title is not None:
-                self.fig.suptitle(self.title, fontsize=self.fontsize)
+        ax.set_facecolor('k')  # have a black color background for image with <1.0 alpha
+        ax.tick_params(labelsize=self.fontsize * 0.8, width=self.fontsize / 10, length=self.fontsize / 2)
+        if self.title is not None:
+            ax.suptitle(self.title, fontsize=self.fontsize)
+        self.fig, self.ax = fig, ax
 
     def show(self, *args, **kwargs):
         if self.fig is None:

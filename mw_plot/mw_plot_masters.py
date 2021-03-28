@@ -17,8 +17,8 @@ def rgb2gray(rgb):
     r = np.where(r<=0.04045, r/12.92, ((r+0.055)/1.055)**2.4)
     g = np.where(g<=0.04045, g/12.92, ((g+0.055)/1.055)**2.4)
     b = np.where(b<=0.04045, b/12.92, ((b+0.055)/1.055)**2.4)
-    gray = np.atleast_3d((0.2126 * r + 0.7152 * g + 0.0722 * b))
-    return np.repeat(gray, 3, axis=2)
+    gray = np.atleast_3d(1-(0.2126 * r + 0.7152 * g + 0.0722 * b))
+    return np.repeat(255*gray, 3, axis=2).astype(int)
 
 
 class MWPlotMaster(ABC):

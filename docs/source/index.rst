@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to milkyway_plot's documentation!
+Welcome to mw-plot's documentation!
 =========================================
 
 .. note::
@@ -26,10 +26,30 @@ The image is 6500x3250px with resolution of 15.38 light years per pixel generate
 is required if you generate plots for your non-commerical publication, but you **must acknowledgement the origin of
 the background images** provided above.
 
+Install
+---------------------
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+To install via ``pip``
+
+.. prompt:: bash $
+   
+   pip install mw_plot
+
+
+If something is not working properly, try to upgrade first and then report it as an issue
+
+.. prompt:: bash $
+
+   pip install mw_plot --upgrade
+
+
+OR clone the latest commit of mw_plot from github and install
+
+.. prompt:: bash $
+
+   git clone --depth=1 git://github.com/henrysky/milkyway_plot
+   python setup.py install
+
 
 Author
 ---------------
@@ -39,6 +59,15 @@ Author
    | Contact Henry: henrysky.leung [at] utoronto.ca
 
 .. _henrysky: https://github.com/henrysky
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+.. toctree::
+   :caption: Getting Started
+   
+   basics
 
 
 Indices and tables

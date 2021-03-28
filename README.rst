@@ -51,9 +51,9 @@ System Requirement
 ---------------------
 
 -  | **Python** 3.6 or above
--  | **astropy** 3.0 or above
+-  | **astropy** 4.0 or above
 -  | **Numpy** 1.16.0 or above
--  | **Matplotlib** 3.1.0 above
+-  | **Matplotlib** 3.1.0 or above
 -  | **Pillow** 5.0.0 above
 
 Matplotlib 2.2.3 has trouble to save pdf plot with this package. Please use Matplotlib >3.0 if you experience issue
