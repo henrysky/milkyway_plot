@@ -34,13 +34,18 @@ class MWPlotMaster(ABC):
                  r0, 
                  center, 
                  radius, 
-                 unit):
+                 unit, 
+                 figsize,
+                 dpi):
         self.__coord = coord
         self.__annotation = annotation
         self.__rot90 = rot90
         self._grayscale = grayscale
         self.r0 = r0 * u.kpc
         self.mode = mode
+        self._initialized = False
+        self.figsize = figsize
+        self.dpi = dpi
         
         # user should not change these values anyway
         self._center = center
@@ -189,7 +194,9 @@ class MWSkyMapMaster(ABC):
                 grayscale, 
                 projection, 
                 center, 
-                radius):
+                radius, 
+                figsize, 
+                dpi):
         if projection in ["equirectangular", "aitoff", "hammer", "lambert", "mollweide"]:
             self._projection = projection
         else:
@@ -198,6 +205,8 @@ class MWSkyMapMaster(ABC):
         self._center = center
         self._radius = radius
         self._grayscale = grayscale
+        self.figsize = figsize
+        self.dpi = dpi
     
     def images_read(self):
         image_filename = 'MW_edgeon_edr3_unannotate.jpg'

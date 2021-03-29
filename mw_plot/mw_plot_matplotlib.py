@@ -21,29 +21,33 @@ __all__ = ["MWPlot", "MWSkyMap"]
 class MWPlot(MWPlotMaster):
     """
     MWPlot class plotting with Matplotlib
+    
+    :param mode: whether plot edge-on or face-on milkyway
+    :type mode: str, either 'face-on' or 'edge-on'
+    :param center: Coordinates of the center of the plot with astropy units
+    :type center: astropy.Quantity
+    :param radius: Radius of the plot with astropy units
+    :type radius: astropy.Quantity
+    :param unit: astropy units
+    :type unit: astropy.Quantity
+    :param coord: 'galactocentric' or 'galactic'
+    :type coord: str
+    :param annotation: whether use a milkyway background with annotation
+    :type annotation: bool
+    :param rot90: number of 90 degree rotation
+    :type rot90: int
+    :param grayscale: whether to use grayscale background
+    :type grayscale: bool
+    :param r0: distance to galactic center in kpc
+    :type r0: float
+    
+    :param figsize: Matplotlib figure size
+    :type figsize: turple
+    :param figsize: Matplotlib figure dpi
+    :type figsize: int
     """
     def __init__(self, mode='face-on', center=(0, 0) * u.kpc, radius=90750 * u.lyr, unit=u.kpc, coord='galactic',
-                 annotation=True, rot90=0, grayscale=False, r0=8.125):
-        """
-        ;:param mode: whether plot edge-on or face-on milkyway
-        :type mode: string, either 'face-on' or 'edge-on'
-        :param center: Coordinates of the center of the plot with astropy units
-        :type center: astropy.Quantity
-        :param radius: Radius of the plot with astropy units
-        :type radius: astropy.Quantity
-        :param unit: astropy units
-        :type unit: astropy.Quantity
-        :param coord: 'galactocentric' or 'galactic'
-        :type coord: str
-        :param annotation: whether use a milkyway background with annotation
-        :type annotation: bool
-        :param rot90: number of 90 degree rotation
-        :type rot90: int
-        :param grayscale: whether to use grayscale background
-        :type grayscale: bool
-        :param r0: distance to galactic center in kpc
-        :type r0: float
-        """
+                 annotation=True, rot90=0, grayscale=False, r0=8.125, figsize=(7.5, 7.5), dpi=144):
         super().__init__(grayscale=grayscale, 
                          annotation=annotation, 
                          rot90=rot90, 
@@ -52,11 +56,11 @@ class MWPlot(MWPlotMaster):
                          r0=r0, 
                          center=center, 
                          radius=radius, 
-                         unit=unit)
-        self.fontsize = 35
+                         unit=unit, 
+                         figsize=figsize, 
+                         dpi=dpi)
+        self.fontsize = 20
         self.s = 1.0
-        self.figsize = (20, 20)
-        self.dpi = 200
         self.cmap = "viridis"
         self.imalpha = 1.
         self.facecolor = 'k' if not grayscale else 'w'
@@ -200,6 +204,8 @@ class MWPlot(MWPlotMaster):
             ax.imshow(self._img[:, :, 0], extent=self._ext, zorder=0, alpha=self.imalpha, rasterized=True, cmap='gray')
         ax.tick_params(labelsize=self.fontsize * 0.8, width=self.fontsize / 10, length=self.fontsize / 2)
         self.fig, self.ax = fig, ax
+        
+        self._initialized = True
 
     def mw_scatter(self, x, y, c, **kwargs):
         """
@@ -298,7 +304,8 @@ class MWSkyMap(MWSkyMapMaster):
     """
     MWSkyMap class plotting with Matplotlib
     """
-    def __init__(self, projection='equirectangular', center=(0, 0) * u.deg, radius=(180, 90) * u.deg, grayscale=False):
+    def __init__(self, projection='equirectangular', center=(0, 0) * u.deg, radius=(180, 90) * u.deg, grayscale=False, 
+                 figsize=(10, 6.5), dpi=144):
         """
 
         :param projection: projection system of the plot
@@ -309,18 +316,23 @@ class MWSkyMap(MWSkyMapMaster):
         :type radius: astropy.Quantity
         :param grayscale: whether to use grayscale background
         :type grayscale: bool
+        
+        :param figsize: Matplotlib figure size
+        :type figsize: turple
+        :param figsize: Matplotlib figure dpi
+        :type figsize: int
         """
         super().__init__(grayscale=grayscale, 
                          projection=projection, 
                          center=center, 
-                         radius=radius)
+                         radius=radius, 
+                         figsize=figsize, 
+                         dpi=dpi)
         self._unit = u.degree
-        self.fontsize = 30
+        self.fontsize = 20
         self.s = 1.
-        self.figsize = (20, 11)
-        self.dpi = 200
         self.cmap = "viridis"
-        self.imalpha = 0.85
+        self.imalpha = 1.
         self.tight_layout = True
         self._ext = None
 
@@ -329,6 +341,7 @@ class MWSkyMap(MWSkyMapMaster):
         self.title = None
         self.cbar_flag = False
         self.clim = None
+        self.facecolor = 'k' if not grayscale else 'w'
 
         #preprocessing
         if self._projection != 'equirectangular':  # other projections do not support zoom in
@@ -370,7 +383,7 @@ class MWSkyMap(MWSkyMapMaster):
         for _ax in ax:
             self.initialize_mwplot(fig, _ax)
 
-    def initialize_mwplot(self, fig, ax):
+    def initialize_mwplot(self, fig=None, ax=None):
         """
         Initial mw_plot images and plot
 
@@ -397,8 +410,8 @@ class MWSkyMap(MWSkyMapMaster):
             ax.imshow(self._img, zorder=2, extent=self._ext, alpha=self.imalpha, rasterized=True)
         else:  # those cases if there is non-trivial projection
             if self.fig is None and fig is None:
-                self.fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
-                self.ax = self.fig.add_subplot(111, projection=self._projection)
+                fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
+                ax = fig.add_subplot(111, projection=self._projection)
             elif fig is not None:
                 pass
             else:
@@ -409,19 +422,25 @@ class MWSkyMap(MWSkyMapMaster):
             cmap_blue = matplotlib.colors.LinearSegmentedColormap.from_list("", ["black", "blue"], N=256)
 
             # coordinates
-            lon = np.linspace(-np.pi, np.pi, 6501)
-            lat = np.linspace(np.pi / 2., -np.pi / 2., 3251)
+            lon = np.linspace(-np.pi, np.pi, 6500+1)
+            lat = np.linspace(np.pi / 2., -np.pi / 2., 3250+1)
             Lon, Lat = np.meshgrid(lon, lat)
-            im = ax.pcolormesh(Lon, Lat, rgb2gray(self._img)[:, :, 0], cmap='gray_r', zorder=2, alpha=self.imalpha, rasterized=True)
+            if self._grayscale:
+                _cmap = 'gray_r'
+            else:
+                _cmap = 'gray'
+            im = ax.pcolormesh(Lon, Lat, rgb2gray(self._img)[:, :, 0], zorder=2, cmap=_cmap, alpha=self.imalpha, rasterized=True)
             # imr = self.ax.pcolormesh(Lon, Lat, self._img[:, :, 0], cmap=cmap_red, zorder=2, alpha=0.33)
             # img = self.ax.pcolormesh(Lon, Lat, self._img[:, :, 1], cmap=cmap_grn, zorder=2, alpha=0.33)
             # imb = self.ax.pcolormesh(Lon, Lat, self._img[:, :, 2], cmap=cmap_blue, zorder=2, alpha=0.33)
 
-        ax.set_facecolor('k')  # have a black color background for image with <1.0 alpha
+        ax.set_facecolor(self.facecolor)  # have a black color background for image with <1.0 alpha
         ax.tick_params(labelsize=self.fontsize * 0.8, width=self.fontsize / 10, length=self.fontsize / 2)
         if self.title is not None:
-            ax.suptitle(self.title, fontsize=self.fontsize)
+            ax.set_title(self.title, fontsize=self.fontsize)
         self.fig, self.ax = fig, ax
+        
+        self._initialized = True
 
     def show(self, *args, **kwargs):
         if self.fig is None:

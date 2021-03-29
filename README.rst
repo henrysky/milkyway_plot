@@ -38,6 +38,8 @@ The image is 6500x3250px with resolution of 15.38 light years per pixel generate
 is required if you generate plots for your non-commerical publication, but you **must acknowledgement the origin of
 the background images** provided above.
 
+Documentation will gradually be migrated to https://readthedocs.org/projects/milkyway-plot/badge/?version=latest
+
 Author
 ---------------
 

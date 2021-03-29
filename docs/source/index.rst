@@ -50,6 +50,26 @@ OR clone the latest commit of mw_plot from github and install
    git clone --depth=1 git://github.com/henrysky/milkyway_plot
    python setup.py install
 
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+.. toctree::
+   :caption: Getting Started
+   
+   basics
+   changelog
+
+.. toctree::
+   :caption: Matplotlib backend
+   
+   matplotlib_single
+   matplotlib_multi
+   matplotlib_gallery
+
+.. toctree::
+   :caption: Bokeh backend
+   
 
 Author
 ---------------
@@ -59,16 +79,6 @@ Author
    | Contact Henry: henrysky.leung [at] utoronto.ca
 
 .. _henrysky: https://github.com/henrysky
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
-.. toctree::
-   :caption: Getting Started
-   
-   basics
-
 
 Indices and tables
 ==================

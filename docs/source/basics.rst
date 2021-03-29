@@ -1,6 +1,11 @@
 Basic Usage
 =================
 
+
+
+Useful constants
+-------------------
+
 .. code-block:: python
     :caption: A few usage constants
     :linenos:
