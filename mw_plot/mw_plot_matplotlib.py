@@ -6,11 +6,11 @@ import numpy as np
 import astropy.units as u
 import astropy.coordinates as apycoords
 
-import matplotlib
+import pylab as plt
+from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.figure import Figure
 from matplotlib.axes._subplots import Axes
 
-import pylab as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mw_plot.mw_plot_masters import MWPlotMaster, MWSkyMapMaster, rgb2gray
 
@@ -389,13 +389,6 @@ class MWSkyMap(MWSkyMapMaster):
 
         :return: None
         """
-        # if self.fig is None and fig is None:
-        #     fig, ax = plt.subplots(1, figsize=self.figsize, dpi=self.dpi)
-        # elif fig is not None:
-        #     pass
-        # else:
-        #     raise HumanError("Something is wrong duh")
-        
         if self._projection == 'equirectangular':
             if self.fig is None and fig is None:
                 fig, ax = plt.subplots(1, figsize=self.figsize, dpi=self.dpi)
@@ -417,9 +410,9 @@ class MWSkyMap(MWSkyMapMaster):
             else:
                 raise HumanError("Something is wrong duh")
             # color
-            cmap_red = matplotlib.colors.LinearSegmentedColormap.from_list("", ["black", "red"], N=256)
-            cmap_grn = matplotlib.colors.LinearSegmentedColormap.from_list("", ["black", "green"], N=256)
-            cmap_blue = matplotlib.colors.LinearSegmentedColormap.from_list("", ["black", "blue"], N=256)
+            cmap_red = LinearSegmentedColormap.from_list("", ["black", "red"], N=256)
+            cmap_grn = LinearSegmentedColormap.from_list("", ["black", "green"], N=256)
+            cmap_blue = LinearSegmentedColormap.from_list("", ["black", "blue"], N=256)
 
             # coordinates
             lon = np.linspace(-np.pi, np.pi, 6500+1)

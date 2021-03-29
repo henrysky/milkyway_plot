@@ -6,6 +6,7 @@ import astropy.units as u
 import astropy.coordinates as coord
 import warnings
 
+
 def rgb2gray(rgb):
     """
     Change RGB color image into grayscale in RGB representation using colorimetric (perceptual luminance-preserving) conversion

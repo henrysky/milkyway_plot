@@ -54,7 +54,9 @@ class MWPlotBokeh(MWPlotMaster):
                          r0=r0, 
                          center=center, 
                          radius=radius, 
-                         unit=unit)
+                         unit=unit, 
+                         figsize=None, 
+                         dpi=None)
         
         # prepossessing procedure
         self._unit_english = self._unit.long_names[0]
@@ -107,7 +109,9 @@ class MWSkyMapBokeh(MWSkyMapMaster):
         super().__init__(grayscale=grayscale, 
                          projection='equirectangular', 
                          center=center, 
-                         radius=radius)
+                         radius=radius, 
+                         figsize=None, 
+                         dpi=None)
         self._unit = u.degree
         self.s = 1.
 
