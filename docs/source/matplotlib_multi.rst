@@ -61,6 +61,9 @@ Tranform multiple subplots
 
 .. image:: matplotlib_imgs/multi1.jpg
 
+Tranform subplots with different style
+---------------------------------------
+
 Not only you can transform with one style, you can do multiple style too
 
 .. code-block:: python
@@ -89,3 +92,27 @@ Not only you can transform with one style, you can do multiple style too
     fig.tight_layout()
 
 .. image:: matplotlib_imgs/multi2.jpg
+
+Tranform all subplots 
+-----------------------
+
+You can quickly transform all subplots in a figure
+
+.. code-block:: python
+    :linenos:
+
+    import pylab as plt
+    from mw_plot import MWPlot
+    from astropy import units as  u
+
+    # setup a mw-plot instance of bird's eyes view of the disc
+    mw1 = MWPlot(radius=20 * u.kpc, center=(0, 0)*u.kpc, unit=u.kpc, coord='galactocentric', grayscale=False, annotation=False)
+
+    # setup subplots with matplotlib
+    fig, (ax_top, ax_bottom) = plt.subplots(2, 4, figsize=(20, 10))
+
+    # transform the whole figure with mw-plot
+    # mw1.transform([ax1, ax2]) will have the same effect
+    mw1.transform(fig)
+
+.. image:: matplotlib_imgs/multi3.jpg

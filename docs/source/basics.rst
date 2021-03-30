@@ -19,3 +19,5 @@ Useful constants
     southpole_radec  # refers to the [RA, DEC] of galactic south pole in deg
 
     mw_plane_ra, mw_plane_dec = mw_radec(deg=True)  # RA/DEC arrays of milkyway plane
+
+.. image:: const_utils.png

@@ -145,18 +145,12 @@ class MWPlot(MWPlotMaster):
             raise AttributeError('Nothing to show, please plot some data first')
         else:
             if self.tight_layout is True:
-                if self.cbar_flag is False:  # if no colorbar, it will push the title in wrong place
-                    self.fig.tight_layout(rect=[0, 0.00, 1, 0.96])
-                else:  # so no colorbar no problem
-                    self.fig.tight_layout(rect=[0, 0.00, 1, 1.05])
+                self.fig.tight_layout()
             self.fig.show(*args, **kwargs)
 
     def savefig(self, file='MWPlot.png'):
         if self.tight_layout is True:
-            if self.cbar_flag is False:  # if no colorbar, it will push the title in wrong place
-                self.fig.tight_layout(rect=[0, 0.00, 1, 0.96])
-            else:  # so no colorbar no problem
-                self.fig.tight_layout(rect=[0, 0.00, 1, 1.05])
+            self.fig.tight_layout()
         # this is a pylab method
         self.fig.savefig(file)
 
@@ -440,18 +434,12 @@ class MWSkyMap(MWSkyMapMaster):
             raise AttributeError('Nothing to show, please plot some data first')
         else:
             if self.tight_layout is True:
-                if self.cbar_flag is False:  # if no colorbar, it will push the title in wrong place
-                    self.fig.tight_layout(rect=[0, 0.00, 1, 0.96])
-                else:  # so no colorbar no problem
-                    self.fig.tight_layout(rect=[0, 0.00, 1, 1.05])
+                self.fig.tight_layout()
             self.fig.show(*args, **kwargs)
 
     def savefig(self, file='MWSkyMap.png'):
         if self.tight_layout is True:
-            if self.cbar_flag is False:  # if no colorbar, it will push the title in wrong place
-                self.fig.tight_layout(rect=[0, 0.00, 1, 0.96])
-            else:  # so no colorbar no problem
-                self.fig.tight_layout(rect=[0, 0.00, 1, 1.05])
+            self.fig.tight_layout()
         # this is a pylab method
         self.fig.savefig(file)
 
