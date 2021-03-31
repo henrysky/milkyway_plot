@@ -49,9 +49,14 @@ class MWPlotMaster(ABC):
         self.dpi = dpi
         
         # user should not change these values anyway
+        self._ext = None
+        self._img = None
+        self._img_fname = None
+        self._gh_img_url = None 
         self._center = center
         self._radius = radius
         self._unit = unit
+        self._gh_imgbase_url = "https://github.com/henrysky/milkyway_plot/raw/master/mw_plot/"
 
         # Fixed value
         if self.mode == 'face-on':
@@ -62,6 +67,16 @@ class MWPlotMaster(ABC):
             self.__resolution = 15.384615846 * u.lyr
         else:
             raise LookupError(f"Unknown mode '{self.mode}', can only be 'edge-on' or 'face-on'")
+        
+        # check if running in browser-based ipython (aka jupyter)
+        self._in_jupyter = False
+        try:
+            from IPython import get_ipython
+            ip = get_ipython()
+            if ip.has_trait('kernel'):
+                self._in_jupyter = True
+        except ImportError or AttributeError:
+            pass
 
     def xy_unit_check(self, x, y):
         if not type(x) == u.quantity.Quantity or not type(y) == u.quantity.Quantity:
@@ -90,7 +105,6 @@ class MWPlotMaster(ABC):
 
     
     def images_read(self):
-        image_filename = 'MW_bg_annotate.jpg'
         if self.mode == 'edge-on':
             image_filename = 'MW_edgeon_edr3_unannotate.jpg'
             path = os.path.join(os.path.dirname(__file__), image_filename)
@@ -101,8 +115,11 @@ class MWPlotMaster(ABC):
             path = os.path.join(os.path.dirname(__file__), image_filename)
             img = plt.imread(path)
         else:
+            image_filename = 'MW_bg_annotate.jpg'
             path = os.path.join(os.path.dirname(__file__), image_filename)
             img = plt.imread(path)
+        self._img_fname = image_filename
+        self._gh_img_url = self._gh_imgbase_url + self._img_fname
             
         if self._grayscale:
             img = rgb2gray(img)

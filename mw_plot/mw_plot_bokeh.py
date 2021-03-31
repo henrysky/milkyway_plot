@@ -1,9 +1,11 @@
+import requests
 import numpy as np
 import astropy.units as u
 import astropy.coordinates as coord
 from mw_plot.mw_plot_masters import MWPlotMaster, MWSkyMapMaster
 
 from bokeh.plotting import figure, show
+from bokeh.io import output_file, save, output_notebook
 from bokeh.models import Range1d
 
 
@@ -65,19 +67,25 @@ class MWPlotBokeh(MWPlotMaster):
             self._radius = self._radius.to(self._unit)
         
         self.images_read()
-        self._img = to_bokeh_img(self._img)
         self.s = 1.0
-
+        
         TOOLS = "pan, wheel_zoom, box_zoom, reset, save, box_select"
         
         self.bokeh_fig = figure(title="", tools=TOOLS,
                                 x_range=Range1d(self._ext[0], self._ext[1], 
-                                                bounds=[self._ext[0], self._ext[1]]), 
+                                                bounds=[min(self._ext[0], self._ext[1]), max(self._ext[0], self._ext[1])]), 
                                 y_range=Range1d(self._ext[2], self._ext[3], 
-                                                bounds=[self._ext[2], self._ext[3]]), 
+                                                bounds=[min(self._ext[2], self._ext[3]), max(self._ext[2], self._ext[3])]), 
                                 width=1000, height=1000)
-        self.bokeh_fig.image_rgba(image=[self._img], x=self._ext[0], y=self._ext[2], 
-                                  dw=self._ext[1]-self._ext[0], dh=self._ext[3]-self._ext[2])
+        if requests.head(self._gh_img_url, allow_redirects=True).status_code == -9999:  # connection successful
+            # disabled currently because rotation and grayscale wont work
+            self.bokeh_fig.image_url(url=[self._gh_img_url], 
+                                     x=self._ext[0], y=self._ext[2], 
+                                     w=abs(self._ext[1]-self._ext[0]), h=abs(self._ext[3]-self._ext[2]), anchor="bottom_left")
+        else:
+            self._img = to_bokeh_img(self._img)
+            self.bokeh_fig.image_rgba(image=[self._img], x=self._ext[0], y=self._ext[2], 
+                                      dw=abs(self._ext[1]-self._ext[0]), dh=abs(self._ext[3]-self._ext[2]))
         
         self.bokeh_fig.xaxis.axis_label = f'{self._coord_english} ({self._unit_english})'
         self.bokeh_fig.yaxis.axis_label = f'{self._coord_english} ({self._unit_english})'
@@ -89,8 +97,12 @@ class MWPlotBokeh(MWPlotMaster):
         self.bokeh_fig.circle(x, y, size=self.s)
 
     def show(self):
+        if self._in_jupyter: output_notebook()
         show(self.bokeh_fig)
-        
+
+    def savefig(self, file='MWPlot.html'):
+        output_file(file)
+        save(self.bokeh_fig)
         
 class MWSkyMapBokeh(MWSkyMapMaster):
     """
@@ -128,19 +140,26 @@ class MWSkyMapBokeh(MWSkyMapMaster):
             raise ValueError("Radius cannot be negative or 0")
 
         self.images_read()
-        self._img = to_bokeh_img(self._img)
         self.s = 1.0
 
         TOOLS = "pan, wheel_zoom, box_zoom, reset, save, box_select"
         
         self.bokeh_fig = figure(title="", tools=TOOLS,
                                 x_range=Range1d(self._ext[0], self._ext[1], 
-                                                bounds=[self._ext[0], self._ext[1]]), 
+                                                bounds=[min(self._ext[0], self._ext[1]), max(self._ext[0], self._ext[1])]), 
                                 y_range=Range1d(self._ext[2], self._ext[3], 
-                                                bounds=[self._ext[2], self._ext[3]]), 
+                                                bounds=[min(self._ext[2], self._ext[3]), max(self._ext[2], self._ext[3])]), 
                                 width=1000, height=500)
-        self.bokeh_fig.image_rgba(image=[self._img], x=self._ext[0], y=self._ext[2], 
-                                  dw=self._ext[1]-self._ext[0], dh=self._ext[3]-self._ext[2])
+        
+        if requests.head(self._gh_img_url, allow_redirects=True).status_code == -9999:  # connection successful
+            # disabled currently because rotation and grayscale wont work
+            self.bokeh_fig.image_url(url=[self._gh_img_url], 
+                                     x=self._ext[0], y=self._ext[2], 
+                                     w=abs(self._ext[1]-self._ext[0]), h=abs(self._ext[3]-self._ext[2]), anchor="bottom_left")
+        else:
+            self._img = to_bokeh_img(self._img)
+            self.bokeh_fig.image_rgba(image=[self._img], x=self._ext[0], y=self._ext[2], 
+                                      dw=abs(self._ext[1]-self._ext[0]), dh=abs(self._ext[3]-self._ext[2]))
         
         self.bokeh_fig.xaxis.axis_label = 'Galactic Longitude (Degree)'
         self.bokeh_fig.yaxis.axis_label = 'Galactic Latitude (Degree)'
@@ -152,4 +171,9 @@ class MWSkyMapBokeh(MWSkyMapMaster):
         self.bokeh_fig.circle(ra, dec, size=self.s)
 
     def show(self):
+        if self._in_jupyter: output_notebook()
         show(self.bokeh_fig)
+
+    def savefig(self, file='MWSkyMap.html'):
+        output_file(file)
+        save(self.bokeh_fig)

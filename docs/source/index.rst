@@ -69,6 +69,8 @@ OR clone the latest commit of mw_plot from github and install
 
 .. toctree::
    :caption: Bokeh backend
+
+   bokeh_single
    
 
 Author

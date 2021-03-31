@@ -6,6 +6,7 @@ pandas
 pillow
 sphinx_rtd_theme
 sphinx-prompt
+bokeh
 
 sphinx
 nbsphinx

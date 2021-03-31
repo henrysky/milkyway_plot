@@ -68,8 +68,6 @@ class MWPlot(MWPlotMaster):
 
         self._unit_english = None
         self._coord_english = None
-        self._ext = None
-        self._img = None
         self._aspect = None
 
         self.fig = None
@@ -328,7 +326,6 @@ class MWSkyMap(MWSkyMapMaster):
         self.cmap = "viridis"
         self.imalpha = 1.
         self.tight_layout = True
-        self._ext = None
 
         self.fig = None
         self.ax = None

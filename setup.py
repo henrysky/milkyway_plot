@@ -19,11 +19,11 @@ setup(
         'mw_plot': ['*.png']},
     python_requires='>=3.6',
     install_requires=[
-        'numpy', 'astropy', 'matplotlib', 'Pillow', 'bokeh'],
+        'requests', 'numpy', 'astropy', 'matplotlib', 'Pillow', 'bokeh'],
     url='https://github.com/henrysky/milkyway_plot',
     project_urls={
         "Bug Tracker": "https://github.com/henrysky/milkyway_plot/issues",
-        "Documentation": "https://github.com/henrysky/milkyway_plot",
+        "Documentation": "https://milkyway-plot.readthedocs.io/",
         "Source Code": "https://github.com/henrysky/milkyway_plot/",
     },
     license='MIT',
