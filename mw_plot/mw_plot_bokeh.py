@@ -25,29 +25,28 @@ def to_bokeh_img(imgarray):
 class MWPlotBokeh(MWPlotMaster):
     """
     MWPlot Brokeh class plotting with Bokeh
+    
+    :param mode: whether plot edge-on or face-on milkyway
+    :type mode: string, either 'face-on' or 'edge-on'
+    :param center: Coordinates of the center of the plot with astropy units
+    :type center: astropy.Quantity
+    :param radius: Radius of the plot with astropy units
+    :type radius: astropy.Quantity
+    :param unit: astropy units
+    :type unit: astropy.Quantity
+    :param coord: 'galactocentric' or 'galactic'
+    :type coord: str
+    :param annotation: whether use a milkyway background with annotation
+    :type annotation: bool
+    :param rot90: number of 90 degree rotation
+    :type rot90: int
+    :param grayscale: whether to use grayscale background
+    :type grayscale: bool
+    :param r0: distance to galactic center in kpc
+    :type r0: float
     """
     def __init__(self, mode='face-on', center=(0, 0) * u.kpc, radius=90750 * u.lyr, unit=u.kpc, coord='galactic',
                  annotation=True, rot90=0, grayscale=False, r0=8.125):
-        """
-        ;:param mode: whether plot edge-on or face-on milkyway
-        :type mode: string, either 'face-on' or 'edge-on'
-        :param center: Coordinates of the center of the plot with astropy units
-        :type center: astropy.Quantity
-        :param radius: Radius of the plot with astropy units
-        :type radius: astropy.Quantity
-        :param unit: astropy units
-        :type unit: astropy.Quantity
-        :param coord: 'galactocentric' or 'galactic'
-        :type coord: str
-        :param annotation: whether use a milkyway background with annotation
-        :type annotation: bool
-        :param rot90: number of 90 degree rotation
-        :type rot90: int
-        :param grayscale: whether to use grayscale background
-        :type grayscale: bool
-        :param r0: distance to galactic center in kpc
-        :type r0: float
-        """
         super().__init__(grayscale=grayscale, 
                          annotation=annotation, 
                          rot90=rot90, 
@@ -110,17 +109,15 @@ class MWPlotBokeh(MWPlotMaster):
 class MWSkyMapBokeh(MWSkyMapMaster):
     """
     MWSkyMapBokeh class plotting with Bokeh
+    
+    :param center: Coordinates of the center of the plot with astropy degree/radian units
+    :type center: astropy.Quantity
+    :param radius: Radius of the plot with astropy degree/radian units
+    :type radius: astropy.Quantity
+    :param grayscale: whether to use grayscale background
+    :type grayscale: bool
     """
     def __init__(self, center=(0, 0) * u.deg, radius=(180, 90) * u.deg, grayscale=False):
-        """
-
-        :param center: Coordinates of the center of the plot with astropy degree/radian units
-        :type center: astropy.Quantity
-        :param radius: Radius of the plot with astropy degree/radian units
-        :type radius: astropy.Quantity
-        :param grayscale: whether to use grayscale background
-        :type grayscale: bool
-        """
         super().__init__(grayscale=grayscale, 
                          projection='equirectangular', 
                          center=center, 

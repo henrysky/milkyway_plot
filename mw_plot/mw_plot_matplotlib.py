@@ -295,25 +295,23 @@ class MWPlot(MWPlotMaster):
 class MWSkyMap(MWSkyMapMaster):
     """
     MWSkyMap class plotting with Matplotlib
+    
+    :param projection: projection system of the plot
+    :type projection: string(["equirectangular", "aitoff", "hammer", "lambert", "mollweide"])
+    :param center: Coordinates of the center of the plot with astropy degree/radian units
+    :type center: astropy.Quantity
+    :param radius: Radius of the plot with astropy degree/radian units
+    :type radius: astropy.Quantity
+    :param grayscale: whether to use grayscale background
+    :type grayscale: bool
+    
+    :param figsize: Matplotlib figure size
+    :type figsize: turple
+    :param figsize: Matplotlib figure dpi
+    :type figsize: int
     """
     def __init__(self, projection='equirectangular', center=(0, 0) * u.deg, radius=(180, 90) * u.deg, grayscale=False, 
                  figsize=(10, 6.5), dpi=144):
-        """
-
-        :param projection: projection system of the plot
-        :type projection: string(["equirectangular", "aitoff", "hammer", "lambert", "mollweide"])
-        :param center: Coordinates of the center of the plot with astropy degree/radian units
-        :type center: astropy.Quantity
-        :param radius: Radius of the plot with astropy degree/radian units
-        :type radius: astropy.Quantity
-        :param grayscale: whether to use grayscale background
-        :type grayscale: bool
-        
-        :param figsize: Matplotlib figure size
-        :type figsize: turple
-        :param figsize: Matplotlib figure dpi
-        :type figsize: int
-        """
         super().__init__(grayscale=grayscale, 
                          projection=projection, 
                          center=center, 
@@ -410,10 +408,9 @@ class MWSkyMap(MWSkyMapMaster):
             lat = np.linspace(np.pi / 2., -np.pi / 2., 3250+1)
             Lon, Lat = np.meshgrid(lon, lat)
             if self._grayscale:
-                _cmap = 'gray_r'
+                im = ax.pcolormesh(Lon, Lat, 255-self._img[:, :, 1], zorder=2, cmap="gray", alpha=self.imalpha, rasterized=True)
             else:
-                _cmap = 'gray'
-            im = ax.pcolormesh(Lon, Lat, rgb2gray(self._img)[:, :, 0], zorder=2, cmap=_cmap, alpha=self.imalpha, rasterized=True)
+                im = ax.pcolormesh(Lon, Lat, self._img[:, :, 1], zorder=2, cmap="gray", alpha=self.imalpha, rasterized=True)
             # imr = self.ax.pcolormesh(Lon, Lat, self._img[:, :, 0], cmap=cmap_red, zorder=2, alpha=0.33)
             # img = self.ax.pcolormesh(Lon, Lat, self._img[:, :, 1], cmap=cmap_grn, zorder=2, alpha=0.33)
             # imb = self.ax.pcolormesh(Lon, Lat, self._img[:, :, 2], cmap=cmap_blue, zorder=2, alpha=0.33)
