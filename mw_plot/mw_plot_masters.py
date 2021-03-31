@@ -73,10 +73,11 @@ class MWPlotMaster(ABC):
         try:
             from IPython import get_ipython
             ip = get_ipython()
-            if ip.has_trait('kernel'):
-                self._in_jupyter = True
-        except ImportError or AttributeError:
+        except ImportError:
             pass
+        else:
+            if hasattr(ip, "has_trait"):
+                if ip.has_trait('kernel'): self._in_jupyter = True
 
     def xy_unit_check(self, x, y):
         if not type(x) == u.quantity.Quantity or not type(y) == u.quantity.Quantity:
@@ -225,6 +226,18 @@ class MWSkyMapMaster(ABC):
         self._grayscale = grayscale
         self.figsize = figsize
         self.dpi = dpi
+        self._gh_imgbase_url = "https://github.com/henrysky/milkyway_plot/raw/master/mw_plot/"
+
+        # check if running in browser-based ipython (aka jupyter)
+        self._in_jupyter = False
+        try:
+            from IPython import get_ipython
+            ip = get_ipython()
+        except ImportError:
+            pass
+        else:
+            if hasattr(ip, "has_trait"):
+                if ip.has_trait('kernel'): self._in_jupyter = True
     
     def images_read(self):
         image_filename = 'MW_edgeon_edr3_unannotate.jpg'
@@ -246,6 +259,9 @@ class MWSkyMapMaster(ABC):
 
         if self._grayscale:
             self._img = rgb2gray(self._img)
+
+        self._img_fname = image_filename
+        self._gh_img_url = self._gh_imgbase_url + self._img_fname
 
         return None
 

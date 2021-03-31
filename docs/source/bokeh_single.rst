@@ -1,20 +1,16 @@
-Bokeh
-=======
+Bokeh Single Plot
+=====================
 
 
 .. bokeh-plot::
     :source-position: above
     :linenos:
 
-    from bokeh.plotting import figure, output_file, show
+    from mw_plot import MWPlotBokeh
+    from astropy import units as  u
+    from bokeh.io import output_file, show
 
-    output_file("example.html")
-
-    x = [1, 2, 3, 4, 5]
-    y = [6, 7, 6, 4, 5]
-
-    p = figure(title="example", plot_width=300, plot_height=300)
-    p.line(x, y, line_width=2)
-    p.circle(x, y, size=10, fill_color="white")
-
-    show(p)
+    # setup a mw-plot instance of bird's eyes view of the disc
+    mw1 = MWPlotBokeh(radius=5 * u.kpc, center=(0, 0)*u.kpc, unit=u.kpc, coord='galactic', grayscale=True, annotation=True)
+    # you should use mw1.show(), I do it this way for the docs to compile correctly
+    show(mw1.bokeh_fig)

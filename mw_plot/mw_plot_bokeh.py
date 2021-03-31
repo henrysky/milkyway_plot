@@ -61,11 +61,11 @@ class MWPlotBokeh(MWPlotMaster):
                          dpi=None)
         
         # prepossessing procedure
-        self._unit_english = self._unit.long_names[0]
+        self._unit_english = self._unit.short_names[0]
         if self._center.unit is not None and self._radius.unit is not None:
             self._center = self._center.to(self._unit)
             self._radius = self._radius.to(self._unit)
-        
+                
         self.images_read()
         self.s = 1.0
         
@@ -96,8 +96,11 @@ class MWPlotBokeh(MWPlotMaster):
             kwargs['s'] = self.s
         self.bokeh_fig.circle(x, y, size=self.s)
 
-    def show(self):
-        if self._in_jupyter: output_notebook()
+    def show(self, notebook=True):
+        if self._in_jupyter and notebook:
+            output_notebook() 
+        else: 
+            pass
         show(self.bokeh_fig)
 
     def savefig(self, file='MWPlot.html'):
@@ -170,8 +173,11 @@ class MWSkyMapBokeh(MWSkyMapMaster):
             kwargs['s'] = self.s
         self.bokeh_fig.circle(ra, dec, size=self.s)
 
-    def show(self):
-        if self._in_jupyter: output_notebook()
+    def show(self, notebook=True):
+        if self._in_jupyter and notebook: 
+            output_notebook()
+        else: 
+            pass
         show(self.bokeh_fig)
 
     def savefig(self, file='MWSkyMap.html'):
