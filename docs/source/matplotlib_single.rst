@@ -13,9 +13,25 @@ Classes API
     :members:
 
 
-MilkyWay Bird's Eyes 
+MilkyWay Bird's Eye
 ---------------------
 
+.. code-block:: python
+    :linenos:
+
+    import numpy as np
+    from astropy import units as  u
+    from mw_plot import MWPlot
+
+    # setup a mw-plot instance of bird's eye view of the disc
+    mw1 = MWPlot(radius=20 * u.kpc, unit=u.kpc, coord='galactocentric', annotation=True, figsize=(15, 12))
+
+    # set up plot title
+    mw1.title = "Bird's Eyes View"
+
+    mw1.scatter(8*u.kpc, 0*u.kpc, c='r', s=200)
+
+.. image:: matplotlib_imgs/single_earth.jpg
 
 
 MilkyWay Sky Map

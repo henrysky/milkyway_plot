@@ -22,14 +22,14 @@ Orbit of Sun
     y = op.y(ts) * u.kpc
     z = op.z(ts)
 
-    # setup a MWPlot instance
-    plot_instance = MWPlot(radius=20 * u.kpc, unit=u.kpc, coord='galactocentric', annotation=True, figsize=(15, 12), r0=8)
+    # setup a mw-plot instance of bird's eye view of the disc
+    mw1 = MWPlot(radius=20 * u.kpc, unit=u.kpc, coord='galactocentric', annotation=True, figsize=(15, 12), r0=8)
 
     # set up plot title
-    plot_instance.title = 'Orbit of Sun in 5Gyr'
+    mw1.title = 'Orbit of Sun in 5Gyr'
 
     # use mw_scatter instead of scatter because we want a colorbar
-    plot_instance.mw_scatter(x, y, [z, 'kpc above galactic plane'], s=1)
+    mw1.mw_scatter(x, y, [z, 'kpc above galactic plane'], s=1)
 
 .. image:: matplotlib_imgs/gallery_sun_single.jpg
 
@@ -54,7 +54,7 @@ Orbit of Sun 2
     y = op.y(ts) * u.kpc
     z = op.z(ts)
 
-    # setup a mw-plot instance of bird's eyes view of the disc
+    # setup a mw-plot instance of bird's eye view of the disc
     mw1 = MWPlot(radius=20 * u.kpc, center=(0, 0)*u.kpc, unit=u.kpc, coord='galactocentric', annotation=False, grayscale=True)
     mw2 = MWPlot(radius=10 * u.kpc, mode="edge-on", center=(0, 0)*u.kpc, unit=u.kpc, coord='galactocentric', annotation=False, grayscale=True)
 
