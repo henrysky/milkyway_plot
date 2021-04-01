@@ -40,7 +40,8 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.inheritance_diagram',
               'sphinx.ext.viewcode',
               'sphinx-prompt',
-              'bokeh.sphinxext.bokeh_plot']
+              'bokeh.sphinxext.bokeh_plot', 
+              'sphinx_copybutton']
 
 bokeh_plot_pyfile_include_dirs = ['bokeh_html']
 
