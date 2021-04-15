@@ -212,7 +212,8 @@ class MWPlot(MWPlotMaster):
         :History: 2018-Mar-17 - Written - Henry Leung (University of Toronto)
         """
         x, y = self.xy_unit_check(x, y)
-        self.initialize_mwplot()
+        if not self._initialized:
+            self.initialize_mwplot()
 
         # decide whether we need colorbar or not
         if isinstance(c, list):
@@ -449,7 +450,9 @@ class MWSkyMap(MWSkyMapMaster):
         :History: 2018-Mar-17 - Written - Henry Leung (University of Toronto)
         """
         ra, dec = self.radec_unit_check(ra, dec)
-        self.initialize_mwplot()
+        
+        if not self._initialized:
+            self.initialize_mwplot()
 
         # decide whether we need colorbar or not
         if isinstance(c, list):
