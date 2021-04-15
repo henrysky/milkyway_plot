@@ -227,6 +227,7 @@ class MWSkyMapMaster(ABC):
         self.figsize = figsize
         self.dpi = dpi
         self._gh_imgbase_url = "https://github.com/henrysky/milkyway_plot/raw/master/mw_plot/"
+        self._initialized =False
 
         # check if running in browser-based ipython (aka jupyter)
         self._in_jupyter = False
