@@ -408,12 +408,11 @@ class MWSkyMap(MWSkyMapMaster):
             lat = np.linspace(np.pi / 2., -np.pi / 2., 3250+1)
             Lon, Lat = np.meshgrid(lon, lat)
             if self._grayscale:
-                im = ax.pcolormesh(Lon, Lat, 255-self._img[:, :, 1], zorder=2, cmap="gray", alpha=self.imalpha, rasterized=True)
+                im = ax.pcolormesh(Lon, Lat, np.dot(self._img, [0.2989, 0.5870, 0.1140]), zorder=2, cmap="gray", alpha=self.imalpha, rasterized=True)
             else:
-                im = ax.pcolormesh(Lon, Lat, self._img[:, :, 1], zorder=2, cmap="gray", alpha=self.imalpha, rasterized=True)
-            # imr = self.ax.pcolormesh(Lon, Lat, self._img[:, :, 0], cmap=cmap_red, zorder=2, alpha=0.33)
-            # img = self.ax.pcolormesh(Lon, Lat, self._img[:, :, 1], cmap=cmap_grn, zorder=2, alpha=0.33)
-            # imb = self.ax.pcolormesh(Lon, Lat, self._img[:, :, 2], cmap=cmap_blue, zorder=2, alpha=0.33)
+                rgb = np.array(self._img)
+                color_tuple = rgb.reshape((rgb.shape[0]*rgb.shape[1],rgb.shape[2]))/255.0
+                im = ax.pcolormesh(Lon, Lat, self._img[:, :, 0], zorder=2, color=color_tuple, alpha=self.imalpha, rasterized=True)
 
         ax.set_facecolor(self.facecolor)  # have a black color background for image with <1.0 alpha
         ax.tick_params(labelsize=self.fontsize * 0.8, width=self.fontsize / 10, length=self.fontsize / 2)
