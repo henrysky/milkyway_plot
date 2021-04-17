@@ -6,7 +6,7 @@ with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'README.rst')
 
 setup(
     name='mw_plot',
-    version='1.0.dev',
+    version='0.9.0',
     classifiers=[
         'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: MIT License',
@@ -16,7 +16,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     package_data={
-        'mw_plot': ['*.png']},
+        'mw_plot': ['*.png', '*.jpg']},
     python_requires='>=3.6',
     install_requires=[
         'requests', 'numpy', 'astropy', 'matplotlib', 'Pillow', 'bokeh'],
@@ -29,6 +29,6 @@ setup(
     license='MIT',
     author='Henry Leung',
     author_email='henrysky.leung@utoronto.ca',
-    description='A handy python package to do plotting on a face-on/edge-on/allsky map milkyway with matplotlib',
+    description='A handy python package to do plotting on a face-on/edge-on/allsky map milkyway with matplotlib and bokeh',
     long_description=long_description
 )
