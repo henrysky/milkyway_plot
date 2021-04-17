@@ -1,8 +1,6 @@
-.. raw:: html
-
-    <p align="center">
-        <img width="50%" src="https://raw.githubusercontent.com/henrysky/milkyway_plot/master/mw-plot-logo-b.png" />
-    </p>
+.. image:: https://raw.githubusercontent.com/henrysky/milkyway_plot/master/mw-plot-logo-b.png
+   :height: 132 px
+   :width: 500 px
 
 |
 
