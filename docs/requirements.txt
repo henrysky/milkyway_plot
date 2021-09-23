@@ -4,11 +4,11 @@ matplotlib
 astroquery
 pandas
 pillow
-sphinx_rtd_theme
+sphinx_rtd_theme>=1
 sphinx-prompt
 sphinx-copybutton
 bokeh
 
-sphinx
+sphinx>=4
 nbsphinx
 ipykernel
