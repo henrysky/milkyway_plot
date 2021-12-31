@@ -43,11 +43,11 @@ class MWPlot(MWPlotMaster):
     
     :param figsize: Matplotlib figure size
     :type figsize: turple
-    :param figsize: Matplotlib figure dpi
-    :type figsize: int
+    :param dpi: Matplotlib figure dpi
+    :type dpi: int
     """
     def __init__(self, mode='face-on', center=(0, 0) * u.kpc, radius=90750 * u.lyr, unit=u.kpc, coord='galactic',
-                 annotation=True, rot90=0, grayscale=False, r0=8.125, figsize=(7.5, 7.5), dpi=144):
+                 annotation=True, rot90=0, grayscale=False, r0=8.125, figsize=(7.5, 7.5), dpi=None):
         super().__init__(grayscale=grayscale, 
                          annotation=annotation, 
                          rot90=rot90, 
@@ -308,11 +308,11 @@ class MWSkyMap(MWSkyMapMaster):
     
     :param figsize: Matplotlib figure size
     :type figsize: turple
-    :param figsize: Matplotlib figure dpi
-    :type figsize: int
+    :param dpi: Matplotlib figure dpi
+    :type dpi: int
     """
     def __init__(self, projection='equirectangular', center=(0, 0) * u.deg, radius=(180, 90) * u.deg, grayscale=False, 
-                 figsize=(10, 6.5), dpi=144):
+                 figsize=(10, 6.5), dpi=None):
         super().__init__(grayscale=grayscale, 
                          projection=projection, 
                          center=center, 
@@ -441,10 +441,10 @@ class MWSkyMap(MWSkyMapMaster):
         """
         Plot scatter points with colorbar
 
-        :param x: Scatter points x-coordinates on the plot
-        :type x: astropy.Quantity
-        :param y: Scatter points y-coordinates on the plot
-        :type y: astropy.Quantity
+        :param ra: Scatter points x-coordinates on the plot
+        :type ra: astropy.Quantity
+        :param dec: Scatter points y-coordinates on the plot
+        :type dec: astropy.Quantity
         :param c: Scatter points color
         :type c: Union[str, list, ndarry]
         :History: 2018-Mar-17 - Written - Henry Leung (University of Toronto)
