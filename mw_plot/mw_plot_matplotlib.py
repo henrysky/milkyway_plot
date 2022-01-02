@@ -146,11 +146,11 @@ class MWPlot(MWPlotMaster):
                 self.fig.tight_layout()
             self.fig.show(*args, **kwargs)
 
-    def savefig(self, file='MWPlot.png'):
+    def savefig(self, file='MWPlot.png', dpi="figure", **kwargs):
         if self.tight_layout is True:
             self.fig.tight_layout()
         # this is a pylab method
-        self.fig.savefig(file)
+        self.fig.savefig(file, dpi=dpi, **kwargs)
 
     @staticmethod
     def transparent_cmap(cmap, N=255):
@@ -431,11 +431,11 @@ class MWSkyMap(MWSkyMapMaster):
                 self.fig.tight_layout()
             self.fig.show(*args, **kwargs)
 
-    def savefig(self, file='MWSkyMap.png'):
+    def savefig(self, file='MWSkyMap.png', dpi="figure", **kwargs):
         if self.tight_layout is True:
             self.fig.tight_layout()
         # this is a pylab method
-        self.fig.savefig(file)
+        self.fig.savefig(file, dpi=dpi, **kwargs)
 
     def mw_scatter(self, ra, dec, c, **kwargs):
         """

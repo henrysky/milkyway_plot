@@ -203,6 +203,9 @@ class MWPlotMaster(ABC):
 
         return None
     
+    def skycoord_xy(self, skycoord):
+        # convert astropy SkyCoord to cartensian x, y
+        return skycoord.cartensian.x, skycoord.cartensian.y
     
 class MWSkyMapMaster(ABC):
     """
