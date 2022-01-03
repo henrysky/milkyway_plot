@@ -60,7 +60,7 @@ class MWPlot(MWPlotMaster):
                          figsize=figsize, 
                          dpi=dpi)
         self.fontsize = 20
-        self.s = 1.0
+        self.s = 20
         self.cmap = "viridis"
         self.imalpha = 1.
         self.facecolor = 'k' if not grayscale else 'w'
@@ -113,12 +113,12 @@ class MWPlot(MWPlotMaster):
         if kwargs.get('label') is not None:
             self.ax.legend(loc='best', fontsize=self.fontsize)
 
-    def scatter(self, x, y, *args, **kwargs):
+    def scatter(self, x, y, c="r", *args, **kwargs):
         x, y = self.xy_unit_check(x, y)
         self.initialize_mwplot()
         if kwargs.get('s') is None:
             kwargs['s'] = self.s
-        self.ax.scatter(x, y, rasterized=True, *args, **kwargs)
+        self.ax.scatter(x, y, c=c, rasterized=True, *args, **kwargs)
         # just want to set the location right, we dont need image again
         self.ax.imshow(self._img, zorder=0, extent=self._ext, alpha=0., rasterized=True)
         if kwargs.get('label') is not None:
@@ -178,26 +178,27 @@ class MWPlot(MWPlotMaster):
 
         :return: None
         """
-        if self.fig is None and fig is None:
-            fig, ax = plt.subplots(1, figsize=self.figsize, dpi=self.dpi)
-        elif fig is not None:
-            pass
-        else:
-            raise HumanError("Something is wrong duh")
-        if self.title is not None:
-            ax.set_title(self.title, fontsize=self.fontsize)
-        ax.set_xlabel(f'{self._coord_english} ({self._unit_english})', fontsize=self.fontsize)
-        ax.set_ylabel(f'{self._coord_english} ({self._unit_english})', fontsize=self.fontsize)
-        ax.set_aspect(self._aspect)
-        ax.set_facecolor(self.facecolor)  # have a black color background for image with <1.0 alpha
-        if not self._grayscale:
-            ax.imshow(self._img, extent=self._ext, zorder=0, alpha=self.imalpha, rasterized=True)
-        else:
-            ax.imshow(self._img[:, :, 0], extent=self._ext, zorder=0, alpha=self.imalpha, rasterized=True, cmap='gray')
-        ax.tick_params(labelsize=self.fontsize * 0.8, width=self.fontsize / 10, length=self.fontsize / 2)
-        self.fig, self.ax = fig, ax
-        
-        self._initialized = True
+        if not self._initialized:
+            if self.fig is None and fig is None:
+                fig, ax = plt.subplots(1, figsize=self.figsize, dpi=self.dpi)
+            elif fig is not None:
+                pass
+            else:
+                raise HumanError("Something is wrong duh")
+            if self.title is not None:
+                ax.set_title(self.title, fontsize=self.fontsize)
+            ax.set_xlabel(f'{self._coord_english} ({self._unit_english})', fontsize=self.fontsize)
+            ax.set_ylabel(f'{self._coord_english} ({self._unit_english})', fontsize=self.fontsize)
+            ax.set_aspect(self._aspect)
+            ax.set_facecolor(self.facecolor)  # have a black color background for image with <1.0 alpha
+            if not self._grayscale:
+                ax.imshow(self._img, extent=self._ext, zorder=0, alpha=self.imalpha, rasterized=True)
+            else:
+                ax.imshow(self._img[:, :, 0], extent=self._ext, zorder=0, alpha=self.imalpha, rasterized=True, cmap='gray')
+            ax.tick_params(labelsize=self.fontsize * 0.8, width=self.fontsize / 10, length=self.fontsize / 2)
+            self.fig, self.ax = fig, ax
+            
+            self._initialized = True
 
     def mw_scatter(self, x, y, c, **kwargs):
         """
@@ -212,8 +213,7 @@ class MWPlot(MWPlotMaster):
         :History: 2018-Mar-17 - Written - Henry Leung (University of Toronto)
         """
         x, y = self.xy_unit_check(x, y)
-        if not self._initialized:
-            self.initialize_mwplot()
+        self.initialize_mwplot()
 
         # decide whether we need colorbar or not
         if isinstance(c, list):
@@ -292,6 +292,33 @@ class MWPlot(MWPlotMaster):
             if self.clim is not None:
                 cbar.set_clim(self.clim)
 
+    def scatter_annotate(self, text, position, arrowprops=dict(facecolor="black", width=1., headwidth=6., headlength=6.), fontsize=15, bbox=dict(pad=2), **kwargs):
+        """
+        Plot annotation with scatter
+
+        :History: 2022-Jan-02 - Written - Henry Leung (University of Toronto)
+        """
+        if isinstance(position, apycoords.SkyCoord):
+            position = self.skycoord_xy(position)
+        else:
+            position_wo_unit, _ = self.xy_unit_check(position, position)
+        position_text = np.add(position_wo_unit, 1.5)
+        if isinstance(text, list):
+            for t, p, pou, pt in zip(text, position, position_wo_unit, position_text):
+                self.scatter(p[0], p[1])
+                self.ax.annotate(t, xy=pou, xytext=pt, arrowprops=arrowprops, fontsize=fontsize, bbox=bbox, **kwargs)
+        else:
+            self.scatter(position[0], position[1])
+            self.ax.annotate(text, xy=position_wo_unit, xytext=position_text, arrowprops=arrowprops, fontsize=fontsize, bbox=bbox, **kwargs)
+
+    def annotate(self, *args, **kwargs):
+        """
+        Plot annotation
+
+        :History: 2022-Jan-02 - Written - Henry Leung (University of Toronto)
+        """
+        return self.ax.annotate(*args, **kwargs)
+
 
 class MWSkyMap(MWSkyMapMaster):
     """
@@ -321,7 +348,7 @@ class MWSkyMap(MWSkyMapMaster):
                          dpi=dpi)
         self._unit = u.degree
         self.fontsize = 20
-        self.s = 1.
+        self.s = 20.
         self.cmap = "viridis"
         self.imalpha = 1.
         self.tight_layout = True
@@ -379,49 +406,50 @@ class MWSkyMap(MWSkyMapMaster):
 
         :return: None
         """
-        if self._projection == 'equirectangular':
-            if self.fig is None and fig is None:
-                fig, ax = plt.subplots(1, figsize=self.figsize, dpi=self.dpi)
-            elif fig is not None:
-                pass
-            else:
-                raise HumanError("Something is wrong duh")
-            ax.set_xlabel('Galactic Longitude (Degree)', fontsize=self.fontsize)
-            ax.set_ylabel('Galactic Latitude (Degree)', fontsize=self.fontsize)
-            self._ext = [(self._center[0] - self._radius[0]).value, (self._center[0] + self._radius[0]).value,
-                            (self._center[1] - self._radius[1]).value, (self._center[1] + self._radius[1]).value]
-            ax.imshow(self._img, zorder=2, extent=self._ext, alpha=self.imalpha, rasterized=True)
-        else:  # those cases if there is non-trivial projection
-            if self.fig is None and fig is None:
-                fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
-                ax = fig.add_subplot(111, projection=self._projection)
-            elif fig is not None:
-                pass
-            else:
-                raise HumanError("Something is wrong duh")
-            # color
-            cmap_red = LinearSegmentedColormap.from_list("", ["black", "red"], N=256)
-            cmap_grn = LinearSegmentedColormap.from_list("", ["black", "green"], N=256)
-            cmap_blue = LinearSegmentedColormap.from_list("", ["black", "blue"], N=256)
+        if not self._initialized:
+            if self._projection == 'equirectangular':
+                if self.fig is None and fig is None:
+                    fig, ax = plt.subplots(1, figsize=self.figsize, dpi=self.dpi)
+                elif fig is not None:
+                    pass
+                else:
+                    raise HumanError("Something is wrong duh")
+                ax.set_xlabel('Galactic Longitude (Degree)', fontsize=self.fontsize)
+                ax.set_ylabel('Galactic Latitude (Degree)', fontsize=self.fontsize)
+                self._ext = [(self._center[0] - self._radius[0]).value, (self._center[0] + self._radius[0]).value,
+                                (self._center[1] - self._radius[1]).value, (self._center[1] + self._radius[1]).value]
+                ax.imshow(self._img, zorder=2, extent=self._ext, alpha=self.imalpha, rasterized=True)
+            else:  # those cases if there is non-trivial projection
+                if self.fig is None and fig is None:
+                    fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
+                    ax = fig.add_subplot(111, projection=self._projection)
+                elif fig is not None:
+                    pass
+                else:
+                    raise HumanError("Something is wrong duh")
+                # color
+                cmap_red = LinearSegmentedColormap.from_list("", ["black", "red"], N=256)
+                cmap_grn = LinearSegmentedColormap.from_list("", ["black", "green"], N=256)
+                cmap_blue = LinearSegmentedColormap.from_list("", ["black", "blue"], N=256)
 
-            # coordinates
-            lon = np.linspace(-np.pi, np.pi, 6500+1)
-            lat = np.linspace(np.pi / 2., -np.pi / 2., 3250+1)
-            Lon, Lat = np.meshgrid(lon, lat)
-            if self._grayscale:
-                im = ax.pcolormesh(Lon, Lat, np.dot(self._img, [0.2989, 0.5870, 0.1140]), zorder=2, cmap="gray", alpha=self.imalpha, rasterized=True)
-            else:
-                rgb = np.array(self._img)
-                color_tuple = rgb.reshape((rgb.shape[0]*rgb.shape[1],rgb.shape[2]))/255.0
-                im = ax.pcolormesh(Lon, Lat, self._img[:, :, 0], zorder=2, color=color_tuple, alpha=self.imalpha, rasterized=True)
+                # coordinates
+                lon = np.linspace(-np.pi, np.pi, 6500+1)
+                lat = np.linspace(np.pi / 2., -np.pi / 2., 3250+1)
+                Lon, Lat = np.meshgrid(lon, lat)
+                if self._grayscale:
+                    im = ax.pcolormesh(Lon, Lat, np.dot(self._img, [0.2989, 0.5870, 0.1140]), zorder=2, cmap="gray", alpha=self.imalpha, rasterized=True)
+                else:
+                    rgb = np.array(self._img)
+                    color_tuple = rgb.reshape((rgb.shape[0]*rgb.shape[1],rgb.shape[2]))/255.0
+                    im = ax.pcolormesh(Lon, Lat, self._img[:, :, 0], zorder=2, color=color_tuple, alpha=self.imalpha, rasterized=True)
 
-        ax.set_facecolor(self.facecolor)  # have a black color background for image with <1.0 alpha
-        ax.tick_params(labelsize=self.fontsize * 0.8, width=self.fontsize / 10, length=self.fontsize / 2)
-        if self.title is not None:
-            ax.set_title(self.title, fontsize=self.fontsize)
-        self.fig, self.ax = fig, ax
-        
-        self._initialized = True
+            ax.set_facecolor(self.facecolor)  # have a black color background for image with <1.0 alpha
+            ax.tick_params(labelsize=self.fontsize * 0.8, width=self.fontsize / 10, length=self.fontsize / 2)
+            if self.title is not None:
+                ax.set_title(self.title, fontsize=self.fontsize)
+            self.fig, self.ax = fig, ax
+            
+            self._initialized = True
 
     def show(self, *args, **kwargs):
         if self.fig is None:
@@ -451,8 +479,7 @@ class MWSkyMap(MWSkyMapMaster):
         """
         ra, dec = self.radec_unit_check(ra, dec)
         
-        if not self._initialized:
-            self.initialize_mwplot()
+        self.initialize_mwplot()
 
         # decide whether we need colorbar or not
         if isinstance(c, list):
@@ -483,12 +510,12 @@ class MWSkyMap(MWSkyMapMaster):
             if self.clim is not None:
                 cbar.set_clim(self.clim)
 
-    def scatter(self, ra, dec, *args, **kwargs):
+    def scatter(self, ra, dec, c="r", *args, **kwargs):
         ra, dec = self.radec_unit_check(ra, dec)
         self.initialize_mwplot()
         if kwargs.get('s') is None:
             kwargs['s'] = self.s
-        self.ax.scatter(ra, dec, zorder=3, rasterized=True, *args, **kwargs)
+        self.ax.scatter(ra, dec, c=c, zorder=3, rasterized=True, *args, **kwargs)
         # just want to set the location right, we dont need image again
         if self._projection == 'equirectangular':
             self.ax.imshow(self._img, zorder=0, extent=self._ext, alpha=0., rasterized=True)
@@ -497,3 +524,30 @@ class MWSkyMap(MWSkyMapMaster):
                            aspect=self.ax.get_aspect(), transform=self.ax.transAxes)
         if kwargs.get('label') is not None:
             self.ax.legend(loc='best', fontsize=self.fontsize, markerscale=kwargs['s'])
+
+    def scatter_annotate(self, text, position, arrowprops=dict(facecolor="black", width=1., headwidth=6., headlength=6.), fontsize=15, bbox=dict(pad=2), **kwargs):
+        """
+        Plot annotation with scatter
+
+        :History: 2022-Jan-02 - Written - Henry Leung (University of Toronto)
+        """
+        if isinstance(position, apycoords.SkyCoord):
+            position = self.skycoord_xy(position)
+        else:
+            position_wo_unit, _ = self.xy_unit_check(position, position)
+        position_text = np.add(position_wo_unit, 1.5)
+        if isinstance(text, list):
+            for t, p, pou, pt in zip(text, position, position_wo_unit, position_text):
+                self.scatter(p[0], p[1])
+                self.ax.annotate(t, xy=pou, xytext=pt, arrowprops=arrowprops, fontsize=fontsize, bbox=bbox, **kwargs)
+        else:
+            self.scatter(position[0], position[1])
+            self.ax.annotate(text, xy=position_wo_unit, xytext=position_text, arrowprops=arrowprops, fontsize=fontsize, bbox=bbox, **kwargs)
+
+    def annotate(self, *args, **kwargs):
+        """
+        Plot annotation
+
+        :History: 2022-Jan-02 - Written - Henry Leung (University of Toronto)
+        """
+        return self.ax.annotate(*args, **kwargs)
