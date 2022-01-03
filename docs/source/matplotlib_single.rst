@@ -33,6 +33,24 @@ MilkyWay Bird's Eye
 
 .. image:: matplotlib_imgs/single_earth.jpg
 
+Annotation
+^^^^^^^^^^^
+
+.. code-block:: python
+    :linenos:
+
+    import numpy as np
+    from astropy import units as u
+    from mw_plot import MWPlot
+
+    mw1 = MWPlot(radius=20 * u.kpc, unit=u.kpc, coord="galactocentric", annotation=True)
+
+    # set up plot title
+    mw1.title = "Annotation"
+
+    mw1.scatter_annotate(["Earth", "Galactic \n Center"], [[8., 0.], [0., 0.]] * u.kpc)
+
+.. image:: matplotlib_imgs/annotation.jpg
 
 MilkyWay Sky Map
 ------------------
