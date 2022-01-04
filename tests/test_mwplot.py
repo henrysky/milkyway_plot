@@ -57,7 +57,37 @@ class MatplotlibTestCases(unittest.TestCase):
         plot_instance.mw_scatter(x, y, [z, 'kpc above galactic plane'])
         
         plot_instance.savefig(file='gaia.png')
-        
+
+    def test_mw_one_annotation(self):
+        mw1 = MWPlot(radius=20 * u.kpc, unit=u.kpc, coord="galactocentric", annotation=True)
+        mw1.title = "Annotation"
+        mw1.scatter(8 * u.kpc, 0 * u.kpc, c="r", s=200)
+        mw1.ax.annotate(
+            "Earth",
+            xy=(8.0, 0.0),
+            xytext=(10.0, 1.0),
+            arrowprops=dict(arrowstyle="->", shrinkA=0.15),
+            fontsize=20,
+            bbox=dict(pad=2),
+        )
+
+        # Save the figure
+        mw1.savefig(file="annotate.jpg")
+
+    def test_mw_one_scatter_annotation(self):
+        mw1 = MWPlot(radius=20 * u.kpc, unit=u.kpc, coord="galactocentric", annotation=True)
+
+        mw1.title = "Annotation"
+        mw1.scatter_annotate(["Earth", "Galactic \n Center"], [[8., 0.], [0., 0.]] * u.kpc)
+        mw1.savefig(file="scatter_annotate_1.jpg")
+            
+    def test_mw_multiple_scatter_annotation(self):
+        mw1 = MWPlot(radius=20 * u.kpc, unit=u.kpc, coord="galactocentric", annotation=True)
+
+        mw1.title = "Annotation"
+        mw1.scatter_annotate(["Earth", "Galactic \n Center"], [[8., 0.], [0., 0.]] * u.kpc)
+        mw1.savefig(file="scatter_annotate_2.jpg")
+                
 
 class BokehTestCases(unittest.TestCase):
     def test_mw_skymap_bokeh(self):
