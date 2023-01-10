@@ -14,7 +14,7 @@ jobs:
           python-version: 3.8
       - name: Install dependencies
         run: |
-          pip install coveralls pydot graphviz pytest pytest-cov galpy astroquery
+          pip install coveralls pydot graphviz pytest pytest-cov galpy astroquery numpy==1.23.5
           python setup.py install
       - name: Test mw-plot
         if: ${{ matrix.PAPER_MODELS == false}}
