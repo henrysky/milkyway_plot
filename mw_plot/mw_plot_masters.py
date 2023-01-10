@@ -211,6 +211,8 @@ class MWPlotMaster(ABC):
     @staticmethod
     def skycoord_radec(skycoord):
         # convert astropy SkyCoord to list
+        if not hasattr(skycoord, "ra"):
+            skycoord = skycoord.icrs
         return [skycoord.ra.deg*u.deg, skycoord.dec.deg*u.deg]
     
 class MWSkyMapMaster(MWPlotMaster):
