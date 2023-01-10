@@ -99,7 +99,7 @@ class MatplotlibTestCases(unittest.TestCase):
         )
 
         # annotated scatter
-        coords = apycoords(
+        coords = apycoords.SkyCoord(
             l=[128, 173] * u.degree, b=[-1.0, -1.0] * u.degree, frame="galactic"
         )
         names = ["NGC 1", "NGC 2"]
