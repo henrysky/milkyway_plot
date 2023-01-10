@@ -300,8 +300,7 @@ class MWPlot(MWPlotMaster):
         """
         if isinstance(position, apycoords.SkyCoord):
             position = self.skycoord_xy(position)
-        else:
-            position_wo_unit, _ = self.xy_unit_check(position, position)
+        position_wo_unit = self.xy_unit_check(position[0], position[1])
         position_text = np.add(position_wo_unit, 1.5)
         if isinstance(text, list):
             for t, p, pou, pt in zip(text, position, position_wo_unit, position_text):
@@ -532,10 +531,9 @@ class MWSkyMap(MWSkyMapMaster):
         :History: 2022-Jan-02 - Written - Henry Leung (University of Toronto)
         """
         if isinstance(position, apycoords.SkyCoord):
-            position = self.skycoord_xy(position)
-        else:
-            position_wo_unit, _ = self.xy_unit_check(position, position)
-        position_text = np.add(position_wo_unit, 1.5)
+            position = self.skycoord_radec(position)
+        position_wo_unit = self.xy_unit_check(position[0], position[1], checkrot=False)
+        position_text = np.add(position_wo_unit, 10)
         if isinstance(text, list):
             for t, p, pou, pt in zip(text, position, position_wo_unit, position_text):
                 self.scatter(p[0], p[1])

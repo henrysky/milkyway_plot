@@ -6,18 +6,18 @@ with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'README.rst')
 
 setup(
     name='mw_plot',
-    version='0.9.0',
+    version='0.10.0',
     classifiers=[
         'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Intended Audience :: Science/Research',
         'Topic :: Scientific/Engineering :: Astronomy'],
     packages=find_packages(),
     include_package_data=True,
     package_data={
         'mw_plot': ['*.png', '*.jpg']},
-    python_requires='>=3.6',
+    python_requires='>=3.7',
     install_requires=[
         'requests', 'numpy', 'astropy', 'matplotlib', 'Pillow', 'bokeh'],
     url='https://github.com/henrysky/milkyway_plot',

@@ -79,19 +79,19 @@ class MWPlotMaster(ABC):
             if hasattr(ip, "has_trait"):
                 if ip.has_trait('kernel'): self._in_jupyter = True
 
-    def xy_unit_check(self, x, y):
+    def xy_unit_check(self, x, y, checkrot=True):
         if not type(x) == u.quantity.Quantity or not type(y) == u.quantity.Quantity:
-            raise TypeError("Both x and y must carry astropy's unit")
+            raise TypeError("All numbers must be astropy Quantity")
+        if x.unit is None and y.unit is None:
+            raise TypeError("All numbers must carry astropy unit")
         else:
-            if x.unit is not None and y.unit is not None:
-                x = x.to(self._unit).value
-                y = y.to(self._unit).value
-            else:
-                raise TypeError("Both x, y, center and radius must carry astropy's unit")
+            x = x.to(self._unit).value
+            y = y.to(self._unit).value
         
         # check if rotation is 90deg or 270deg
-        if self.__rot90%2==1:
-            x, y = y, x
+        if checkrot:  # nested, do not unnest
+            if self.__rot90%2==1:
+                x, y = y, x
         return x, y
 
     def lrbt_rot(self):
@@ -208,7 +208,12 @@ class MWPlotMaster(ABC):
         # convert astropy SkyCoord to cartesian x, y
         return [skycoord.cartesian.x, skycoord.cartesian.y]
     
-class MWSkyMapMaster(ABC):
+    @staticmethod
+    def skycoord_radec(skycoord):
+        # convert astropy SkyCoord to list
+        return [skycoord.ra.deg*u.deg, skycoord.dec.deg*u.deg]
+    
+class MWSkyMapMaster(MWPlotMaster):
     """
     MWSkyMap master class
     """
@@ -219,7 +224,7 @@ class MWSkyMapMaster(ABC):
                 center, 
                 radius, 
                 figsize, 
-                dpi):
+                dpi):        
         if projection in ["equirectangular", "aitoff", "hammer", "lambert", "mollweide"]:
             self._projection = projection
         else:
