@@ -200,7 +200,7 @@ class MWPlot(MWPlotMaster):
             
             self._initialized = True
 
-    def mw_scatter(self, x, y, c, **kwargs):
+    def mw_scatter(self, x, y, c="r", **kwargs):
         """
         Plot scatter points with colorbar
 
@@ -440,7 +440,7 @@ class MWSkyMap(MWSkyMapMaster):
                 else:
                     rgb = np.array(self._img)
                     color_tuple = rgb.reshape((rgb.shape[0]*rgb.shape[1],rgb.shape[2]))/255.0
-                    im = ax.pcolormesh(Lon, Lat, self._img[:, :, 0], zorder=2, color=color_tuple, alpha=self.imalpha, rasterized=True)
+                    im = ax.pcolormesh(Lon, Lat, self._img, zorder=2, alpha=self.imalpha, rasterized=True)
 
             ax.set_facecolor(self.facecolor)  # have a black color background for image with <1.0 alpha
             ax.tick_params(labelsize=self.fontsize * 0.8, width=self.fontsize / 10, length=self.fontsize / 2)
@@ -464,7 +464,7 @@ class MWSkyMap(MWSkyMapMaster):
         # this is a pylab method
         self.fig.savefig(file, dpi=dpi, **kwargs)
 
-    def mw_scatter(self, ra, dec, c, **kwargs):
+    def mw_scatter(self, ra, dec, c="r", **kwargs):
         """
         Plot scatter points with colorbar
 
