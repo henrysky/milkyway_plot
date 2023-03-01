@@ -217,7 +217,7 @@ class MWPlot(MWPlotMaster):
 
         # decide whether we need colorbar or not
         if isinstance(c, list):
-            if isinstance(c[0], list):
+            if hasattr(c[0], "__len__"):
                 color = c[0]
                 cbar_label = c[1]
                 self.cbar_flag = True
@@ -485,7 +485,7 @@ class MWSkyMap(MWSkyMapMaster):
 
         # decide whether we need colorbar or not
         if isinstance(c, list):
-            if isinstance(c[0], list):
+            if hasattr(c[0], "__len__"):
                 color = c[0]
                 cbar_label = c[1]
                 self.cbar_flag = True
