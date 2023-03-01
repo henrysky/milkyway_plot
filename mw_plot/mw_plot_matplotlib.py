@@ -9,7 +9,7 @@ import astropy.coordinates as apycoords
 import pylab as plt
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.figure import Figure
-from matplotlib.axes._subplots import Axes
+from matplotlib.axes import Axes
 
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mw_plot.mw_plot_masters import MWPlotMaster, MWSkyMapMaster, rgb2gray
