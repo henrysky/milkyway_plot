@@ -35,7 +35,7 @@ class MatplotlibTestCases(unittest.TestCase):
         ] * u.degree
 
         # use mw_scatter instead of scatter
-        plot_instance.mw_scatter(lsmc_ra, lsmc_dec, "r")
+        plot_instance.mw_scatter(lsmc_ra, lsmc_dec, c="r")
 
         plot_instance.savefig(file="lmc_smc_projection.png")
 
@@ -61,7 +61,7 @@ class MatplotlibTestCases(unittest.TestCase):
         )
 
         # use mw_scatter instead of scatter because we want a colorbar
-        plot_instance.mw_scatter(x, y, [z, "kpc above galactic plane"])
+        plot_instance.mw_scatter(x, y, c=[z, "kpc above galactic plane"])
 
         plot_instance.savefig(file="gaia.png")
 

@@ -217,18 +217,21 @@ class MWPlot(MWPlotMaster):
 
         # decide whether we need colorbar or not
         if isinstance(c, list):
-            color = c[0]
-            cbar_label = c[1]
-            self.cbar_flag = True
-            if type(color) == u.quantity.Quantity:
-                color = color.to(self._unit).value
+            if isinstance(c[0], list):
+                color = c[0]
+                cbar_label = c[1]
+                self.cbar_flag = True
+                if type(color) == u.quantity.Quantity:
+                    color = color.to(self._unit).value
+            else:
+                color = c
         else:
             color = c
             
         if kwargs.get('s') is None:
             kwargs['s'] = self.s
 
-        mappable = self.ax.scatter(x, y, zorder=3, c=color, cmap=plt.get_cmap(self.cmap), rasterized=True,
+        mappable = self.ax.scatter(x, y, zorder=3, c=color, cmap=plt.get_cmap(self.cmap) if self.cbar_flag else None, rasterized=True,
                                    **kwargs)
         self.ax.imshow(self._img, zorder=0, extent=self._ext, alpha=0., rasterized=True)
 
@@ -482,15 +485,18 @@ class MWSkyMap(MWSkyMapMaster):
 
         # decide whether we need colorbar or not
         if isinstance(c, list):
-            color = c[0]
-            cbar_label = c[1]
-            self.cbar_flag = True
-            if type(color) == u.quantity.Quantity:
-                color = color.to(self._unit).value
+            if isinstance(c[0], list):
+                color = c[0]
+                cbar_label = c[1]
+                self.cbar_flag = True
+                if type(color) == u.quantity.Quantity:
+                    color = color.to(self._unit).value
+            else:
+                color = c
         else:
             color = c
 
-        mappable = self.ax.scatter(ra, dec, zorder=3, s=self.s, c=color, cmap=plt.get_cmap(self.cmap), rasterized=True,
+        mappable = self.ax.scatter(ra, dec, zorder=3, s=self.s, c=color, cmap=plt.get_cmap(self.cmap) if self.cbar_flag else None, rasterized=True,
                                    **kwargs)
         if self._projection == 'equirectangular':
             self.ax.imshow(self._img, zorder=0, extent=self._ext, alpha=0., rasterized=True)

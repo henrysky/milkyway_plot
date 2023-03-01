@@ -29,7 +29,7 @@ Orbit of Sun
     mw1.title = 'Orbit of Sun in 5Gyr'
 
     # use mw_scatter instead of scatter because we want a colorbar
-    mw1.mw_scatter(x, y, [z, 'kpc above galactic plane'], s=1)
+    mw1.mw_scatter(x, y, c=[z, 'kpc above galactic plane'], s=1)
 
 .. image:: matplotlib_imgs/gallery_sun_single.jpg
 
