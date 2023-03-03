@@ -429,10 +429,6 @@ class MWSkyMap(MWSkyMapMaster):
                     pass
                 else:
                     raise HumanError("Something is wrong duh")
-                # color
-                cmap_red = LinearSegmentedColormap.from_list("", ["black", "red"], N=256)
-                cmap_grn = LinearSegmentedColormap.from_list("", ["black", "green"], N=256)
-                cmap_blue = LinearSegmentedColormap.from_list("", ["black", "blue"], N=256)
 
                 # coordinates
                 lon = np.linspace(-np.pi, np.pi, 6500+1)
@@ -441,8 +437,6 @@ class MWSkyMap(MWSkyMapMaster):
                 if self._grayscale:
                     im = ax.pcolormesh(Lon, Lat, np.dot(self._img, [0.2989, 0.5870, 0.1140]), zorder=2, cmap="gray", alpha=self.imalpha, rasterized=True)
                 else:
-                    rgb = np.array(self._img)
-                    color_tuple = rgb.reshape((rgb.shape[0]*rgb.shape[1],rgb.shape[2]))/255.0
                     im = ax.pcolormesh(Lon, Lat, self._img, zorder=2, alpha=self.imalpha, rasterized=True)
 
             ax.set_facecolor(self.facecolor)  # have a black color background for image with <1.0 alpha
