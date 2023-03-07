@@ -48,18 +48,16 @@ OR clone the latest commit of mw_plot from github and install
 System Requirement
 ---------------------
 
--  | **Python** 3.6 or above
--  | **astropy** 4.0 or above
--  | **Numpy** 1.16.0 or above
--  | **Matplotlib** 3.1.0 or above
--  | **Pillow** 5.0.0 above
-
-Matplotlib 2.2.3 has trouble to save pdf plot with this package. Please use Matplotlib >3.0 if you experience issue
+-  | **Python** 3.7 or above
+-  | **astropy** 5.0 or above
+-  | **Numpy** 1.20.0 or above
+-  | **Matplotlib** 3.5.0 or above
+-  | **Pillow** 7.0.0 above
 
 .. prompt:: bash $
 
    git clone --depth=1 git://github.com/henrysky/milkyway_plot
-   python setup.py install
+   python -m pip install .  # add -e if you are developing
 
 .. toctree::
    :maxdepth: 2

@@ -15,7 +15,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install coveralls pydot graphviz pytest pytest-cov galpy astroquery numpy
-          python setup.py install
+          pip install .
       - name: Test mw-plot
         if: ${{ matrix.PAPER_MODELS == false}}
         run: >
