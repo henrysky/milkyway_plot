@@ -4,6 +4,7 @@ import unittest
 import numpy.testing as npt
 
 import numpy as np
+import pylab as plt
 from astropy import units as u
 import astropy.coordinates as apycoords
 from mw_plot import MWSkyMap, MWPlot, MWSkyMapBokeh, MWPlotBokeh
@@ -117,6 +118,17 @@ class MatplotlibTestCases(unittest.TestCase):
         )
         mw1.savefig(file="mwplot_scatter_annotate_1.jpg")
 
+    def test_mw_skymap_impossible_transform(self):
+        mw1 = MWSkyMap(projection="aitoff", grayscale=False)
+        fig, ax = plt.subplots(figsize=(10, 5))
+        # should raise error
+        self.assertRaises(TypeError, mw1.transform, ax)
+
+        mw1 = MWSkyMap(projection="equirectangular", grayscale=False)
+        fig, ax = plt.subplots(figsize=(10, 5))
+        # should not raise error
+        mw1.transform(ax)
+        
 
 class BokehTestCases(unittest.TestCase):
     def test_mw_skymap_bokeh(self):

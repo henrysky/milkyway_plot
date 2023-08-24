@@ -48,7 +48,7 @@ OR clone the latest commit of mw_plot from github and install
 System Requirement
 ---------------------
 
--  | **Python** 3.7 or above
+-  | **Python** 3.8 or above
 -  | **astropy** 5.0 or above
 -  | **Numpy** 1.20.0 or above
 -  | **Matplotlib** 3.5.0 or above
