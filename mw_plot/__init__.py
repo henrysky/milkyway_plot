@@ -5,7 +5,7 @@ from astropy.coordinates import SkyCoord, ICRS
 import astropy.units as u
 import numpy as np
 
-version = __version__ = get_distribution('mw_plot').version
+version = __version__ = get_distribution("mw_plot").version
 
 # RA and DEC of galactic center, galactic anti-center, galactic north and south pole in degree
 center_radec = [266.4167, -29.0078]
@@ -22,14 +22,16 @@ def mw_radec(deg=True, size=3600):
     :type deg: bool
     :param size: number of point
     :type size: int
-    
+
     :return: RA, DEC
     :rtype: np.ndarray
 
     :History: 2021-Feb-26 - Written - Henry Leung (University of Toronto)
     """
-    c= SkyCoord(np.linspace(0., 360., size)*u.deg, np.zeros(size)*u.deg, frame='galactic')
-    c= c.transform_to(ICRS)
+    c = SkyCoord(
+        np.linspace(0.0, 360.0, size) * u.deg, np.zeros(size) * u.deg, frame="galactic"
+    )
+    c = c.transform_to(ICRS)
     idx = np.argsort(c.ra.to(u.deg).value)
     if deg:
         return c.ra.to(u.deg).value[idx], c.dec.to(u.deg).value[idx]
