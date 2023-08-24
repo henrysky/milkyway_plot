@@ -386,6 +386,12 @@ class MWSkyMap(MWSkyMapMaster):
         """
         Transform matplotlib figure or a single axes
         """
+        if self._projection == 'equirectangular':
+            projection_name = "rectilinear"
+        else:
+            projection_name = self._projection
+        if (projection_name != x.name):
+            raise TypeError(f"You can not transform a figure with different projection, you want to transform to '{projection_name}' but your figure is '{x.name}'")
         if isinstance(x, Figure):
             if len(x.axes) > 1: 
                 warnings.warn("More than 1 axes in the figure, mw-plot will populate to all axes")
