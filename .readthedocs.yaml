@@ -22,11 +22,6 @@ sphinx:
   # Fail on all warnings to avoid broken references
   # fail_on_warning: true
 
-# Optionally build your docs in additional formats such as PDF and ePub
-formats:
-   - pdf
-   - epub
-
 # Optional but recommended, declare the Python requirements required
 # to build your documentation
 # See https://docs.readthedocs.io/en/stable/guides/reproducible-builds.html
