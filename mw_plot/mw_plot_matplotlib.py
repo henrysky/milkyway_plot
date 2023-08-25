@@ -5,6 +5,7 @@ import numpy as np
 
 import astropy.units as u
 import astropy.coordinates as apycoords
+from galpy.util.coords import radec_to_lb
 
 import pylab as plt
 from matplotlib.colors import LinearSegmentedColormap
@@ -439,8 +440,10 @@ class MWSkyMap(MWSkyMapMaster):
     :type radius: astropy.Quantity
     :param grayscale: whether to use grayscale background
     :type grayscale: bool
-    :param grid: whether to show grid
+    :param grid: whether to show galactic grid
     :type grid: bool
+    :param radecgrid: whether to show ra & dec grid
+    :type radecgrid: bool
 
     :param figsize: Matplotlib figure size
     :type figsize: turple
@@ -455,6 +458,7 @@ class MWSkyMap(MWSkyMapMaster):
         radius=(180, 90) * u.deg,
         grayscale=False,
         grid=False,
+        radecgrid=False,
         figsize=(10, 6.5),
         dpi=None,
     ):
@@ -473,6 +477,7 @@ class MWSkyMap(MWSkyMapMaster):
         self.cmap = "viridis"
         self.imalpha = 1.0
         self.tight_layout = True
+        self.radecgrid = radecgrid
 
         self.fig = None
         self.ax = None
@@ -629,6 +634,37 @@ class MWSkyMap(MWSkyMapMaster):
                     self.ax.plot(np.deg2rad([-180, 180]), np.deg2rad([i, i]), c=self._opposite_color, lw=0.5, zorder=3)
                 for i in [-150, -120, -90, -60, -30, 0, 30, 60, 90, 120, 150]:
                     self.ax.plot(np.deg2rad([i, i]), np.deg2rad([-75, 75]), c=self._opposite_color, lw=0.5, zorder=3)
+
+            if self.radecgrid is True:
+                for i in [-75, -60, -45, -30, -15, 0, 15, 30, 45, 60, 75]:
+                    ras = np.linspace(0, 360, 180)
+                    des = np.linspace(i, i, 180)
+                    l, b = radec_to_lb(ras, des, degree=True).T
+                    l = l - 180.
+                    if np.max(np.diff(l)) > 2.:
+                        idx = np.argmax(l) + 1
+                        l = np.concatenate([l[idx:], l[:idx]])
+                        b = np.concatenate([b[idx:], b[:idx]])
+                    idx = np.argsort(l)
+                    self.ax.plot(np.deg2rad(l), np.deg2rad(b), c="white", lw=0.5, zorder=3)
+
+
+                for i in [30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330]:
+                    ras = np.linspace(i, i, 180)
+                    des = np.linspace(-75, 75, 180)
+                    l, b = radec_to_lb(ras, des, degree=True).T
+                    l = l - 180.
+                    if np.max(np.diff(l)) > 0.5:
+                        idx = np.argmax(np.diff(l))
+                        idx = np.argmax(l) + 1
+                        l = np.concatenate([l[idx:], l[:idx]])
+                        b = np.concatenate([b[idx:], b[:idx]])
+                        idx_break = np.argmax(np.diff(l))
+                        self.ax.plot(np.deg2rad(l[:idx_break]), np.deg2rad(b[:idx_break]), c="white", lw=0.5, zorder=3)
+                        self.ax.plot(np.deg2rad(l[idx_break+1:]), np.deg2rad(b[idx_break+1:]), c="white", lw=0.5, zorder=3) 
+                    else:
+                        self.ax.plot(np.deg2rad(l), np.deg2rad(b), c="white", lw=0.5, zorder=3)
+
 
     def show(self, *args, **kwargs):
         if self.fig is None:

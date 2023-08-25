@@ -21,7 +21,7 @@ setup(
     include_package_data=True,
     package_data={"mw_plot": ["*.png", "*.jpg"]},
     python_requires=">=3.7",
-    install_requires=["requests", "numpy", "astropy", "matplotlib", "Pillow", "bokeh"],
+    install_requires=["requests", "numpy", "astropy", "matplotlib", "Pillow", "bokeh", "galpy"],
     url="https://github.com/henrysky/milkyway_plot",
     project_urls={
         "Bug Tracker": "https://github.com/henrysky/milkyway_plot/issues",

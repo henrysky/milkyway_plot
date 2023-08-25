@@ -2,6 +2,7 @@ numpy
 astropy
 matplotlib
 astroquery
+galpy
 pandas
 pillow
 sphinx_rtd_theme
