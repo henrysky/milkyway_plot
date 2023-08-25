@@ -262,7 +262,7 @@ class MWSkyMapMaster(MWPlotMaster):
     MWSkyMap master class
     """
 
-    def __init__(self, grayscale, projection, center, radius, figsize, dpi):
+    def __init__(self, grayscale, projection, center, radius, figsize, dpi, grid=False):
         if projection in [
             "equirectangular",
             "aitoff",
@@ -279,10 +279,15 @@ class MWSkyMapMaster(MWPlotMaster):
         self._grayscale = grayscale
         self.figsize = figsize
         self.dpi = dpi
+        self.grid = grid
         self._gh_imgbase_url = (
             "https://github.com/henrysky/milkyway_plot/raw/master/mw_plot/"
         )
         self._initialized = False
+
+        self._opposite_color = "white"
+        if self._grayscale:
+            self._opposite_color = "black"
 
         # check if running in browser-based ipython (aka jupyter)
         self._in_jupyter = False

@@ -83,3 +83,28 @@ MilkyWay Sky Map
     mw1.scatter(lsmc_ra, lsmc_dec, c="r", s=200)
 
 .. image:: matplotlib_imgs/single_lmcsmc.jpg
+
+You can also plot with grid
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: python
+    :linenos:
+
+    import numpy as np
+    from astropy import units as u
+    from mw_plot import MWSkyMap
+
+    # setup a MWSkyMap instance with projection, other projection can be 'hammer', 'mollweide' etc
+    # grid: whether to show the grid
+    mw1 = MWSkyMap(projection="aitoff", grid=True)
+
+    # set up plot title
+    mw1.title = "LMC and SMC in red dots"
+
+    # LMC and SMC coordinates
+    lsmc_ra = [78.77, 16.26] * u.degree
+    lsmc_dec = [-69.01, -72.42] * u.degree
+
+    mw1.scatter(lsmc_ra, lsmc_dec, c="r", s=200)
+
+.. image:: matplotlib_imgs/single_lmcsmc_w_grid.jpg

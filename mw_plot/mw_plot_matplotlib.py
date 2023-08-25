@@ -439,6 +439,8 @@ class MWSkyMap(MWSkyMapMaster):
     :type radius: astropy.Quantity
     :param grayscale: whether to use grayscale background
     :type grayscale: bool
+    :param grid: whether to show grid
+    :type grid: bool
 
     :param figsize: Matplotlib figure size
     :type figsize: turple
@@ -452,6 +454,7 @@ class MWSkyMap(MWSkyMapMaster):
         center=(0, 0) * u.deg,
         radius=(180, 90) * u.deg,
         grayscale=False,
+        grid=False,
         figsize=(10, 6.5),
         dpi=None,
     ):
@@ -462,6 +465,7 @@ class MWSkyMap(MWSkyMapMaster):
             radius=radius,
             figsize=figsize,
             dpi=dpi,
+            grid=grid,
         )
         self._unit = u.degree
         self.fontsize = 20
@@ -616,10 +620,15 @@ class MWSkyMap(MWSkyMapMaster):
                 length=self.fontsize / 2,
             )
             if self.title is not None:
-                ax.set_title(self.title, fontsize=self.fontsize)
+                ax.set_title(self.title, fontsize=self.fontsize, y=1.05)
             self.fig, self.ax = fig, ax
 
             self._initialized = True
+            if self.grid is True:
+                for i in [0, -15, 15, -30, 30, -45, 45, -60, 60, -75, 75]:
+                    self.ax.plot(np.deg2rad([-180, 180]), np.deg2rad([i, i]), c=self._opposite_color, lw=0.5, zorder=3)
+                for i in [-150, -120, -90, -60, -30, 0, 30, 60, 90, 120, 150]:
+                    self.ax.plot(np.deg2rad([i, i]), np.deg2rad([-75, 75]), c=self._opposite_color, lw=0.5, zorder=3)
 
     def show(self, *args, **kwargs):
         if self.fig is None:
