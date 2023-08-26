@@ -637,24 +637,22 @@ class MWSkyMap(MWSkyMapMaster):
 
             if self.radecgrid is True:
                 for i in [-75, -60, -45, -30, -15, 0, 15, 30, 45, 60, 75]:
-                    ras = np.linspace(0, 360, 180)
-                    des = np.linspace(i, i, 180)
+                    ras = np.linspace(0, 360, 360)
+                    des = np.linspace(i, i, 360)
                     l, b = radec_to_lb(ras, des, degree=True).T
-                    l = l - 180.
-                    if np.max(np.diff(l)) > 2.:
-                        idx = np.argmax(l) + 1
+                    l = - (l + 180) % (2 * 180) - 180
+                    if np.max(np.diff(l)) > 1.:
+                        idx = np.argmax(np.diff(l)) + 1
                         l = np.concatenate([l[idx:], l[:idx]])
                         b = np.concatenate([b[idx:], b[:idx]])
-                    idx = np.argsort(l)
                     self.ax.plot(np.deg2rad(l), np.deg2rad(b), c="white", lw=0.5, zorder=3)
 
-
                 for i in [30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330]:
-                    ras = np.linspace(i, i, 180)
-                    des = np.linspace(-75, 75, 180)
+                    ras = np.linspace(i, i, 360)
+                    des = np.linspace(-75, 75, 360)
                     l, b = radec_to_lb(ras, des, degree=True).T
-                    l = l - 180.
-                    if np.max(np.diff(l)) > 0.5:
+                    l = - (l + 180) % (2 * 180) - 180
+                    if np.max(np.diff(l)) > 0.25:
                         idx = np.argmax(np.diff(l))
                         idx = np.argmax(l) + 1
                         l = np.concatenate([l[idx:], l[:idx]])
