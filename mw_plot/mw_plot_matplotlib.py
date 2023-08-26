@@ -444,6 +444,8 @@ class MWSkyMap(MWSkyMapMaster):
     :type grid: bool
     :param radecgrid: whether to show ra & dec grid
     :type radecgrid: bool
+    :param eclgrid: whether to show ecliptic grid
+    :type eclgrid: bool
 
     :param figsize: Matplotlib figure size
     :type figsize: turple
@@ -459,6 +461,7 @@ class MWSkyMap(MWSkyMapMaster):
         grayscale=False,
         grid=False,
         radecgrid=False,
+        eclgrid=False,
         figsize=(10, 6.5),
         dpi=None,
     ):
@@ -478,6 +481,7 @@ class MWSkyMap(MWSkyMapMaster):
         self.imalpha = 1.0
         self.tight_layout = True
         self.radecgrid = radecgrid
+        self.eclgrid = eclgrid
 
         self.fig = None
         self.ax = None
@@ -560,6 +564,10 @@ class MWSkyMap(MWSkyMapMaster):
 
         :return: None
         """
+        if self._projection == "equirectangular":
+            self._fake_rad2deg = np.rad2deg
+        else:
+            self._fake_rad2deg = lambda x: x
         if not self._initialized:
             if self._projection == "equirectangular":
                 if self.fig is None and fig is None:
@@ -631,38 +639,128 @@ class MWSkyMap(MWSkyMapMaster):
             self._initialized = True
             if self.grid is True:
                 for i in [0, -15, 15, -30, 30, -45, 45, -60, 60, -75, 75]:
-                    self.ax.plot(np.deg2rad([-180, 180]), np.deg2rad([i, i]), c=self._opposite_color, lw=0.5, zorder=3)
+                    self.ax.plot(
+                        self._fake_rad2deg(np.deg2rad([-180, 180])),
+                        self._fake_rad2deg(np.deg2rad([i, i])),
+                        c=self._opposite_color,
+                        lw=0.5,
+                        zorder=3,
+                    )
                 for i in [-150, -120, -90, -60, -30, 0, 30, 60, 90, 120, 150]:
-                    self.ax.plot(np.deg2rad([i, i]), np.deg2rad([-75, 75]), c=self._opposite_color, lw=0.5, zorder=3)
+                    self.ax.plot(
+                        self._fake_rad2deg(np.deg2rad([i, i])),
+                        self._fake_rad2deg(np.deg2rad([-75, 75])),
+                        c=self._opposite_color,
+                        lw=0.5,
+                        zorder=3,
+                    )
+            else:
+                # disable ticks if not galactic grid
+                self.ax.set_yticklabels([])
 
             if self.radecgrid is True:
                 for i in [-75, -60, -45, -30, -15, 0, 15, 30, 45, 60, 75]:
                     ras = np.linspace(0, 360, 360)
                     des = np.linspace(i, i, 360)
                     l, b = radec_to_lb(ras, des, degree=True).T
-                    l = - (l + 180) % (2 * 180) - 180
-                    if np.max(np.diff(l)) > 1.:
+                    l = -(l + 180) % (2 * 180) - 180
+                    if np.max(np.diff(l)) > 100.0:
                         idx = np.argmax(np.diff(l)) + 1
                         l = np.concatenate([l[idx:], l[:idx]])
                         b = np.concatenate([b[idx:], b[:idx]])
-                    self.ax.plot(np.deg2rad(l), np.deg2rad(b), c="white", lw=0.5, zorder=3)
+                    self.ax.plot(
+                        self._fake_rad2deg(np.deg2rad(l)), self._fake_rad2deg(np.deg2rad(b)), c="white", lw=0.5, zorder=3
+                    )
 
                 for i in [30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330]:
                     ras = np.linspace(i, i, 360)
                     des = np.linspace(-75, 75, 360)
                     l, b = radec_to_lb(ras, des, degree=True).T
-                    l = - (l + 180) % (2 * 180) - 180
+                    l = -(l + 180) % (2 * 180) - 180
                     if np.max(np.diff(l)) > 0.25:
                         idx = np.argmax(np.diff(l))
                         idx = np.argmax(l) + 1
                         l = np.concatenate([l[idx:], l[:idx]])
                         b = np.concatenate([b[idx:], b[:idx]])
                         idx_break = np.argmax(np.diff(l))
-                        self.ax.plot(np.deg2rad(l[:idx_break]), np.deg2rad(b[:idx_break]), c="white", lw=0.5, zorder=3)
-                        self.ax.plot(np.deg2rad(l[idx_break+1:]), np.deg2rad(b[idx_break+1:]), c="white", lw=0.5, zorder=3) 
+                        self.ax.plot(
+                            self._fake_rad2deg(np.deg2rad(l[:idx_break])),
+                            self._fake_rad2deg(np.deg2rad(b[:idx_break])),
+                            c="white",
+                            lw=0.5,
+                            zorder=3,
+                        )
+                        self.ax.plot(
+                            self._fake_rad2deg(np.deg2rad(l[idx_break + 1 :])),
+                            self._fake_rad2deg(np.deg2rad(b[idx_break + 1 :])),
+                            c="white",
+                            lw=0.5,
+                            zorder=3,
+                        )
                     else:
-                        self.ax.plot(np.deg2rad(l), np.deg2rad(b), c="white", lw=0.5, zorder=3)
+                        self.ax.plot(
+                            self._fake_rad2deg(np.deg2rad(l)), self._fake_rad2deg(np.deg2rad(b)), c="white", lw=0.5, zorder=3
+                        )
 
+            if self.eclgrid is True:
+                def ecl_to_lb(elon, elat):
+                    """
+                    elon and elat in radian
+                    """
+                    e = 23.43928083333333 / 180 * np.pi
+                    atan_top = (np.sin(elon) * np.cos(e) - np.tan(elat) * np.sin(e))
+                    atan_bottom = np.cos(elon)
+                    ra = np.arctan(atan_top / atan_bottom)
+                    dec = np.arcsin(
+                        np.sin(elat) * np.cos(e)
+                        + np.cos(elat) * np.sin(e) * np.sin(elon)
+                    )
+                    case_1_idx = (atan_top > 0) & (atan_bottom < 0)
+                    case_2_idx = (atan_top < 0) & (atan_bottom > 0)
+                    case_3_idx = (atan_top < 0) & (atan_bottom < 0)
+                    ra[case_1_idx] += np.pi
+                    ra[case_2_idx] += 2*np.pi
+                    ra[case_3_idx] += 3*np.pi
+                    l, b = radec_to_lb(ra, dec).T
+                    l = -(l + np.pi) % (2 * np.pi) - np.pi
+                    return l, b
+
+                for i in [-75, -60, -45, -30, -15, 0, 15, 30, 45, 60, 75]:
+                    elon = np.linspace(0, 360, 360)
+                    elat = np.linspace(i, i, 360)
+                    l, b = ecl_to_lb(np.deg2rad(elon), np.deg2rad(elat))
+                    if np.max(np.diff(l)) > 2.0:
+                        idx = np.argmax(np.diff(l)) + 1
+                        l = np.concatenate([l[idx:], l[:idx]])
+                        b = np.concatenate([b[idx:], b[:idx]])
+                    self.ax.plot(self._fake_rad2deg(l), self._fake_rad2deg(b), c="white", lw=0.5, zorder=3)
+
+                for i in [30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330]:
+                    elon = np.linspace(i, i, 360)
+                    elat = np.linspace(-75, 75, 360)
+                    l, b = ecl_to_lb(np.deg2rad(elon), np.deg2rad(elat))
+                    if np.max(np.diff(l)) > 0.004:
+                        idx = np.argmax(np.diff(l))
+                        idx = np.argmax(l) + 1
+                        l = np.concatenate([l[idx:], l[:idx]])
+                        b = np.concatenate([b[idx:], b[:idx]])
+                        idx_break = np.argmax(np.diff(l))
+                        self.ax.plot(
+                            self._fake_rad2deg(l[:idx_break]),
+                            self._fake_rad2deg(b[:idx_break]),
+                            c="white",
+                            lw=0.5,
+                            zorder=3,
+                        )
+                        self.ax.plot(
+                            self._fake_rad2deg(l[idx_break + 1 :]),
+                            self._fake_rad2deg(b[idx_break + 1 :]),
+                            c="white",
+                            lw=0.5,
+                            zorder=3,
+                        )
+                    else:
+                        self.ax.plot(self._fake_rad2deg(l), self._fake_rad2deg(b), c="white", lw=0.5, zorder=3)
 
     def show(self, *args, **kwargs):
         if self.fig is None:
