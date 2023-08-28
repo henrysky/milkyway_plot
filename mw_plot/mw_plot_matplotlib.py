@@ -636,6 +636,10 @@ class MWSkyMap(MWSkyMapMaster):
                 ax.set_title(self.title, fontsize=self.fontsize, y=1.05)
             self.fig, self.ax = fig, ax
 
+            grad_alpha = 0.5
+            grid_width = 1.0
+            grid_style = "--"
+
             self._initialized = True
             if self.grid is True:
                 for i in [0, -15, 15, -30, 30, -45, 45, -60, 60, -75, 75]:
@@ -643,16 +647,20 @@ class MWSkyMap(MWSkyMapMaster):
                         self._fake_rad2deg(np.deg2rad([-180, 180])),
                         self._fake_rad2deg(np.deg2rad([i, i])),
                         c=self._opposite_color,
-                        lw=0.5,
+                        lw=grid_width,
+                        ls=grid_style,
                         zorder=3,
+                        alpha=grad_alpha,
                     )
                 for i in [-150, -120, -90, -60, -30, 0, 30, 60, 90, 120, 150]:
                     self.ax.plot(
                         self._fake_rad2deg(np.deg2rad([i, i])),
                         self._fake_rad2deg(np.deg2rad([-75, 75])),
                         c=self._opposite_color,
-                        lw=0.5,
+                        lw=grid_width,
+                        ls=grid_style,
                         zorder=3,
+                        alpha=grad_alpha,
                     )
             else:
                 # disable ticks if not galactic grid
@@ -669,7 +677,13 @@ class MWSkyMap(MWSkyMapMaster):
                         l = np.concatenate([l[idx:], l[:idx]])
                         b = np.concatenate([b[idx:], b[:idx]])
                     self.ax.plot(
-                        self._fake_rad2deg(np.deg2rad(l)), self._fake_rad2deg(np.deg2rad(b)), c="white", lw=0.5, zorder=3
+                        self._fake_rad2deg(np.deg2rad(l)),
+                        self._fake_rad2deg(np.deg2rad(b)),
+                        c=self._opposite_color,
+                        lw=grid_width,
+                        ls=grid_style,
+                        zorder=3,
+                        alpha=grad_alpha,
                     )
 
                 for i in [30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330]:
@@ -686,29 +700,40 @@ class MWSkyMap(MWSkyMapMaster):
                         self.ax.plot(
                             self._fake_rad2deg(np.deg2rad(l[:idx_break])),
                             self._fake_rad2deg(np.deg2rad(b[:idx_break])),
-                            c="white",
-                            lw=0.5,
+                            c=self._opposite_color,
+                            lw=grid_width,
+                            ls=grid_style,
                             zorder=3,
+                            alpha=grad_alpha,
                         )
                         self.ax.plot(
                             self._fake_rad2deg(np.deg2rad(l[idx_break + 1 :])),
                             self._fake_rad2deg(np.deg2rad(b[idx_break + 1 :])),
-                            c="white",
-                            lw=0.5,
+                            c=self._opposite_color,
+                            lw=grid_width,
+                            ls=grid_style,
                             zorder=3,
+                            alpha=grad_alpha,
                         )
                     else:
                         self.ax.plot(
-                            self._fake_rad2deg(np.deg2rad(l)), self._fake_rad2deg(np.deg2rad(b)), c="white", lw=0.5, zorder=3
+                            self._fake_rad2deg(np.deg2rad(l)),
+                            self._fake_rad2deg(np.deg2rad(b)),
+                            c=self._opposite_color,
+                            lw=grid_width,
+                            ls=grid_style,
+                            zorder=3,
+                            alpha=grad_alpha,
                         )
 
             if self.eclgrid is True:
+
                 def ecl_to_lb(elon, elat):
                     """
                     elon and elat in radian
                     """
                     e = 23.43928083333333 / 180 * np.pi
-                    atan_top = (np.sin(elon) * np.cos(e) - np.tan(elat) * np.sin(e))
+                    atan_top = np.sin(elon) * np.cos(e) - np.tan(elat) * np.sin(e)
                     atan_bottom = np.cos(elon)
                     ra = np.arctan(atan_top / atan_bottom)
                     dec = np.arcsin(
@@ -719,8 +744,8 @@ class MWSkyMap(MWSkyMapMaster):
                     case_2_idx = (atan_top < 0) & (atan_bottom > 0)
                     case_3_idx = (atan_top < 0) & (atan_bottom < 0)
                     ra[case_1_idx] += np.pi
-                    ra[case_2_idx] += 2*np.pi
-                    ra[case_3_idx] += 3*np.pi
+                    ra[case_2_idx] += 2 * np.pi
+                    ra[case_3_idx] += 3 * np.pi
                     l, b = radec_to_lb(ra, dec).T
                     l = -(l + np.pi) % (2 * np.pi) - np.pi
                     return l, b
@@ -733,7 +758,15 @@ class MWSkyMap(MWSkyMapMaster):
                         idx = np.argmax(np.diff(l)) + 1
                         l = np.concatenate([l[idx:], l[:idx]])
                         b = np.concatenate([b[idx:], b[:idx]])
-                    self.ax.plot(self._fake_rad2deg(l), self._fake_rad2deg(b), c="white", lw=0.5, zorder=3)
+                    self.ax.plot(
+                        self._fake_rad2deg(l),
+                        self._fake_rad2deg(b),
+                        c=self._opposite_color,
+                        lw=grid_width,
+                        ls=grid_style,
+                        zorder=3,
+                        alpha=grad_alpha,
+                    )
 
                 for i in [30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330]:
                     elon = np.linspace(i, i, 360)
@@ -748,19 +781,31 @@ class MWSkyMap(MWSkyMapMaster):
                         self.ax.plot(
                             self._fake_rad2deg(l[:idx_break]),
                             self._fake_rad2deg(b[:idx_break]),
-                            c="white",
-                            lw=0.5,
+                            c=self._opposite_color,
+                            lw=grid_width,
+                            ls=grid_style,
                             zorder=3,
+                            alpha=grad_alpha,
                         )
                         self.ax.plot(
                             self._fake_rad2deg(l[idx_break + 1 :]),
                             self._fake_rad2deg(b[idx_break + 1 :]),
-                            c="white",
-                            lw=0.5,
+                            c=self._opposite_color,
+                            lw=grid_width,
+                            ls=grid_style,
                             zorder=3,
+                            alpha=grad_alpha,
                         )
                     else:
-                        self.ax.plot(self._fake_rad2deg(l), self._fake_rad2deg(b), c="white", lw=0.5, zorder=3)
+                        self.ax.plot(
+                            self._fake_rad2deg(l),
+                            self._fake_rad2deg(b),
+                            c=self._opposite_color,
+                            lw=grid_width,
+                            ls=grid_style,
+                            zorder=3,
+                            alpha=grad_alpha,
+                        )
 
     def show(self, *args, **kwargs):
         if self.fig is None:
