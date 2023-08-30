@@ -12,3 +12,4 @@ bokeh
 sphinx
 nbsphinx
 ipykernel
+myst_parser

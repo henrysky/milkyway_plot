@@ -41,7 +41,8 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.viewcode',
               'sphinx-prompt',
               'bokeh.sphinxext.bokeh_plot', 
-              'sphinx_copybutton']
+              'sphinx_copybutton',
+              'myst_parser']
 
 bokeh_plot_pyfile_include_dirs = ['bokeh_html']
 
@@ -52,7 +53,7 @@ templates_path = ['_templates']
 # You can specify multiple suffix as a list of string:
 #
 # source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
+source_suffix = ['.rst', '.md']
 
 # The master toctree document.
 master_doc = 'index'
