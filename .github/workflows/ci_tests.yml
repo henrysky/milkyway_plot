@@ -13,9 +13,8 @@ jobs:
           python-version: "3.11"
       - name: Install dependencies
         run: |
-          pip install coveralls pydot graphviz pytest pytest-cov galpy astroquery numpy
+          pip install coveralls pydot graphviz pytest pytest-cov galpy astroquery numpy bokeh
           pip install .
       - name: Test mw-plot
-        if: ${{ matrix.PAPER_MODELS == false}}
         run: >
           python -m pytest --cov mw_plot --cov-report=xml tests/test_mwplot.py

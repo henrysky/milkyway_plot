@@ -1,3 +1,10 @@
+try:
+    import bokeh
+except ImportError:
+    raise ImportError(
+        "Bokeh is not installed. Please install Bokeh to use this feature"
+    )
+
 import requests
 import numpy as np
 import astropy.units as u

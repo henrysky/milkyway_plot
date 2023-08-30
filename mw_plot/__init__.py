@@ -1,5 +1,12 @@
+try:
+    import bokeh
+    _BOKEH_LOADED = True
+except ImportError:
+    _BOKEH_LOADED = False
+else:
+    from mw_plot.mw_plot_bokeh import *
+
 from mw_plot.mw_plot_matplotlib import *
-from mw_plot.mw_plot_bokeh import *
 from pkg_resources import get_distribution
 from astropy.coordinates import SkyCoord, ICRS
 import astropy.units as u
