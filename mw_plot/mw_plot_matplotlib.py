@@ -5,7 +5,6 @@ import numpy as np
 
 import astropy.units as u
 import astropy.coordinates as apycoords
-from galpy.util.coords import radec_to_lb
 
 import pylab as plt
 from matplotlib.colors import LinearSegmentedColormap
@@ -666,11 +665,22 @@ class MWSkyMap(MWSkyMapMaster):
                 # disable ticks if not galactic grid
                 self.ax.set_yticklabels([])
 
+            epoch = "J2000"
+
+            def radec_to_lb(ra, dec, degree=False):
+                if degree is True:
+                    unit = u.deg
+                else:
+                    unit = u.rad
+                c = apycoords.SkyCoord(ra * unit, dec * unit, equinox=epoch, frame="icrs")
+                c = c.transform_to(apycoords.Galactic)
+                return c.l.to(unit).value, c.b.to(unit).value
+
             if self.radecgrid is True:
                 for i in [-75, -60, -45, -30, -15, 0, 15, 30, 45, 60, 75]:
                     ras = np.linspace(0, 360, 360)
                     des = np.linspace(i, i, 360)
-                    l, b = radec_to_lb(ras, des, degree=True).T
+                    l, b = radec_to_lb(ras, des, degree=True)
                     l = -(l + 180) % (2 * 180) - 180
                     if np.max(np.diff(l)) > 100.0:
                         idx = np.argmax(np.diff(l)) + 1
@@ -689,7 +699,7 @@ class MWSkyMap(MWSkyMapMaster):
                 for i in [30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330]:
                     ras = np.linspace(i, i, 360)
                     des = np.linspace(-75, 75, 360)
-                    l, b = radec_to_lb(ras, des, degree=True).T
+                    l, b = radec_to_lb(ras, des, degree=True)
                     l = -(l + 180) % (2 * 180) - 180
                     if np.max(np.diff(l)) > 0.25:
                         idx = np.argmax(np.diff(l))
@@ -746,7 +756,7 @@ class MWSkyMap(MWSkyMapMaster):
                     ra[case_1_idx] += np.pi
                     ra[case_2_idx] += 2 * np.pi
                     ra[case_3_idx] += 3 * np.pi
-                    l, b = radec_to_lb(ra, dec).T
+                    l, b = radec_to_lb(ra, dec)
                     l = -(l + np.pi) % (2 * np.pi) - np.pi
                     return l, b
 
