@@ -239,6 +239,7 @@ class MWPlotMaster(ABC):
             / float(img.shape[1])
             * ((self._ext[1] - self._ext[0]) / (self._ext[3] - self._ext[2]))
         )
+        self._aspect = np.abs(self._aspect)
 
         self.lrbt_rot()
 

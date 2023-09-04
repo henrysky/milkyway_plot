@@ -42,9 +42,14 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx-prompt',
               'bokeh.sphinxext.bokeh_plot', 
               'sphinx_copybutton',
-              'myst_parser']
+              'myst_parser',
+              'matplotlib.sphinxext.plot_directive',
+              ]
 
 bokeh_plot_pyfile_include_dirs = ['bokeh_html']
+
+plot_formats = [("png", 200), ("pdf", 200)]
+plot_include_source = False
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

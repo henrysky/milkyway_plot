@@ -123,7 +123,7 @@ class MWPlot(MWPlotMaster):
                 f"Your input type {type(x)} is unsupported, can only be matplotlib figure or axes"
             )
         for _ax in ax:
-            self.initialize_mwplot(fig, _ax)
+            self.initialize_mwplot(fig, _ax, _multi=True)
 
     def plot(self, x, y, *args, **kwargs):
         x, y = self.xy_unit_check(x, y)
@@ -201,13 +201,13 @@ class MWPlot(MWPlotMaster):
         mycmap._lut[0, -1] = 0
         return mycmap
 
-    def initialize_mwplot(self, fig=None, ax=None):
+    def initialize_mwplot(self, fig=None, ax=None, _multi=False):
         """
         Internal method to initial mw_plot images and plot
 
         :return: None
         """
-        if not self._initialized:
+        if not self._initialized or _multi:
             if self.fig is None and fig is None:
                 fig, ax = plt.subplots(1, figsize=self.figsize, dpi=self.dpi)
             elif fig is not None:
@@ -555,9 +555,9 @@ class MWSkyMap(MWSkyMapMaster):
                 f"Your input type {type(x)} is unsupported, can only be matplotlib figure or axes"
             )
         for _ax in ax:
-            self.initialize_mwplot(fig, _ax)
+            self.initialize_mwplot(fig, _ax, _multi=True)
 
-    def initialize_mwplot(self, fig=None, ax=None):
+    def initialize_mwplot(self, fig=None, ax=None, _multi=False):
         """
         Initial mw_plot images and plot
 
@@ -567,7 +567,7 @@ class MWSkyMap(MWSkyMapMaster):
             self._fake_rad2deg = np.rad2deg
         else:
             self._fake_rad2deg = lambda x: x
-        if not self._initialized:
+        if not self._initialized or _multi:
             if self._projection == "equirectangular":
                 if self.fig is None and fig is None:
                     fig, ax = plt.subplots(1, figsize=self.figsize, dpi=self.dpi)
