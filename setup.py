@@ -9,7 +9,7 @@ with open(
 
 setup(
     name="mw_plot",
-    version="0.11.0",
+    version="0.12.0.dev0",
     classifiers=[
         "Development Status :: 3 - Alpha",
         "License :: OSI Approved :: MIT License",
