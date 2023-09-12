@@ -6,10 +6,6 @@
 Welcome to mw-plot's documentation!
 =========================================
 
-.. note::
-
-    Documentation on readthedocs is still under construction
-
 A handy python package to do plotting on a face-on/edge-on milkyway/skymap with `matplotlib` (https://matplotlib.org/) for 
 static plots or `bokeh` (https://bokeh.org/) for interactive plots (`bokeh` module under develop).
 

@@ -29,7 +29,7 @@ MilkyWay Bird's Eye
         unit=u.kpc,
         coord="galactocentric",
         annotation=True,
-        figsize=(15, 12),
+        figsize=(10, 8),
     )
 
     # set up plot title
@@ -50,7 +50,7 @@ MilkyWay Bird's Eye
         unit=u.kpc,
         coord="galactocentric",
         annotation=True,
-        figsize=(15, 12),
+        figsize=(10, 8),
     )
 
     # set up plot title
@@ -69,7 +69,7 @@ Annotation
     from astropy import units as u
     from mw_plot import MWPlot
 
-    mw1 = MWPlot(radius=20 * u.kpc, unit=u.kpc, coord="galactocentric", annotation=True)
+    mw1 = MWPlot(radius=20 * u.kpc, unit=u.kpc, coord="galactocentric", annotation=True, figsize=(10, 8),)
 
     # set up plot title
     mw1.title = "Annotation"
@@ -83,7 +83,7 @@ Annotation
     from astropy import units as u
     from mw_plot import MWPlot
 
-    mw1 = MWPlot(radius=20 * u.kpc, unit=u.kpc, coord="galactocentric", annotation=True)
+    mw1 = MWPlot(radius=20 * u.kpc, unit=u.kpc, coord="galactocentric", annotation=True, figsize=(10, 8),)
 
     # set up plot title
     mw1.title = "Annotation"

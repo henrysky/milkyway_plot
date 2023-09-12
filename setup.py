@@ -9,7 +9,7 @@ with open(
 
 setup(
     name="mw_plot",
-    version="0.11.0.dev0",
+    version="0.11.0",
     classifiers=[
         "Development Status :: 3 - Alpha",
         "License :: OSI Approved :: MIT License",
@@ -20,7 +20,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     package_data={"mw_plot": ["*.png", "*.jpg"]},
-    python_requires=">=3.7",
+    python_requires=">=3.8",
     install_requires=["requests", "numpy", "astropy", "matplotlib", "Pillow"],
     url="https://github.com/henrysky/milkyway_plot",
     project_urls={
