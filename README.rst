@@ -41,7 +41,7 @@ Documentation is avaliable at https://milkyway-plot.readthedocs.io/
 Author
 ---------------
 
--  | **Henry Leung** - *Initial work and developer* - henrysky_
+-  | **Henry Leung** - henrysky_
    | Department of Astronomy & Astrophysics, University of Toronto
    | Contact Henry: henrysky.leung [at] utoronto.ca
 

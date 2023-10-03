@@ -47,7 +47,7 @@ System Requirement
 -  | **Python** 3.8 or above
 -  | **astropy** 5.0 or above
 -  | **Numpy** 1.20.0 or above
--  | **Matplotlib** 3.5.0 or above
+-  | **Matplotlib** 3.7.0 or above
 -  | **Pillow** 7.0.0 above
 
 .. prompt:: bash $
@@ -57,9 +57,6 @@ System Requirement
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
-
-.. toctree::
    :caption: Getting Started
    
    basics
@@ -81,7 +78,7 @@ System Requirement
 Author
 ---------------
 
--  | **Henry Leung** - *Initial work and developer* - henrysky_
+-  | **Henry Leung** - henrysky_
    | Department of Astronomy & Astrophysics, University of Toronto
    | Contact Henry: henrysky.leung [at] utoronto.ca
 
