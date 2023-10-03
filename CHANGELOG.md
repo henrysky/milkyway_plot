@@ -5,7 +5,7 @@
 
 ## [0.11.1] - 2 October 2023
 ### Changed
-- Change Matplotlib minimium required version to at least v3.7.0
+- Change Matplotlib minimum required version to at least v3.7.0
 
 ## [0.11.0] - 12 September 2023
 ### Changed
