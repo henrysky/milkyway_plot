@@ -264,7 +264,6 @@ class MWSkyMapBokeh(MWSkyMapMaster):
 
     def scatter(self, ra, dec, *args, **kwargs):
         ra, dec = self.radec_unit_check(ra, dec)
-
         if kwargs.get("s") is None:
             # Only one of radius or size should be passed to bokeh circle. Size is prioritized.
             if kwargs.get("r") is not None:
