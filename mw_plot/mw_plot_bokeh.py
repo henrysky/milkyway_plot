@@ -144,6 +144,10 @@ class MWPlotBokeh(MWPlotMaster):
     def scatter(self, x, y, *args, **kwargs):
         x, y = self.xy_unit_check(x, y)
         if kwargs.get("s") is None:
+            # Only one of radius or size should be passed to bokeh circle. Size is prioritized.
+            if kwargs.get("r") is not None:
+                self.bokeh_fig.circle(x, y, radius=kwargs["r"])
+                return
             kwargs["s"] = self.s
         self.bokeh_fig.circle(x, y, size=self.s)
 
@@ -260,7 +264,12 @@ class MWSkyMapBokeh(MWSkyMapMaster):
 
     def scatter(self, ra, dec, *args, **kwargs):
         ra, dec = self.radec_unit_check(ra, dec)
+
         if kwargs.get("s") is None:
+            # Only one of radius or size should be passed to bokeh circle. Size is prioritized.
+            if kwargs.get("r") is not None:
+                self.bokeh_fig.circle(ra, dec, radius=kwargs["r"])
+                return
             kwargs["s"] = self.s
         self.bokeh_fig.circle(ra, dec, size=self.s)
 
