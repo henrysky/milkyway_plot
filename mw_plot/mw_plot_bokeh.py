@@ -4,16 +4,15 @@ except ImportError:
     raise ImportError(
         "Bokeh is not installed. Please install Bokeh to use this feature"
     )
+else:
+    from bokeh.plotting import figure, show
+    from bokeh.io import output_file, save, output_notebook
+    from bokeh.models import Range1d
 
 import requests
 import numpy as np
 import astropy.units as u
-import astropy.coordinates as coord
 from mw_plot.mw_plot_masters import MWPlotMaster, MWSkyMapMaster
-
-from bokeh.plotting import figure, show
-from bokeh.io import output_file, save, output_notebook
-from bokeh.models import Range1d
 
 
 def to_bokeh_img(imgarray):
@@ -149,7 +148,7 @@ class MWPlotBokeh(MWPlotMaster):
                 self.bokeh_fig.circle(x, y, radius=kwargs["r"])
                 return
             kwargs["s"] = self.s
-        self.bokeh_fig.circle(x, y, size=self.s)
+        self.bokeh_fig.circle(x, y, size=kwargs["s"])
 
     def show(self, notebook=True):
         if self._in_jupyter and notebook:
@@ -270,7 +269,7 @@ class MWSkyMapBokeh(MWSkyMapMaster):
                 self.bokeh_fig.circle(ra, dec, radius=kwargs["r"])
                 return
             kwargs["s"] = self.s
-        self.bokeh_fig.circle(ra, dec, size=self.s)
+        self.bokeh_fig.circle(ra, dec, size=kwargs["s"])
 
     def show(self, notebook=True):
         if self._in_jupyter and notebook:
