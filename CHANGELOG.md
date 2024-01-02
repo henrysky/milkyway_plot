@@ -1,7 +1,7 @@
 # Change log
 
 ## [0.12.0] - x xxx 202x
-
+- Added radius (r) as supported parameter for bokeh figures (Mitlasóczki Bence) 
 
 ## [0.11.1] - 2 October 2023
 ### Changed

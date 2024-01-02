@@ -19,7 +19,7 @@ import mw_plot
 # -- Project information -----------------------------------------------------
 
 project = 'mw-plot'
-copyright = '2021-2023, Henry Leung'
+copyright = '2021-2024, Henry Leung'
 author = 'Henry Leung'
 
 # The short X.Y version.
