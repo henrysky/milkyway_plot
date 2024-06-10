@@ -885,9 +885,9 @@ class MWSkyMap(MWSkyMapMaster):
                 transform=self.ax.transAxes,
             )
         if self.cbar_flag is True:
-            divider = make_axes_locatable(self.ax)
-            cax = divider.append_axes("right", size="5%", pad=0.05)
             if self._projection == "equirectangular":
+                divider = make_axes_locatable(self.ax)
+                cax = divider.append_axes("right", size="5%", pad=0.05)
                 cbar = self.fig.colorbar(mappable, cax=cax)
             else:
                 cbar = self.fig.colorbar(mappable, ax=self.ax)
