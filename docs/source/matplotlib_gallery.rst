@@ -33,7 +33,7 @@ Orbit of Sun
 
 .. plot::
 
-    import pylab as plt
+    import matplotlib.pyplot as plt
     from mw_plot import MWPlot
 
     from galpy.potential import MWPotential2014
@@ -65,7 +65,7 @@ Orbit of Sun 2
 .. code-block:: python
     :linenos:
 
-    import pylab as plt
+    import matplotlib.pyplot as plt
     from mw_plot import MWPlot
     from astropy import units as  u
     from galpy.potential import MWPotential2014
@@ -100,7 +100,7 @@ Orbit of Sun 2
 
 .. plot::
 
-    import pylab as plt
+    import matplotlib.pyplot as plt
     from mw_plot import MWPlot
     from astropy import units as  u
     from galpy.potential import MWPotential2014

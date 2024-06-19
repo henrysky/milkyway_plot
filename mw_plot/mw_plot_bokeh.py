@@ -180,6 +180,7 @@ class MWSkyMapBokeh(MWSkyMapMaster):
         super().__init__(
             grayscale=grayscale,
             projection="equirectangular",
+            wavelength="optical",
             center=center,
             radius=radius,
             figsize=None,

@@ -39,7 +39,7 @@ MilkyWay Bird's Eye
 
 .. plot::
 
-    import pylab as plt
+    import matplotlib.pyplot as plt
     import numpy as np
     from astropy import units as u
     from mw_plot import MWPlot
@@ -78,7 +78,7 @@ Annotation
 
 .. plot::
 
-    import pylab as plt
+    import matplotlib.pyplot as plt
     import numpy as np
     from astropy import units as u
     from mw_plot import MWPlot
@@ -116,7 +116,7 @@ MilkyWay Sky Map
 
 .. plot::
 
-    import pylab as plt
+    import matplotlib.pyplot as plt
     import numpy as np
     from astropy import units as u
     from mw_plot import MWSkyMap
@@ -133,6 +133,50 @@ MilkyWay Sky Map
     lsmc_dec = [-69.01, -72.42] * u.degree
 
     mw1.scatter(lsmc_ra, lsmc_dec, c="r", s=200)
+    plt.tight_layout()
+
+You can also plot in different wavelength
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: python
+    :linenos:
+
+    import numpy as np
+    from astropy import units as u
+    from mw_plot import MWSkyMap
+
+    # setup a MWSkyMap instance with projection, other projection can be 'hammer', 'mollweide' etc
+    # grid: whether to show the Galactic grid
+    mw1 = MWSkyMap(projection="aitoff", wavelength="gamam")
+
+    # set up plot title
+    mw1.title = "LMC and SMC in Green dots"
+
+    # LMC and SMC coordinates
+    lsmc_ra = [78.77, 16.26] * u.degree
+    lsmc_dec = [-69.01, -72.42] * u.degree
+
+    mw1.scatter(lsmc_ra, lsmc_dec, c="g", s=200)
+
+.. plot::
+
+    import matplotlib.pyplot as plt
+    import numpy as np
+    from astropy import units as u
+    from mw_plot import MWSkyMap
+
+    # setup a MWSkyMap instance with projection, other projection can be 'hammer', 'mollweide' etc
+    # grid: whether to show the Galactic grid
+    mw1 = MWSkyMap(projection="aitoff", wavelength="gamam")
+
+    # set up plot title
+    mw1.title = "LMC and SMC in red dots with Galactic Grid"
+
+    # LMC and SMC coordinates
+    lsmc_ra = [78.77, 16.26] * u.degree
+    lsmc_dec = [-69.01, -72.42] * u.degree
+
+    mw1.scatter(lsmc_ra, lsmc_dec, c="g", s=200)
     plt.tight_layout()
 
 You can also plot with grid
@@ -160,7 +204,7 @@ You can also plot with grid
 
 .. plot::
 
-    import pylab as plt
+    import matplotlib.pyplot as plt
     import numpy as np
     from astropy import units as u
     from mw_plot import MWSkyMap
@@ -201,7 +245,7 @@ You can also plot with grid
 
 .. plot::
 
-    import pylab as plt
+    import matplotlib.pyplot as plt
     import numpy as np
     from astropy import units as u
     from mw_plot import MWSkyMap
@@ -243,7 +287,7 @@ You can also plot with grid
 
 .. plot::
 
-    import pylab as plt
+    import matplotlib.pyplot as plt
     import numpy as np
     from astropy import units as u
     from mw_plot import MWSkyMap

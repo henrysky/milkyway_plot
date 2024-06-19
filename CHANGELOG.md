@@ -1,5 +1,9 @@
 # Change log
 
+## [0.13.0] - xx xxxx 20xx
+- Remove `setuptools` as a requirement
+- Add milkyway background in far-infrared, infrared and gamma
+
 ## [0.12.0] - 10 June 2024
 - Add radius (r) as supported parameter for bokeh figures (Mitlasóczki Bence)
 - Fix a bug where ticks show up in between the all-sky plot and the colour bar when doing all-sky plot + scatter plot + colorbar (Camila Navarrete)

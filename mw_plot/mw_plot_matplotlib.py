@@ -6,7 +6,7 @@ import numpy as np
 import astropy.units as u
 import astropy.coordinates as apycoords
 
-import pylab as plt
+import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
@@ -433,6 +433,8 @@ class MWSkyMap(MWSkyMapMaster):
 
     :param projection: projection system of the plot
     :type projection: string(["equirectangular", "aitoff", "hammer", "lambert", "mollweide"])
+    :param wavelength: wavelength of the sky map
+    :type wavelength: string([gamma", "optical", "infrared", "far-infrared"])
     :param center: Coordinates of the center of the plot with astropy degree/radian units
     :type center: astropy.Quantity
     :param radius: Radius of the plot with astropy degree/radian units
@@ -455,6 +457,7 @@ class MWSkyMap(MWSkyMapMaster):
     def __init__(
         self,
         projection="equirectangular",
+        wavelength="optical",
         center=(0, 0) * u.deg,
         radius=(180, 90) * u.deg,
         grayscale=False,
@@ -467,6 +470,7 @@ class MWSkyMap(MWSkyMapMaster):
         super().__init__(
             grayscale=grayscale,
             projection=projection,
+            wavelength=wavelength,
             center=center,
             radius=radius,
             figsize=figsize,
@@ -600,8 +604,8 @@ class MWSkyMap(MWSkyMapMaster):
                     raise HumanError("Something is wrong duh")
 
                 # coordinates
-                lon = np.linspace(-np.pi, np.pi, 6500 + 1)
-                lat = np.linspace(np.pi / 2.0, -np.pi / 2.0, 3250 + 1)
+                lon = np.linspace(-np.pi, np.pi, self._img.shape[1] + 1)
+                lat = np.linspace(np.pi / 2.0, -np.pi / 2.0, self._img.shape[0] + 1)
                 Lon, Lat = np.meshgrid(lon, lat)
                 if self._grayscale:
                     im = ax.pcolormesh(
@@ -636,7 +640,7 @@ class MWSkyMap(MWSkyMapMaster):
             self.fig, self.ax = fig, ax
 
             grad_alpha = 0.5
-            grid_width = 1.0
+            grid_width = 0.5
             grid_style = "--"
 
             self._initialized = True

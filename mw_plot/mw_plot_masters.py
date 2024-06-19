@@ -1,6 +1,6 @@
 import os
 import numpy as np
-import pylab as plt
+import matplotlib.pyplot as plt
 from abc import ABC, abstractmethod
 import astropy.units as u
 import astropy.coordinates as coord
@@ -263,7 +263,7 @@ class MWSkyMapMaster(MWPlotMaster):
     MWSkyMap master class
     """
 
-    def __init__(self, grayscale, projection, center, radius, figsize, dpi, grid=False):
+    def __init__(self, grayscale, projection, wavelength, center, radius, figsize, dpi, grid=False):
         if projection in [
             "equirectangular",
             "aitoff",
@@ -274,6 +274,11 @@ class MWSkyMapMaster(MWPlotMaster):
             self._projection = projection
         else:
             raise ValueError("Unknown projection")
+        
+        if wavelength in (allowed_wavelength := ["gamma", "optical", "infrared", "far-infrared"]):
+            self.wavlength = wavelength
+        else:
+            raise ValueError(f"Unknown wavelength, allowed values are: {allowed_wavelength}")
 
         self._center = center
         self._radius = radius
@@ -304,16 +309,25 @@ class MWSkyMapMaster(MWPlotMaster):
                     self._in_jupyter = True
 
     def images_read(self):
-        image_filename = "MW_edgeon_edr3_unannotate.jpg"
+        if self.wavlength == "optical":
+            image_filename = "MW_edgeon_edr3_unannotate.jpg"
+        elif self.wavlength == "gamma":
+            image_filename = "MW_fermi_gamma.jpg"
+        elif self.wavlength == "infrared":
+            image_filename = "MW_2mass.jpg"
+        elif self.wavlength == "far-infrared":
+            image_filename = "MW_farinfrared.jpg"
+        else:
+            raise ValueError("Unknown wavelength")
         path = os.path.join(os.path.dirname(__file__), image_filename)
         img = plt.imread(path)
         self._img = img
 
         # find center pixel and radius pixel
-        y_img_center = 1625 - int((3250 / 180) * self._center[1].value)
-        y_radious_px = int((3250 / 180) * self._radius[1].value)
-        x_img_center = int((6500 / 360) * self._center[0].value) + 3250
-        x_radious_px = int((6500 / 360) * self._radius[0].value)
+        y_img_center = self._img.shape[0] // 2 - int((self._img.shape[0] / 180) * self._center[1].value)
+        y_radious_px = int((self._img.shape[0] / 180) * self._radius[1].value)
+        x_img_center = int((self._img.shape[1] / 360) * self._center[0].value) + self._img.shape[0]
+        x_radious_px = int((self._img.shape[1] / 360) * self._radius[0].value)
 
         self._ext = [
             (self._center[0] - self._radius[0]).value,

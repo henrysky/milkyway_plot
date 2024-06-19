@@ -4,7 +4,7 @@ import unittest
 import numpy.testing as npt
 
 import numpy as np
-import pylab as plt
+import matplotlib.pyplot as plt
 from astropy import units as u
 import astropy.coordinates as apycoords
 from mw_plot import MWSkyMap, MWPlot, MWSkyMapBokeh, MWPlotBokeh
