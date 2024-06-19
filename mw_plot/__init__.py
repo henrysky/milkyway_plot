@@ -7,12 +7,12 @@ else:
     from mw_plot.mw_plot_bokeh import *
 
 from mw_plot.mw_plot_matplotlib import *
-from pkg_resources import get_distribution
+from importlib.metadata import version
 from astropy.coordinates import SkyCoord, ICRS
 import astropy.units as u
 import numpy as np
 
-version = __version__ = get_distribution("mw_plot").version
+version = __version__ = version("mw_plot")
 
 # RA and DEC of galactic center, galactic anti-center, galactic north and south pole in degree
 center_radec = [266.4167, -29.0078]
