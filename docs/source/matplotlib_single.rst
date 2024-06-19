@@ -147,7 +147,7 @@ You can also plot in different wavelength
 
     # setup a MWSkyMap instance with projection, other projection can be 'hammer', 'mollweide' etc
     # grid: whether to show the Galactic grid
-    mw1 = MWSkyMap(projection="aitoff", wavelength="gamam")
+    mw1 = MWSkyMap(projection="aitoff", wavelength="gamma")
 
     # set up plot title
     mw1.title = "LMC and SMC in Green dots"
@@ -167,7 +167,7 @@ You can also plot in different wavelength
 
     # setup a MWSkyMap instance with projection, other projection can be 'hammer', 'mollweide' etc
     # grid: whether to show the Galactic grid
-    mw1 = MWSkyMap(projection="aitoff", wavelength="gamam")
+    mw1 = MWSkyMap(projection="aitoff", wavelength="gamma")
 
     # set up plot title
     mw1.title = "LMC and SMC in red dots with Galactic Grid"
