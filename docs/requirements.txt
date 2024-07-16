@@ -1,14 +1,9 @@
-numpy
-astropy
-matplotlib
+bokeh
 astroquery
 galpy
-pandas
-pillow
 sphinx_rtd_theme
 sphinx-prompt
 sphinx-copybutton
-bokeh
 sphinx
 nbsphinx
 ipykernel
