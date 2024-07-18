@@ -2,3 +2,5 @@ astropy
 matplotlib
 numpy
 Requests
+ipython
+ipykernel

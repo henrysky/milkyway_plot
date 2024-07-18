@@ -2,22 +2,13 @@
 requires = ["setuptools >= 61.0"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools.packages.find]
-include = ["mw_plot"]  # package names should match these glob patterns (["*"] by default)
-
 [tool.setuptools.package-data]
 mypkg = ["*.png", "*.jpg"]
 
 [project]
 name = "mw_plot"
 version = "0.12.1.dev0"
-dependencies = [
-  "requests", 
-  "numpy", 
-  "astropy", 
-  "matplotlib>=3.7", 
-  "Pillow"
-]
+dynamic = ["dependencies"]
 requires-python = ">=3.9"
 authors = [
   {name = "Henry Leung", email = "henryskyleung@gmail.com"},
@@ -35,6 +26,9 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "Topic :: Scientific/Engineering :: Astronomy",
 ]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
 
 [project.urls]
 Homepage = "https://github.com/henrysky/milkyway_plot"
