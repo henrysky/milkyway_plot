@@ -1,2 +1,2 @@
-include mw_plot/*.jpg
-include mw_plot/*.png
+include src/mw_plot/*.jpg
+include src/mw_plot/*.png
