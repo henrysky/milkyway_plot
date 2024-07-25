@@ -36,3 +36,6 @@ Documentation = "https://milkyway-plot.readthedocs.io/"
 Repository = "https://github.com/henrysky/milkyway_plot/"
 "Bug Tracker" = "https://github.com/henrysky/milkyway_plot/issues"
 Changelog = "https://milkyway-plot.readthedocs.io/en/latest/changelog.html"
+
+[tool.ruff]
+extend-include = ["*.ipynb"]

@@ -12,15 +12,16 @@
 
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../'))
+
+sys.path.insert(0, os.path.abspath("../"))
 
 import mw_plot
 
 # -- Project information -----------------------------------------------------
 
-project = 'mw-plot'
-copyright = '2021-2024, Henry Leung'
-author = 'Henry Leung'
+project = "mw-plot"
+copyright = "2021-2024, Henry Leung"
+author = "Henry Leung"
 
 # The short X.Y version.
 version = mw_plot.__version__
@@ -33,35 +34,36 @@ release = mw_plot.__version__
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.autodoc',
-              'sphinx.ext.intersphinx',
-              'sphinx.ext.todo',
-              'sphinx.ext.mathjax',
-              'sphinx.ext.inheritance_diagram',
-              'sphinx.ext.viewcode',
-              'sphinx-prompt',
-              'bokeh.sphinxext.bokeh_plot', 
-              'sphinx_copybutton',
-              'myst_parser',
-              'matplotlib.sphinxext.plot_directive',
-              ]
+extensions = [
+    "sphinx.ext.autodoc",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.todo",
+    "sphinx.ext.mathjax",
+    "sphinx.ext.inheritance_diagram",
+    "sphinx.ext.viewcode",
+    "sphinx-prompt",
+    "bokeh.sphinxext.bokeh_plot",
+    "sphinx_copybutton",
+    "myst_parser",
+    "matplotlib.sphinxext.plot_directive",
+]
 
-bokeh_plot_pyfile_include_dirs = ['bokeh_html']
+bokeh_plot_pyfile_include_dirs = ["bokeh_html"]
 
 plot_formats = [("png", 200), ("pdf", 200)]
 plot_include_source = False
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
 # source_suffix = ['.rst', '.md']
-source_suffix = ['.rst', '.md']
+source_suffix = [".rst", ".md"]
 
 # The master toctree document.
-master_doc = 'index'
+master_doc = "index"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -74,31 +76,29 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
-html_favicon = 'favicon.png'
-html_logo = 'mw-plot-logo.png'
+html_theme = "sphinx_rtd_theme"
+html_favicon = "favicon.png"
+html_logo = "mw-plot-logo.png"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-html_theme_options = {
-    'logo_only': True
-}
+html_theme_options = {"logo_only": True}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ["_static"]
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
-html_last_updated_fmt = '%d %b %Y'
+html_last_updated_fmt = "%d %b %Y"
 
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'mw-plotdoc'
+htmlhelp_basename = "mw-plotdoc"
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -106,15 +106,12 @@ latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     #
     # 'papersize': 'letterpaper',
-
     # The font size ('10pt', '11pt' or '12pt').
     #
     # 'pointsize': '10pt',
-
     # Additional stuff for the LaTeX preamble.
     #
     # 'preamble': '',
-
     # Latex figure (float) alignment
     #
     # 'figure_align': 'htbp',
@@ -124,18 +121,14 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'mwplot.tex', 'mw-plot Documentation',
-     'Henry Leung', 'manual'),
+    (master_doc, "mwplot.tex", "mw-plot Documentation", "Henry Leung", "manual"),
 ]
 
 # -- Options for manual page output ---------------------------------------
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, 'mw-plot', 'mw-plot Documentation',
-     [author], 1)
-]
+man_pages = [(master_doc, "mw-plot", "mw-plot Documentation", [author], 1)]
 
 # -- Options for Texinfo output -------------------------------------------
 
@@ -143,9 +136,15 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'mw-plot', 'mw-plot Documentation',
-     author, 'mw-plot', 'A handy python package to do plotting on a face-on/edge-on/allsky map milkyway',
-     'Miscellaneous'),
+    (
+        master_doc,
+        "mw-plot",
+        "mw-plot Documentation",
+        author,
+        "mw-plot",
+        "A handy python package to do plotting on a face-on/edge-on/allsky map milkyway",
+        "Miscellaneous",
+    ),
 ]
 
 html_show_sourcelink = True

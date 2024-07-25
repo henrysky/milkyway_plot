@@ -676,7 +676,9 @@ class MWSkyMap(MWSkyMapMaster):
                     unit = u.deg
                 else:
                     unit = u.rad
-                c = apycoords.SkyCoord(ra * unit, dec * unit, equinox=epoch, frame="icrs")
+                c = apycoords.SkyCoord(
+                    ra * unit, dec * unit, equinox=epoch, frame="icrs"
+                )
                 c = c.transform_to(apycoords.Galactic)
                 return c.l.to(unit).value, c.b.to(unit).value
 

@@ -1,5 +1,6 @@
 try:
     import bokeh
+
     _BOKEH_LOADED = True
 except ImportError:
     _BOKEH_LOADED = False

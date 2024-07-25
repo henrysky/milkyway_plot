@@ -128,7 +128,7 @@ class MatplotlibTestCases(unittest.TestCase):
         fig, ax = plt.subplots(figsize=(10, 5))
         # should not raise error
         mw1.transform(ax)
-        
+
 
 class BokehTestCases(unittest.TestCase):
     def test_mw_skymap_bokeh(self):
