@@ -148,7 +148,7 @@ class MWPlotBokeh(MWPlotMaster):
                 self.bokeh_fig.circle(x, y, radius=kwargs["r"])
                 return
             kwargs["s"] = self.s
-        self.bokeh_fig.circle(x, y, size=kwargs["s"])
+        self.bokeh_fig.scatter(x, y, size=kwargs["s"])
 
     def show(self, notebook=True):
         if self._in_jupyter and notebook:
@@ -270,7 +270,7 @@ class MWSkyMapBokeh(MWSkyMapMaster):
                 self.bokeh_fig.circle(ra, dec, radius=kwargs["r"])
                 return
             kwargs["s"] = self.s
-        self.bokeh_fig.circle(ra, dec, size=kwargs["s"])
+        self.bokeh_fig.scatter(ra, dec, size=kwargs["s"])
 
     def show(self, notebook=True):
         if self._in_jupyter and notebook:
