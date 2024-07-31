@@ -32,8 +32,6 @@ class MWPlotBokeh(MWPlotBase):
     """
     MWPlot Brokeh class plotting with Bokeh
 
-    :param mode: whether plot edge-on or face-on milkyway
-    :type mode: string, either 'face-on' or 'edge-on'
     :param center: Coordinates of the center of the plot with astropy units
     :type center: astropy.Quantity
     :param radius: Radius of the plot with astropy units
@@ -54,7 +52,6 @@ class MWPlotBokeh(MWPlotBase):
 
     def __init__(
         self,
-        mode="face-on",
         center=(0, 0) * u.kpc,
         radius=90750 * u.lyr,
         unit=u.kpc,
@@ -69,7 +66,6 @@ class MWPlotBokeh(MWPlotBase):
             annotation=annotation,
             rot90=rot90,
             coord=coord,
-            mode=mode,
             r0=r0,
             center=center,
             radius=radius,

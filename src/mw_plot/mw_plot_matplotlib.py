@@ -7,20 +7,17 @@ import astropy.units as u
 import astropy.coordinates as apycoords
 
 import matplotlib.pyplot as plt
-from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-from mw_plot.mw_plot_base import MWPlotBase, MWSkyMapBase, rgb2gray
+from mw_plot.mw_plot_base import MWPlotBase, MWSkyMapBase
 
 
 class MWPlot(MWPlotBase):
     """
     MWPlot class plotting with Matplotlib
 
-    :param mode: whether plot edge-on or face-on milkyway
-    :type mode: str, either 'face-on' or 'edge-on'
     :param center: Coordinates of the center of the plot with astropy units
     :type center: astropy.Quantity
     :param radius: Radius of the plot with astropy units
@@ -46,7 +43,6 @@ class MWPlot(MWPlotBase):
 
     def __init__(
         self,
-        mode="face-on",
         center=(0, 0) * u.kpc,
         radius=90750 * u.lyr,
         unit=u.kpc,
@@ -63,7 +59,6 @@ class MWPlot(MWPlotBase):
             annotation=annotation,
             rot90=rot90,
             coord=coord,
-            mode=mode,
             r0=r0,
             center=center,
             radius=radius,

@@ -1,63 +1,129 @@
-import os
-import numpy as np
-import matplotlib.pyplot as plt
-from abc import ABC
-import astropy.units as u
-import astropy.coordinates as coord
+import importlib.util
+import pathlib
 import warnings
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
 
+import astropy.coordinates as coord
+import astropy.units as u
+import matplotlib.pyplot as plt
+import numpy as np
 from numpy.typing import NDArray
 
+from mw_plot.utils import rgb2gray
 
-def rgb2gray(rgb: NDArray) -> NDArray:
+
+@dataclass
+class MWImage:
     """
-    Change 8-bit RGB color image [0...255] into grayscale in RGB 8-bit representation [0...255]
-    using colorimetric (perceptual luminance-preserving) conversion
-
-    Parameters
-    ----------
-    rgb : NDArray
-        RGB 2D image array
-
-    Returns
-    -------
-    NDArray
-        Grayscale 2D image in RGB array
+    Dataclass to keep track of background images
     """
-    rgb_norm = rgb / 255.0
-    # need to seperate the color channel to avoid using excessive memory
-    rgb_norm[:, :, 0] = np.where(
-        rgb_norm[:, :, 0] <= 0.04045,
-        rgb_norm[:, :, 0] / 12.92,
-        ((rgb_norm[:, :, 0] + 0.055) / 1.055) ** 2.4,
-    )
-    rgb_norm[:, :, 1] = np.where(
-        rgb_norm[:, :, 1] <= 0.04045,
-        rgb_norm[:, :, 1] / 12.92,
-        ((rgb_norm[:, :, 1] + 0.055) / 1.055) ** 2.4,
-    )
-    rgb_norm[:, :, 2] = np.where(
-        rgb_norm[:, :, 2] <= 0.04045,
-        rgb_norm[:, :, 2] / 12.92,
-        ((rgb_norm[:, :, 2] + 0.055) / 1.055) ** 2.4,
-    )
-    gray = np.rint(
-        255.0
-        * (
-            1
-            - (
-                0.2126 * rgb_norm[:, :, 0]
-                + 0.7152 * rgb_norm[:, :, 1]
-                + 0.0722 * rgb_norm[:, :, 2]
-            )
+
+    filename: str
+    citation: str
+
+    @property
+    def img_path(self) -> pathlib.Path:
+        # get path to the mw_plot directory
+        return pathlib.Path(importlib.util.find_spec("mw_plot").origin).parent.joinpath(
+            self.filename
         )
-    ).astype(np.uint8)
-    return np.concatenate([gray[:, :, None]] * 3, axis=-1)
+
+    @property
+    def img(self) -> NDArray:
+        # read the image
+        return plt.imread(self.img_path)
 
 
-class MWPlotBase(ABC):
+class MWPlotCommon(ABC):
     """
-    MWPlot base class
+    Common class for MWPlotBase and MWSkyMapBase
+    """
+
+    def __init__(self):
+        self._gh_imgbase_url = (
+            "https://github.com/henrysky/milkyway_plot/raw/master/mw_plot/"
+        )
+        
+        # check if running in browser-based ipython (aka jupyter)
+        self._in_jupyter = False
+        try:
+            from IPython import get_ipython
+        except ImportError:
+            # the case where ipython is not installed
+            pass
+        else:
+            if (ip := get_ipython()) is None:
+                # the case where ipython is installed but not in ipython runtime
+                pass
+            else:
+                # only in jupyter notebook/lab has the kernel trait
+                self._in_jupyter = ip.has_trait("kernel")
+
+        # all the background images
+        self._MW_IMAGES = {
+            "MW_bg_unannotate": MWImage(
+                filename="MW_bg_unannotate.jpg",
+                citation="NASA/JPL-Caltech/R. Hurt (SSC/Caltech)",
+            ),
+            "MW_bg_annotate": MWImage(
+                filename="MW_bg_annotate.jpg",
+                citation="NASA/JPL-Caltech/R. Hurt (SSC/Caltech)",
+            ),
+            "MW_edgeon_edr3_unannotate": MWImage(
+                filename="MW_edgeon_edr3_unannotate.jpg", citation="ESA/Gaia/DPAC"
+            ),
+            "MW_fermi_gamma": MWImage(
+                filename="MW_fermi_gamma.jpg",
+                citation="NASA/DOE/Fermi LAT Collaboration",
+            ),
+            "MW_2mass": MWImage(
+                filename="MW_2mass",
+                citation="2MASS/IPAC/Caltech/University of Massachusetts",
+            ),
+            "MW_farinfrared": MWImage(
+                filename="MW_farinfrared.jpg",
+                citation="WISE/NASA/JPL-Caltech/UCLA & IRAS/NASA",
+            ),
+        }
+
+    @abstractmethod
+    def images_read(self):
+        # class to read images
+        pass
+
+    @staticmethod
+    def skycoord_xy(skycoord):
+        # convert astropy SkyCoord to cartesian x, y
+        return [skycoord.cartesian.x, skycoord.cartesian.y]
+
+    @staticmethod
+    def skycoord_radec(skycoord):
+        # convert astropy SkyCoord to list
+        if not hasattr(skycoord, "ra"):
+            skycoord = skycoord.icrs
+        return [skycoord.ra.deg * u.deg, skycoord.dec.deg * u.deg]
+
+    def xy_unit_check(self, x, y, checkrot=True):
+        if not isinstance(x, u.quantity.Quantity) or not isinstance(
+            y, u.quantity.Quantity
+        ):
+            raise TypeError("All numbers must be astropy Quantity")
+        if x.unit is None and y.unit is None:
+            raise TypeError("All numbers must carry astropy unit")
+        else:
+            x = x.to(self._unit).value
+            y = y.to(self._unit).value
+
+        # check if rotation is 90deg or 270deg
+        if checkrot:  # nested, do not unnest
+            if self.__rot90 % 2 == 1:
+                x, y = y, x
+        return x, y
+
+class MWPlotBase(MWPlotCommon):
+    """
+    MWPlot base class to plot the edge-on Milky Way
 
     Parameters
     ----------
@@ -69,8 +135,6 @@ class MWPlotBase(ABC):
         Number of 90 degree rotation
     coord : str
         'galactocentric' or 'galactic'
-    mode : str
-        'face-on' or 'edge-on'
     r0 : float
         Distance to galactic center in kpc
     center : tuple
@@ -91,7 +155,6 @@ class MWPlotBase(ABC):
         annotation,
         rot90,
         coord,
-        mode,
         r0,
         center,
         radius,
@@ -99,12 +162,12 @@ class MWPlotBase(ABC):
         figsize,
         dpi,
     ):
+        super().__init__()
         self.__coord = coord
         self.__annotation = annotation
         self.__rot90 = rot90
         self._grayscale = grayscale
         self.r0 = r0 * u.kpc
-        self.mode = mode
         self._initialized = False
         self.figsize = figsize
         self.dpi = dpi
@@ -117,49 +180,21 @@ class MWPlotBase(ABC):
         self._center = center
         self._radius = radius
         self._unit = unit
-        self._gh_imgbase_url = (
-            "https://github.com/henrysky/milkyway_plot/raw/master/mw_plot/"
-        )
 
-        # Fixed value
-        if self.mode == "face-on":
-            self.__pixels = 5600
-            self.__resolution = (self.r0 / 1078).to(u.lyr)
-        elif self.mode == "edge-on":
-            self.__pixels = 6500
-            self.__resolution = 15.384615846 * u.lyr
-        else:
-            raise LookupError(
-                f"Unknown mode '{self.mode}', can only be 'edge-on' or 'face-on'"
-            )
+        self.__pixels = 5600
+        self.__resolution = (self.r0 / 1078).to(u.lyr)
 
-        # check if running in browser-based ipython (aka jupyter)
-        self._in_jupyter = False
-        try:
-            from IPython import get_ipython
-
-            ip = get_ipython()
-        except ImportError:
-            pass
-        else:
-            if hasattr(ip, "has_trait"):
-                if ip.has_trait("kernel"):
-                    self._in_jupyter = True
-
-    def xy_unit_check(self, x, y, checkrot=True):
-        if not type(x) == u.quantity.Quantity or not type(y) == u.quantity.Quantity:
-            raise TypeError("All numbers must be astropy Quantity")
-        if x.unit is None and y.unit is None:
-            raise TypeError("All numbers must carry astropy unit")
-        else:
-            x = x.to(self._unit).value
-            y = y.to(self._unit).value
-
-        # check if rotation is 90deg or 270deg
-        if checkrot:  # nested, do not unnest
-            if self.__rot90 % 2 == 1:
-                x, y = y, x
-        return x, y
+        # # Fixed value
+        # if self.mode == "face-on":
+        #     self.__pixels = 5600
+        #     self.__resolution = (self.r0 / 1078).to(u.lyr)
+        # elif self.mode == "edge-on":
+        #     self.__pixels = 6500
+        #     self.__resolution = 15.384615846 * u.lyr
+        # else:
+        #     raise LookupError(
+        #         f"Unknown mode '{self.mode}', can only be 'edge-on' or 'face-on'"
+        #     )
 
     def lrbt_rot(self):
         """This function rotate matplolti's extent ordered LRBT"""
@@ -172,21 +207,16 @@ class MWPlotBase(ABC):
             self._ext = [t, b, r, l]
 
     def images_read(self):
-        if self.mode == "edge-on":
-            image_filename = "MW_edgeon_edr3_unannotate.jpg"
-            path = os.path.join(os.path.dirname(__file__), image_filename)
-            img = np.zeros((6500, 6500, 3), dtype=int)
-            img[1625:4875, :, :] = plt.imread(path)
-        elif self.__annotation is False:
-            image_filename = "MW_bg_unannotate.jpg"
-            path = os.path.join(os.path.dirname(__file__), image_filename)
-            img = plt.imread(path)
+        # if self.mode == "edge-on":
+        #     img_obj = self._MW_IMAGES["MW_edgeon_edr3_unannotate"]
+        #     img = np.zeros((6500, 6500, 3), dtype=np.uint8)
+        #     img[1625:4875, :, :] = img_obj.img
+        if self.__annotation:
+            img_obj = self._MW_IMAGES["MW_bg_annotate"]
         else:
-            image_filename = "MW_bg_annotate.jpg"
-            path = os.path.join(os.path.dirname(__file__), image_filename)
-            img = plt.imread(path)
-        self._img_fname = image_filename
-        self._gh_img_url = self._gh_imgbase_url + self._img_fname
+            img_obj = self._MW_IMAGES["MW_bg_unannotate"]
+        img = img_obj.img
+        self._gh_img_url = self._gh_imgbase_url + img_obj.filename
 
         if self._grayscale:
             img = rgb2gray(img)
@@ -204,16 +234,15 @@ class MWPlotBase(ABC):
                 "Unknown coordinates, can only be 'galactic' or 'galactocentric'"
             )
 
-        if (
-            not type(self._center) == u.quantity.Quantity
-            and not type(self._radius) == u.quantity.Quantity
+        if not isinstance(self._center, u.quantity.Quantity) and not isinstance(
+            self._radius, u.quantity.Quantity
         ):
             warnings.warn(
                 f"You did not specify units for center and radius, assuming the unit is {self._unit.long_names[0]}"
             )
-            if not type(self._center) == u.quantity.Quantity:
+            if not isinstance(self._center, u.quantity.Quantity):
                 self._center = self._center * self._unit
-            if not type(self._radius) == u.quantity.Quantity:
+            if not isinstance(self._radius, u.quantity.Quantity):
                 self._radius = self._radius * self._unit
 
         self.__resolution = self.__resolution.to(self._unit)
@@ -287,9 +316,9 @@ class MWPlotBase(ABC):
             (self._center[1] + self._radius).value,
         ]
 
-        if self.mode == "edge-on":
-            self._ext[2] *= -1
-            self._ext[3] *= -1
+        # if self.mode == "edge-on":
+        #     self._ext[2] *= -1
+        #     self._ext[3] *= -1
 
         self._img = img
         self._aspect = (
@@ -303,22 +332,10 @@ class MWPlotBase(ABC):
 
         return None
 
-    @staticmethod
-    def skycoord_xy(skycoord):
-        # convert astropy SkyCoord to cartesian x, y
-        return [skycoord.cartesian.x, skycoord.cartesian.y]
 
-    @staticmethod
-    def skycoord_radec(skycoord):
-        # convert astropy SkyCoord to list
-        if not hasattr(skycoord, "ra"):
-            skycoord = skycoord.icrs
-        return [skycoord.ra.deg * u.deg, skycoord.dec.deg * u.deg]
-
-
-class MWSkyMapBase(MWPlotBase):
+class MWSkyMapBase(MWPlotCommon):
     """
-    MWSkyMap base class
+    MWSkyMap base class to plot the sky map
     """
 
     def __init__(
@@ -332,16 +349,16 @@ class MWSkyMapBase(MWPlotBase):
         dpi,
         grid=False,
     ):
-        if projection in [
+        super().__init__()
+        self._projection = projection
+        if self._projection not in [
             "equirectangular",
             "aitoff",
             "hammer",
             "lambert",
             "mollweide",
         ]:
-            self._projection = projection
-        else:
-            raise ValueError("Unknown projection")
+            raise ValueError(f"Unknown projection '{self._projection}'")
 
         if wavelength in (
             allowed_wavelength := ["gamma", "optical", "infrared", "far-infrared"]
@@ -358,42 +375,25 @@ class MWSkyMapBase(MWPlotBase):
         self.figsize = figsize
         self.dpi = dpi
         self.grid = grid
-        self._gh_imgbase_url = (
-            "https://github.com/henrysky/milkyway_plot/raw/master/mw_plot/"
-        )
         self._initialized = False
 
         self._opposite_color = "white"
         if self._grayscale:
             self._opposite_color = "black"
 
-        # check if running in browser-based ipython (aka jupyter)
-        self._in_jupyter = False
-        try:
-            from IPython import get_ipython
-
-            ip = get_ipython()
-        except ImportError:
-            pass
-        else:
-            if hasattr(ip, "has_trait"):
-                if ip.has_trait("kernel"):
-                    self._in_jupyter = True
-
     def images_read(self):
         if self.wavlength == "optical":
-            image_filename = "MW_edgeon_edr3_unannotate.jpg"
+            img_key = "MW_edgeon_edr3_unannotate"
         elif self.wavlength == "gamma":
-            image_filename = "MW_fermi_gamma.jpg"
+            img_key = "MW_fermi_gamma"
         elif self.wavlength == "infrared":
-            image_filename = "MW_2mass.jpg"
+            img_key = "MW_2mass"
         elif self.wavlength == "far-infrared":
-            image_filename = "MW_farinfrared.jpg"
+            img_key = "MW_farinfrared"
         else:
             raise ValueError("Unknown wavelength")
-        path = os.path.join(os.path.dirname(__file__), image_filename)
-        img = plt.imread(path)
-        self._img = img
+        img_obj = self._MW_IMAGES[img_key]
+        self._img = img_obj.img
 
         # find center pixel and radius pixel
         y_img_center = self._img.shape[0] // 2 - int(
@@ -421,13 +421,14 @@ class MWSkyMapBase(MWPlotBase):
         if self._grayscale:
             self._img = rgb2gray(self._img)
 
-        self._img_fname = image_filename
-        self._gh_img_url = self._gh_imgbase_url + self._img_fname
+        self._gh_img_url = self._gh_imgbase_url + img_obj.filename
 
         return None
 
     def radec_unit_check(self, ra, dec):
-        if not type(ra) == u.quantity.Quantity or not type(dec) == u.quantity.Quantity:
+        if not isinstance(ra, u.quantity.Quantity) or not isinstance(
+            dec, u.quantity.Quantity
+        ):
             raise TypeError("Both RA and DEC must carry astropy's unit")
         else:
             if ra.unit is not None and dec.unit is not None:

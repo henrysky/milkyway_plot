@@ -1,48 +1,32 @@
-from mw_plot.mw_plot_matplotlib import MWPlot, MWSkyMap
-
-__all__ = ["MWPlot", "MWSkyMap"]
-
-try:
-    import bokeh
-
-    _BOKEH_LOADED = True
-except ImportError:
-    _BOKEH_LOADED = False
-
 from importlib.metadata import version
-from astropy.coordinates import SkyCoord, ICRS
-import astropy.units as u
-import numpy as np
+from importlib.util import find_spec
+
+from mw_plot.mw_plot_matplotlib import MWPlot, MWSkyMap
+from mw_plot.utils import (
+    anti_center_radec,
+    center_radec,
+    mw_radec,
+    northpole_radec,
+    rgb2gray,
+    southpole_radec,
+)
+
+if find_spec("bokeh") is not None:
+    _HAS_BOKEH = True
+else:
+    _HAS_BOKEH = False
+
+
+__all__ = [
+    "MWPlot",
+    "MWSkyMap",
+    "center_radec",
+    "anti_center_radec",
+    "northpole_radec",
+    "southpole_radec",
+    "mw_radec",
+    "rgb2gray",
+    "_HAS_BOKEH",
+]
 
 version = __version__ = version("mw_plot")
-
-# RA and DEC of galactic center, galactic anti-center, galactic north and south pole in degree
-center_radec = [266.4167, -29.0078]
-anti_center_radec = [86.4167, 28.0078]
-northpole_radec = [192.7667, 27.1167]
-southpole_radec = [12.7667, -27.1167]
-
-
-def mw_radec(deg=True, size=3600):
-    """
-    Get RA DEC coordinates of the milkyway
-
-    :param deg: To get RA/DEC in deg when True or rad when False
-    :type deg: bool
-    :param size: number of point
-    :type size: int
-
-    :return: RA, DEC
-    :rtype: np.ndarray
-
-    :History: 2021-Feb-26 - Written - Henry Leung (University of Toronto)
-    """
-    c = SkyCoord(
-        np.linspace(0.0, 360.0, size) * u.deg, np.zeros(size) * u.deg, frame="galactic"
-    )
-    c = c.transform_to(ICRS)
-    idx = np.argsort(c.ra.to(u.deg).value)
-    if deg:
-        return c.ra.to(u.deg).value[idx], c.dec.to(u.deg).value[idx]
-    else:
-        return c.ra.to(u.rad).value[idx], c.dec.to(u.rad).value[idx]
