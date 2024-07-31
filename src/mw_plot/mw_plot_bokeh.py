@@ -12,7 +12,7 @@ else:
 import requests
 import numpy as np
 import astropy.units as u
-from mw_plot.mw_plot_masters import MWPlotMaster, MWSkyMapMaster
+from mw_plot.mw_plot_base import MWPlotBase, MWSkyMapBase
 
 
 def to_bokeh_img(imgarray):
@@ -28,7 +28,7 @@ def to_bokeh_img(imgarray):
     return img
 
 
-class MWPlotBokeh(MWPlotMaster):
+class MWPlotBokeh(MWPlotBase):
     """
     MWPlot Brokeh class plotting with Bokeh
 
@@ -162,7 +162,7 @@ class MWPlotBokeh(MWPlotMaster):
         save(self.bokeh_fig)
 
 
-class MWSkyMapBokeh(MWSkyMapMaster):
+class MWSkyMapBokeh(MWSkyMapBase):
     """
     MWSkyMapBokeh class plotting with Bokeh
 

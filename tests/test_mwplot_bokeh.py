@@ -1,6 +1,6 @@
 import numpy as np
 from astropy import units as u
-from mw_plot import MWSkyMapBokeh, MWPlotBokeh
+from mw_plot.mw_plot_bokeh import MWSkyMapBokeh, MWPlotBokeh
 from galpy.orbit import Orbit
 from galpy.potential import MWPotential2014
 

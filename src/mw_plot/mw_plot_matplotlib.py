@@ -12,13 +12,10 @@ from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-from mw_plot.mw_plot_masters import MWPlotMaster, MWSkyMapMaster, rgb2gray
+from mw_plot.mw_plot_base import MWPlotBase, MWSkyMapBase, rgb2gray
 
 
-__all__ = ["MWPlot", "MWSkyMap"]
-
-
-class MWPlot(MWPlotMaster):
+class MWPlot(MWPlotBase):
     """
     MWPlot class plotting with Matplotlib
 
@@ -427,7 +424,7 @@ class MWPlot(MWPlotMaster):
         return self.ax.annotate(*args, **kwargs)
 
 
-class MWSkyMap(MWSkyMapMaster):
+class MWSkyMap(MWSkyMapBase):
     """
     MWSkyMap class plotting with Matplotlib
 

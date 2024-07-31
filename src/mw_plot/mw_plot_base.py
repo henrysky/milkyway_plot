@@ -1,30 +1,88 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from abc import ABC, abstractmethod
+from abc import ABC
 import astropy.units as u
 import astropy.coordinates as coord
 import warnings
 
+from numpy.typing import NDArray
 
-def rgb2gray(rgb):
+
+def rgb2gray(rgb: NDArray) -> NDArray:
     """
-    Change RGB color image into grayscale in RGB representation using colorimetric (perceptual luminance-preserving) conversion
+    Change 8-bit RGB color image [0...255] into grayscale in RGB 8-bit representation [0...255]
+    using colorimetric (perceptual luminance-preserving) conversion
 
-    :param rgb: NumPy array of the RGB image
-    :return: NumPy array of grayscale image, same shape as input
+    Parameters
+    ----------
+    rgb : NDArray
+        RGB 2D image array
+
+    Returns
+    -------
+    NDArray
+        Grayscale 2D image in RGB array
     """
-    r, g, b = rgb[:, :, 0] / 255, rgb[:, :, 1] / 255, rgb[:, :, 2] / 255
-    r = np.where(r <= 0.04045, r / 12.92, ((r + 0.055) / 1.055) ** 2.4)
-    g = np.where(g <= 0.04045, g / 12.92, ((g + 0.055) / 1.055) ** 2.4)
-    b = np.where(b <= 0.04045, b / 12.92, ((b + 0.055) / 1.055) ** 2.4)
-    gray = np.atleast_3d(1 - (0.2126 * r + 0.7152 * g + 0.0722 * b))
-    return np.repeat(255 * gray, 3, axis=2).astype(int)
+    rgb_norm = rgb / 255.0
+    # need to seperate the color channel to avoid using excessive memory
+    rgb_norm[:, :, 0] = np.where(
+        rgb_norm[:, :, 0] <= 0.04045,
+        rgb_norm[:, :, 0] / 12.92,
+        ((rgb_norm[:, :, 0] + 0.055) / 1.055) ** 2.4,
+    )
+    rgb_norm[:, :, 1] = np.where(
+        rgb_norm[:, :, 1] <= 0.04045,
+        rgb_norm[:, :, 1] / 12.92,
+        ((rgb_norm[:, :, 1] + 0.055) / 1.055) ** 2.4,
+    )
+    rgb_norm[:, :, 2] = np.where(
+        rgb_norm[:, :, 2] <= 0.04045,
+        rgb_norm[:, :, 2] / 12.92,
+        ((rgb_norm[:, :, 2] + 0.055) / 1.055) ** 2.4,
+    )
+    gray = np.rint(
+        255.0
+        * (
+            1
+            - (
+                0.2126 * rgb_norm[:, :, 0]
+                + 0.7152 * rgb_norm[:, :, 1]
+                + 0.0722 * rgb_norm[:, :, 2]
+            )
+        )
+    ).astype(np.uint8)
+    return np.concatenate([gray[:, :, None]] * 3, axis=-1)
 
 
-class MWPlotMaster(ABC):
+class MWPlotBase(ABC):
     """
-    MWPlot master class
+    MWPlot base class
+
+    Parameters
+    ----------
+    grayscale : bool
+        Whether to use grayscale background
+    annotation : bool
+        Whether use a milkyway background with annotation
+    rot90 : int
+        Number of 90 degree rotation
+    coord : str
+        'galactocentric' or 'galactic'
+    mode : str
+        'face-on' or 'edge-on'
+    r0 : float
+        Distance to galactic center in kpc
+    center : tuple
+        Coordinates of the center of the plot with astropy units
+    radius : float
+        Radius of the plot with astropy units
+    unit : astropy units
+        Astropy units
+    figsize : tuple
+        Figure size
+    dpi : int
+        Dots per inch
     """
 
     def __init__(
@@ -258,9 +316,9 @@ class MWPlotMaster(ABC):
         return [skycoord.ra.deg * u.deg, skycoord.dec.deg * u.deg]
 
 
-class MWSkyMapMaster(MWPlotMaster):
+class MWSkyMapBase(MWPlotBase):
     """
-    MWSkyMap master class
+    MWSkyMap base class
     """
 
     def __init__(

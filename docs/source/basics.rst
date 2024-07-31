@@ -1,9 +1,9 @@
 Basic Usage
 =================
 
-This python package consists of two major abstract classes - MWPlotMaster and MWSkyMapMaster with Matplotlib or Bokeh backend as well as  a few useful utilities. 
+This python package consists of two major abstract classes - MWPlotBase and MWSkyMapBase with Matplotlib or Bokeh backend as well as  a few useful utilities. 
 
-MWPlotMaster is used to plot things on a face-on/edge-on milkyway with galactic/galactocentric coordinates. MWSkyMapMaster is used to plot skymap with milkyway background with RA/DEC.
+MWPlotBase is used to plot things on a face-on/edge-on milkyway with galactic/galactocentric coordinates. MWSkyMapBase is used to plot skymap with milkyway background with RA/DEC.
 
 Useful constants
 -------------------
