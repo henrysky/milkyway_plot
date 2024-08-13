@@ -117,7 +117,7 @@ class MWPlotCommon(ABC):
 
         # check if rotation is 90deg or 270deg
         if checkrot:  # nested, do not unnest
-            if self.__rot90 % 2 == 1:
+            if self._rot90 % 2 == 1:
                 x, y = y, x
         return x, y
 
@@ -163,9 +163,9 @@ class MWPlotBase(MWPlotCommon):
         dpi,
     ):
         super().__init__()
-        self.__coord = coord
-        self.__annotation = annotation
-        self.__rot90 = rot90
+        self._coord = coord
+        self._annotation = annotation
+        self._rot90 = rot90
         self._grayscale = grayscale
         self.r0 = r0 * u.kpc
         self._initialized = False
@@ -181,16 +181,16 @@ class MWPlotBase(MWPlotCommon):
         self._radius = radius
         self._unit = unit
 
-        self.__pixels = 5600
-        self.__resolution = (self.r0 / 1078).to(u.lyr)
+        self._pixels = 5600
+        self._resolution = (self.r0 / 1078).to(u.lyr)
 
         # # Fixed value
         # if self.mode == "face-on":
-        #     self.__pixels = 5600
-        #     self.__resolution = (self.r0 / 1078).to(u.lyr)
+        #     self._pixels = 5600
+        #     self._resolution = (self.r0 / 1078).to(u.lyr)
         # elif self.mode == "edge-on":
-        #     self.__pixels = 6500
-        #     self.__resolution = 15.384615846 * u.lyr
+        #     self._pixels = 6500
+        #     self._resolution = 15.384615846 * u.lyr
         # else:
         #     raise LookupError(
         #         f"Unknown mode '{self.mode}', can only be 'edge-on' or 'face-on'"
@@ -199,11 +199,11 @@ class MWPlotBase(MWPlotCommon):
     def lrbt_rot(self):
         """This function rotate matplolti's extent ordered LRBT"""
         l, r, b, t = self._ext[0], self._ext[1], self._ext[2], self._ext[3]
-        if self.__rot90 % 4 == 1:  # -90deg
+        if self._rot90 % 4 == 1:  # -90deg
             self._ext = [b, t, l, r]
-        elif self.__rot90 % 4 == 2:  # -180deg
+        elif self._rot90 % 4 == 2:  # -180deg
             self._ext = [r, l, t, b]
-        elif self.__rot90 % 4 == 3:  # -270deg
+        elif self._rot90 % 4 == 3:  # -270deg
             self._ext = [t, b, r, l]
 
     def images_read(self):
@@ -211,7 +211,7 @@ class MWPlotBase(MWPlotCommon):
         #     img_obj = self._MW_IMAGES["MW_edgeon_edr3_unannotate"]
         #     img = np.zeros((6500, 6500, 3), dtype=np.uint8)
         #     img[1625:4875, :, :] = img_obj.img
-        if self.__annotation:
+        if self._annotation:
             img_obj = self._MW_IMAGES["MW_bg_annotate"]
         else:
             img_obj = self._MW_IMAGES["MW_bg_unannotate"]
@@ -221,12 +221,12 @@ class MWPlotBase(MWPlotCommon):
         if self._grayscale:
             img = rgb2gray(img)
 
-        if self.__coord.lower() == "galactic":
+        if self._coord.lower() == "galactic":
             # shift the coord by r0 to the new coord system
             x_shift = self.r0
             self._center[0] += x_shift
             self._coord_english = "Galactic Coordinates"
-        elif self.__coord.lower() == "galactocentric":
+        elif self._coord.lower() == "galactocentric":
             x_shift = 0.0 * u.kpc
             self._coord_english = "Galactocentric Coordinates"
         else:
@@ -245,30 +245,30 @@ class MWPlotBase(MWPlotCommon):
             if not isinstance(self._radius, u.quantity.Quantity):
                 self._radius = self._radius * self._unit
 
-        self.__resolution = self.__resolution.to(self._unit)
+        self._resolution = self._resolution.to(self._unit)
         self._radius = self._radius.to(self._unit)
 
         # convert physical unit to pixel unit
-        pixel_radius = int((self._radius / self.__resolution).value)
+        pixel_radius = int((self._radius / self._resolution).value)
         pixel_center = [
-            int((self.__pixels / 2 + self._center[0] / self.__resolution).value),
-            int((self.__pixels / 2 - self._center[1] / self.__resolution).value),
+            int((self._pixels / 2 + self._center[0] / self._resolution).value),
+            int((self._pixels / 2 - self._center[1] / self._resolution).value),
         ]
 
         # get the pixel coordinates
         x_left_px = pixel_center[0] - pixel_radius
         x_right_px = pixel_center[0] + pixel_radius
-        y_top_px = self.__pixels - pixel_center[1] - pixel_radius
-        y_bottom_px = self.__pixels - pixel_center[1] + pixel_radius
+        y_top_px = self._pixels - pixel_center[1] - pixel_radius
+        y_bottom_px = self._pixels - pixel_center[1] + pixel_radius
 
         # decide whether it needs to fill black pixels because the range outside the pre-compiled images
         if np.all(
             np.array(
                 [
                     x_left_px,
-                    self.__pixels - x_right_px,
+                    self._pixels - x_right_px,
                     y_top_px,
-                    self.__pixels - y_bottom_px,
+                    self._pixels - y_bottom_px,
                 ]
             )
             >= 0
@@ -289,9 +289,9 @@ class MWPlotBase(MWPlotCommon):
             # assign them to temp value
             # just in case the area is outside the images, will fill black pixel
             temp_x_left_px = max(x_left_px, 0)
-            temp_x_right_px = min(x_right_px, self.__pixels)
+            temp_x_right_px = min(x_right_px, self._pixels)
             temp_y_top_px = max(y_top_px, 0)
-            temp_y_bottom_px = min(y_bottom_px, self.__pixels)
+            temp_y_bottom_px = min(y_bottom_px, self._pixels)
 
             left_exceed_px = abs(min(x_left_px, 0))
             top_exceed_px = abs(min(y_top_px, 0))
@@ -308,7 +308,7 @@ class MWPlotBase(MWPlotCommon):
             # Set the images as the filled black-background image
             img = np.array(black_img)
 
-        img = np.rot90(img, self.__rot90)
+        img = np.rot90(img, self._rot90)
         self._ext = [
             (self._center[0] - self._radius - x_shift).value,
             (self._center[0] + self._radius - x_shift).value,
