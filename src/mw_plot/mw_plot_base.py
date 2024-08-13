@@ -29,11 +29,6 @@ class MWImage:
             self.filename
         )
 
-    @property
-    def img(self) -> NDArray:
-        # read the image
-        return plt.imread(self.img_path)
-
 
 class MWPlotCommon(ABC):
     """
@@ -44,7 +39,7 @@ class MWPlotCommon(ABC):
         self._gh_imgbase_url = (
             "https://github.com/henrysky/milkyway_plot/raw/master/mw_plot/"
         )
-        
+
         # check if running in browser-based ipython (aka jupyter)
         self._in_jupyter = False
         try:
@@ -121,6 +116,11 @@ class MWPlotCommon(ABC):
                 x, y = y, x
         return x, y
 
+    @property
+    def reference(self):
+        return self.reference_str
+
+
 class MWPlotBase(MWPlotCommon):
     """
     MWPlot base class to plot the edge-on Milky Way
@@ -180,6 +180,7 @@ class MWPlotBase(MWPlotCommon):
         self._center = center
         self._radius = radius
         self._unit = unit
+        self.reference_str = None
 
         self._pixels = 5600
         self._resolution = (self.r0 / 1078).to(u.lyr)
@@ -208,18 +209,19 @@ class MWPlotBase(MWPlotCommon):
 
     def images_read(self):
         # if self.mode == "edge-on":
-        #     img_obj = self._MW_IMAGES["MW_edgeon_edr3_unannotate"]
-        #     img = np.zeros((6500, 6500, 3), dtype=np.uint8)
-        #     img[1625:4875, :, :] = img_obj.img
+        #    self._img_obj = self._MW_IMAGES["MW_edgeon_edr3_unannotate"]
+        #    self._img = np.zeros((6500, 6500, 3), dtype=np.uint8)
+        #    self._img[1625:4875, :, :] =self._img_obj.img
         if self._annotation:
             img_obj = self._MW_IMAGES["MW_bg_annotate"]
         else:
             img_obj = self._MW_IMAGES["MW_bg_unannotate"]
-        img = img_obj.img
+        self._img = plt.imread(img_obj.img_path)
+        self.reference_str = img_obj.citation
         self._gh_img_url = self._gh_imgbase_url + img_obj.filename
 
         if self._grayscale:
-            img = rgb2gray(img)
+            self._img = rgb2gray(self._img)
 
         if self._coord.lower() == "galactic":
             # shift the coord by r0 to the new coord system
@@ -273,17 +275,19 @@ class MWPlotBase(MWPlotCommon):
             )
             >= 0
         ):
-            img = img[y_top_px:y_bottom_px, x_left_px:x_right_px]
+            self._img = self._img[y_top_px:y_bottom_px, x_left_px:x_right_px]
         else:
             # create a black/white image first with 3 channel with the same data type
             if self._grayscale:
                 black_img = (
-                    np.ones((pixel_radius * 2, pixel_radius * 2, 3), dtype=img.dtype)
+                    np.ones(
+                        (pixel_radius * 2, pixel_radius * 2, 3), dtype=self._img.dtype
+                    )
                     * 255
                 )
             else:
                 black_img = np.zeros(
-                    (pixel_radius * 2, pixel_radius * 2, 3), dtype=img.dtype
+                    (pixel_radius * 2, pixel_radius * 2, 3), dtype=self._img.dtype
                 )
 
             # assign them to temp value
@@ -296,19 +300,21 @@ class MWPlotBase(MWPlotCommon):
             left_exceed_px = abs(min(x_left_px, 0))
             top_exceed_px = abs(min(y_top_px, 0))
             # Extract available area from pre-compiled first
-            img = img[temp_y_top_px:temp_y_bottom_px, temp_x_left_px:temp_x_right_px]
+            self._img = self._img[
+                temp_y_top_px:temp_y_bottom_px, temp_x_left_px:temp_x_right_px
+            ]
 
             # fill the black/white image with the background image
             black_img[
-                top_exceed_px : top_exceed_px + img.shape[0],
-                left_exceed_px : left_exceed_px + img.shape[1],
+                top_exceed_px : top_exceed_px + self._img.shape[0],
+                left_exceed_px : left_exceed_px + self._img.shape[1],
                 :,
-            ] = img
+            ] = self._img
 
             # Set the images as the filled black-background image
-            img = np.array(black_img)
+            self._img = np.array(black_img)
 
-        img = np.rot90(img, self._rot90)
+        self._img = np.rot90(self._img, self._rot90)
         self._ext = [
             (self._center[0] - self._radius - x_shift).value,
             (self._center[0] + self._radius - x_shift).value,
@@ -320,10 +326,10 @@ class MWPlotBase(MWPlotCommon):
         #     self._ext[2] *= -1
         #     self._ext[3] *= -1
 
-        self._img = img
+        self._img = self._img
         self._aspect = (
-            img.shape[0]
-            / float(img.shape[1])
+            self._img.shape[0]
+            / float(self._img.shape[1])
             * ((self._ext[1] - self._ext[0]) / (self._ext[3] - self._ext[2]))
         )
         self._aspect = np.abs(self._aspect)
@@ -393,7 +399,8 @@ class MWSkyMapBase(MWPlotCommon):
         else:
             raise ValueError("Unknown wavelength")
         img_obj = self._MW_IMAGES[img_key]
-        self._img = img_obj.img
+        self._img = plt.imread(img_obj.img_path)
+        self.reference_str = img_obj.citation
 
         # find center pixel and radius pixel
         y_img_center = self._img.shape[0] // 2 - int(
