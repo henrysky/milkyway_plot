@@ -17,7 +17,7 @@ jobs:
           pip install .
       - name: Test mw-plot
         run: >
-          python -m pytest -v ./tests --cov --junitxml=junit.xml
+          python -m pytest -v ./tests --cov ./src --junitxml=junit.xml
       - name: Upload results to Codecov
         uses: codecov/codecov-action@v4
         with:
