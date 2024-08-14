@@ -14,7 +14,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install coveralls pytest pytest-cov galpy astroquery numpy bokeh
-          pip install .
+          pip install -e .
       - name: Test mw-plot
         run: >
           python -m pytest -v ./tests --cov ./src --junitxml=junit.xml
