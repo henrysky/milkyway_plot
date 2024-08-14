@@ -357,14 +357,25 @@ class MWSkyMapBase(MWPlotCommon):
     ):
         super().__init__()
         self._projection = projection
-        if self._projection not in [
-            "equirectangular",
-            "aitoff",
-            "hammer",
-            "lambert",
-            "mollweide",
-        ]:
-            raise ValueError(f"Unknown projection '{self._projection}'")
+
+        if self._projection in (
+            allowed_proj := [
+                "equirectangular",
+                "aitoff",
+                "hammer",
+                "mollweide",
+            ]
+        ):
+            pass
+        # projection that is not suitable for sky map but available from matplotlib
+        elif self._projection in ["lambert", "polar", "rectilinear"]:
+            raise NotImplementedError(
+                f"`{self._projection}` projection is not implemented for sky map"
+            )
+        else:
+            raise ValueError(
+                f"Unknown projection `{self._projection}`, allowed values are: {allowed_proj}"
+            )
 
         if wavelength in (
             allowed_wavelength := ["gamma", "optical", "infrared", "far-infrared"]

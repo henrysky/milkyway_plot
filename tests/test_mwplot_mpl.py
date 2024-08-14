@@ -9,10 +9,11 @@ from galpy.orbit import Orbit
 from galpy.potential import MWPotential2014
 
 
-def test_mw_skymap():
+@pytest.mark.parametrize("projection", ["equirectangular", "aitoff", "hammer", "mollweide"])
+def test_mw_skymap(projection):
     # setup a MWSkyMap instance with projection, other projection can be 'hammer', 'mollweide' etc
     # grayscale: whether to turn the background image to grayscale
-    plot_instance = MWSkyMap(projection="aitoff", grayscale=False)
+    plot_instance = MWSkyMap(projection=projection, grayscale=False)
 
     # so that the colorbar will has a better contract
     # plot_instance.clim = (5., 15.)
