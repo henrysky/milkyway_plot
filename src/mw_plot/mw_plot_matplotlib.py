@@ -433,12 +433,8 @@ class MWSkyMap(MWSkyMapBase):
     :type radius: astropy.Quantity
     :param grayscale: whether to use grayscale background
     :type grayscale: bool
-    :param grid: whether to show galactic grid
-    :type grid: bool
-    :param radecgrid: whether to show ra & dec grid
-    :type radecgrid: bool
-    :param eclgrid: whether to show ecliptic grid
-    :type eclgrid: bool
+    :param grid: 'galactic' or 'equatorial' or 'ecliptic'
+    :type grid: str
 
     :param figsize: Matplotlib figure size
     :type figsize: turple
@@ -453,9 +449,7 @@ class MWSkyMap(MWSkyMapBase):
         center=(0, 0) * u.deg,
         radius=(180, 90) * u.deg,
         grayscale=False,
-        grid=False,
-        radecgrid=False,
-        eclgrid=False,
+        grid=None,
         figsize=(10, 6.5),
         dpi=None,
     ):
@@ -467,7 +461,6 @@ class MWSkyMap(MWSkyMapBase):
             radius=radius,
             figsize=figsize,
             dpi=dpi,
-            grid=grid,
         )
         self._unit = u.degree
         self.fontsize = 20
@@ -475,8 +468,22 @@ class MWSkyMap(MWSkyMapBase):
         self.cmap = "viridis"
         self.imalpha = 1.0
         self.tight_layout = True
-        self.radecgrid = radecgrid
-        self.eclgrid = eclgrid
+
+        self.grid = False
+        self.radecgrid = False
+        self.eclgrid = False
+        if grid is None:
+            self.grid = False
+        elif grid == "galactic":
+            self.grid = True
+        elif grid == "equatorial":
+            self.radecgrid = True
+        elif grid == "ecliptic":
+            self.eclgrid = True
+        else:
+            raise ValueError(
+                "grid must be either 'galactic', 'equatorial' or 'ecliptic'"
+            )
 
         self.fig = None
         self.ax = None

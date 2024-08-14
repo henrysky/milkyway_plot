@@ -1,19 +1,26 @@
-import pytest
-
-import numpy as np
-import matplotlib.pyplot as plt
-from astropy import units as u
 import astropy.coordinates as apycoords
-from mw_plot import MWSkyMap, MWPlot
+import matplotlib.pyplot as plt
+import numpy as np
+import pytest
+from astropy import units as u
 from galpy.orbit import Orbit
 from galpy.potential import MWPotential2014
+from mw_plot import MWPlot, MWSkyMap
 
 
-@pytest.mark.parametrize("projection", ["equirectangular", "aitoff", "hammer", "mollweide"])
-def test_mw_skymap(projection):
+@pytest.mark.parametrize(
+    "projection,grayscale,grid,wavelength",
+    [
+        ("equirectangular", False, "equatorial", "gamma"),
+        ("aitoff", False, "galactic", "optical"),
+        ("hammer", True, "ecliptic", "far-infrared"),
+        ("mollweide", True, None, "infrared"),
+    ],
+)
+def test_mw_skymap(projection, grayscale, grid, wavelength):
     # setup a MWSkyMap instance with projection, other projection can be 'hammer', 'mollweide' etc
     # grayscale: whether to turn the background image to grayscale
-    plot_instance = MWSkyMap(projection=projection, grayscale=False)
+    plot_instance = MWSkyMap(projection=projection, grayscale=grayscale, grid=grid, wavelength=wavelength)
 
     # so that the colorbar will has a better contract
     # plot_instance.clim = (5., 15.)
@@ -36,6 +43,26 @@ def test_mw_skymap(projection):
     plot_instance.mw_scatter(lsmc_ra, lsmc_dec, c="r")
 
     plot_instance.savefig(file="lmc_smc_projection.png")
+
+
+@pytest.mark.parametrize(
+    "projection,grid,wavelength",
+    [
+        ("equirectangular", "supergalactic", "optical"),
+        ("lambert", "galactic", "optical"),
+        ("sinusoidal", "ecliptic", "optical"),
+        ("polar", None, "optical"),
+        ("rectilinear", "supergalactic", "optical"),
+        ("mollweide", None, "rainbow"),
+    ],
+)
+def test_skymap_bad_config(projection, grid, wavelength):
+    """
+    Test bad configuration for MWSkyMap will raise an exception
+    """
+    with pytest.raises(Exception):
+        MWSkyMap(projection=projection, grid=grid, wavelength=wavelength)
+
 
 def test_mw_plot():
     # Orbit Integration using galpy for the Sun
@@ -63,10 +90,9 @@ def test_mw_plot():
 
     plot_instance.savefig(file="gaia.png")
 
+
 def test_mw_one_annotation():
-    mw1 = MWPlot(
-        radius=20 * u.kpc, unit=u.kpc, coord="galactocentric", annotation=True
-    )
+    mw1 = MWPlot(radius=20 * u.kpc, unit=u.kpc, coord="galactocentric", annotation=True)
     mw1.title = "Annotation"
     mw1.scatter(8 * u.kpc, 0 * u.kpc, c="r", s=200)
     mw1.ax.annotate(
@@ -80,6 +106,7 @@ def test_mw_one_annotation():
 
     # Save the figure
     mw1.savefig(file="annotate.jpg")
+
 
 def test_mwdkymap_one_scatter_annotation():
     # plot
@@ -104,16 +131,16 @@ def test_mwdkymap_one_scatter_annotation():
     mw1.scatter_annotate(names, coords, arrowprops=dict(color="C0"))
     mw1.savefig(file="mwskymap_scatter_annotate_1.jpg")
 
+
 def test_mw_one_scatter_annotation():
-    mw1 = MWPlot(
-        radius=20 * u.kpc, unit=u.kpc, coord="galactocentric", annotation=True
-    )
+    mw1 = MWPlot(radius=20 * u.kpc, unit=u.kpc, coord="galactocentric", annotation=True)
 
     mw1.title = "Annotation"
     mw1.scatter_annotate(
         ["Earth", "Galactic \n Center"], [[8.0, 0.0], [0.0, 0.0]] * u.kpc
     )
     mw1.savefig(file="mwplot_scatter_annotate_1.jpg")
+
 
 def test_mw_skymap_impossible_transform():
     mw1 = MWSkyMap(projection="aitoff", grayscale=False)

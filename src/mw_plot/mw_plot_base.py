@@ -73,7 +73,7 @@ class MWPlotCommon(ABC):
                 citation="NASA/DOE/Fermi LAT Collaboration",
             ),
             "MW_2mass": MWImage(
-                filename="MW_2mass",
+                filename="MW_2mass.jpg",
                 citation="2MASS/IPAC/Caltech/University of Massachusetts",
             ),
             "MW_farinfrared": MWImage(
@@ -353,7 +353,6 @@ class MWSkyMapBase(MWPlotCommon):
         radius,
         figsize,
         dpi,
-        grid=False,
     ):
         super().__init__()
         self._projection = projection
@@ -391,7 +390,6 @@ class MWSkyMapBase(MWPlotCommon):
         self._grayscale = grayscale
         self.figsize = figsize
         self.dpi = dpi
-        self.grid = grid
         self._initialized = False
 
         self._opposite_color = "white"
