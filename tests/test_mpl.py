@@ -1,11 +1,16 @@
 import astropy.coordinates as apycoords
 import matplotlib.pyplot as plt
-import numpy as np
 import pytest
 from astropy import units as u
-from galpy.orbit import Orbit
-from galpy.potential import MWPotential2014
 from mw_plot import MWPlot, MWSkyMap
+from astroquery.simbad import Simbad
+
+
+@pytest.fixture(scope="session")
+def simbad():
+    simbad = Simbad()
+    simbad.add_votable_fields("ra(d)", "dec(d)")
+    return simbad
 
 
 @pytest.mark.parametrize(
@@ -17,7 +22,7 @@ from mw_plot import MWPlot, MWSkyMap
         ("mollweide", True, None, "infrared"),
     ],
 )
-def test_mw_skymap(projection, grayscale, grid, wavelength):
+def test_mw_skymap(simbad, projection, grayscale, grid, wavelength):
     # setup a MWSkyMap instance with projection, other projection can be 'hammer', 'mollweide' etc
     # grayscale: whether to turn the background image to grayscale
     plot_instance = MWSkyMap(
@@ -34,15 +39,11 @@ def test_mw_skymap(projection, grayscale, grid, wavelength):
     plot_instance.title = "LMC and SMC in red dots"
     plot_instance.s = 200
 
-    # LMC and SMC coordinates, get coordinates with galpy from_name
-    lsmc_ra = [Orbit.from_name("LMC").ra(), Orbit.from_name("SMC").ra()] * u.degree
-    lsmc_dec = [
-        Orbit.from_name("LMC").dec(),
-        Orbit.from_name("SMC").dec(),
-    ] * u.degree
+    # LMC and SMC coordinates, get coordinates from Simbad
+    result = simbad.query_objects(["LMC", "SMC"])
 
     # use mw_scatter instead of scatter
-    plot_instance.mw_scatter(lsmc_ra, lsmc_dec, c="r")
+    plot_instance.mw_scatter(result["RA_d"], result["DEC_d"], c="r")
 
     plot_instance.savefig(file="lmc_smc_projection.png")
 
@@ -67,14 +68,6 @@ def test_skymap_bad_config(projection, grid, wavelength):
 
 
 def test_mw_plot():
-    # Orbit Integration using galpy for the Sun
-    op = Orbit([0.0, 0.0, 0.0, 0.0, 0.0, 0.0], radec=True, ro=8.0, vo=220.0)
-    ts = np.linspace(0, 5, 10000) * u.Gyr
-    op.integrate(ts, MWPotential2014)
-    x = op.x(ts) * u.kpc
-    y = op.y(ts) * u.kpc
-    z = op.z(ts)
-
     # setup a MWPlot instance
     plot_instance = MWPlot(
         radius=20 * u.kpc, unit=u.kpc, coord="galactocentric", annotation=True
@@ -88,7 +81,9 @@ def test_mw_plot():
     )
 
     # use mw_scatter instead of scatter because we want a colorbar
-    plot_instance.mw_scatter(x, y, c=[z, "kpc above galactic plane"])
+    plot_instance.mw_scatter(
+        [1, 2, 3], [1, 2, 3], c=[[1, 2, 3], "kpc above galactic plane"]
+    )
 
     plot_instance.savefig(file="gaia.png")
 
