@@ -2,15 +2,8 @@ import astropy.coordinates as apycoords
 import matplotlib.pyplot as plt
 import pytest
 from astropy import units as u
+
 from mw_plot import MWPlot, MWSkyMap
-from astroquery.simbad import Simbad
-
-
-@pytest.fixture(scope="session")
-def simbad():
-    simbad = Simbad()
-    simbad.add_votable_fields("ra(d)", "dec(d)")
-    return simbad
 
 
 @pytest.mark.parametrize(
@@ -43,7 +36,7 @@ def test_mw_skymap(simbad, projection, grayscale, grid, wavelength):
     result = simbad.query_objects(["LMC", "SMC"])
 
     # use mw_scatter instead of scatter
-    plot_instance.mw_scatter(result["RA_d"], result["DEC_d"], c="r")
+    plot_instance.mw_scatter(u.Quantity(result["RA_d"]), u.Quantity(result["DEC_d"]), c="r")
 
     plot_instance.savefig(file="lmc_smc_projection.png")
 
@@ -82,7 +75,7 @@ def test_mw_plot():
 
     # use mw_scatter instead of scatter because we want a colorbar
     plot_instance.mw_scatter(
-        [1, 2, 3], [1, 2, 3], c=[[1, 2, 3], "kpc above galactic plane"]
+        [1, 2, 3] * u.kpc, [1, 2, 3] * u.kpc, c=[[1, 2, 3] * u.pc, "kpc above galactic plane"]
     )
 
     plot_instance.savefig(file="gaia.png")

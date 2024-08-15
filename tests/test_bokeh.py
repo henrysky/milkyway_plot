@@ -1,5 +1,6 @@
 from astropy import units as u
-from mw_plot.mw_plot_bokeh import MWSkyMapBokeh, MWPlotBokeh
+
+from mw_plot.mw_plot_bokeh import MWPlotBokeh, MWSkyMapBokeh
 
 
 def test_mw_skymap_bokeh(simbad):
@@ -21,7 +22,7 @@ def test_mw_skymap_bokeh(simbad):
     result = simbad.query_objects(["LMC", "SMC"])
 
     # use mw_scatter instead of scatter
-    plot_instance.scatter(result["RA_d"], result["DEC_d"])
+    plot_instance.scatter(u.Quantity(result["RA_d"]), u.Quantity(result["DEC_d"]))
 
 
 def test_mw_plot_bokeh():
@@ -33,9 +34,7 @@ def test_mw_plot_bokeh():
     plot_instance.s = 10  # make the scatter points bigger
 
     # set up plot title
-    plot_instance.title = (
-        "Testing Testing"
-    )
+    plot_instance.title = "Testing Testing"
 
     # use mw_scatter instead of scatter because we want a colorbar
-    plot_instance.scatter([1, 2, 3], [1, 2, 3])
+    plot_instance.scatter([1, 2, 3] * u.kpc, [1, 2, 3] * u.kpc)
