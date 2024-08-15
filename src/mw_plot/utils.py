@@ -21,7 +21,7 @@ def mw_radec(deg: bool = True, size: int = 3600) -> Tuple[NDArray, NDArray]:
         Return RA and DEC in degree if True else in radian, by default True
     size : int, optional
         Number of points to generate, by default 3600
-    
+
     Returns
     -------
     Tuple
@@ -36,7 +36,7 @@ def mw_radec(deg: bool = True, size: int = 3600) -> Tuple[NDArray, NDArray]:
         ang_unit = u.deg
     else:
         ang_unit = u.rad
-    
+
     return c.ra.to(ang_unit).value[idx], c.dec.to(ang_unit).value[idx]
 
 

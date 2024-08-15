@@ -30,6 +30,7 @@ def test_mw_skymap_bokeh():
     # use mw_scatter instead of scatter
     plot_instance.scatter(lsmc_ra, lsmc_dec)
 
+
 def test_mw_plot_bokeh():
     # Orbit Integration using galpy for the Sun
     op = Orbit([0.0, 0.0, 0.0, 0.0, 0.0, 0.0], radec=True, ro=8.0, vo=220.0)

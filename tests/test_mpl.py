@@ -20,7 +20,9 @@ from mw_plot import MWPlot, MWSkyMap
 def test_mw_skymap(projection, grayscale, grid, wavelength):
     # setup a MWSkyMap instance with projection, other projection can be 'hammer', 'mollweide' etc
     # grayscale: whether to turn the background image to grayscale
-    plot_instance = MWSkyMap(projection=projection, grayscale=grayscale, grid=grid, wavelength=wavelength)
+    plot_instance = MWSkyMap(
+        projection=projection, grayscale=grayscale, grid=grid, wavelength=wavelength
+    )
 
     # so that the colorbar will has a better contract
     # plot_instance.clim = (5., 15.)
@@ -142,7 +144,7 @@ def test_mw_one_scatter_annotation():
     mw1.savefig(file="mwplot_scatter_annotate_1.jpg")
 
 
-def test_mw_skymap_impossible_transform():
+def test_skymap_transform():
     mw1 = MWSkyMap(projection="aitoff", grayscale=False)
     fig, ax = plt.subplots(figsize=(10, 5))
     # should raise error
