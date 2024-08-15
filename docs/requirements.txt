@@ -1,10 +1,7 @@
 bokeh
-astroquery
-galpy
 sphinx_rtd_theme
 sphinx-prompt
 sphinx-copybutton
 sphinx
 nbsphinx
-ipykernel
 myst_parser

@@ -20,7 +20,8 @@ jobs:
           python-version: "3.x"
       - name: Install dependencies
         run: |
-          pip install galpy astroquery numpy build
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
       - name: Build sdist
         run: |
           python -m build --sdist

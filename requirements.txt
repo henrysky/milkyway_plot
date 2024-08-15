@@ -1,6 +1,7 @@
 astropy
+astroquery
 matplotlib
 numpy
-Requests
+requests
 ipython
 ipykernel

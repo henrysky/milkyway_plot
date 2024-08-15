@@ -13,7 +13,8 @@ jobs:
           python-version: "3.11"
       - name: Install dependencies
         run: |
-          pip install coveralls pytest pytest-cov galpy astroquery numpy bokeh
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
           pip install .
       - name: Test mw-plot
         run: >

@@ -1,0 +1,4 @@
+build
+pytest
+pytest-cov
+bokeh
