@@ -1,5 +1,6 @@
 import astropy.coordinates as apycoords
 import matplotlib.pyplot as plt
+import numpy as np
 import pytest
 from astropy import units as u
 
@@ -132,14 +133,46 @@ def test_mw_one_scatter_annotation():
     mw1.savefig(file="mwplot_scatter_annotate_1.jpg")
 
 
+def test_faceon_transform():
+    mw1 = MWPlot(radius=20 * u.kpc, unit=u.kpc, coord="galactocentric", annotation=True)
+    fig, ax = plt.subplots(figsize=(10, 5))
+    # should raise error if not axes or figure
+    with pytest.raises(TypeError):
+        mw1.transform(np.array([1,2,3]))
+
+    mw1 = MWPlot(radius=20 * u.kpc, unit=u.kpc, coord="galactocentric", annotation=True)
+    fig, ax = plt.subplots(figsize=(10, 5))
+    # should not raise error
+    mw1.transform(ax)
+
+    # transform all subplots with fig
+    fig, ax = plt.subplots(2, 2, figsize=(10, 5))
+    mw1.transform(fig)
+
+    # transform all subplots with axes
+    fig, ax = plt.subplots(2, 2, figsize=(10, 5))
+    mw1.transform(ax[0])
+
+
 def test_skymap_transform():
     mw1 = MWSkyMap(projection="aitoff", grayscale=False)
     fig, ax = plt.subplots(figsize=(10, 5))
-    # should raise error
+    # should raise error because projection is different
     with pytest.raises(TypeError):
         mw1.transform(ax)
+    # should raise error if not axes or figure
+    with pytest.raises(TypeError):
+        mw1.transform(np.array([1,2,3]))
 
     mw1 = MWSkyMap(projection="equirectangular", grayscale=False)
     fig, ax = plt.subplots(figsize=(10, 5))
     # should not raise error
     mw1.transform(ax)
+
+    # transform all subplots with fig
+    fig, ax = plt.subplots(2, 2, figsize=(10, 5))
+    mw1.transform(fig)
+
+    # transform all subplots with axes
+    fig, ax = plt.subplots(2, 2, figsize=(10, 5))
+    mw1.transform(ax[0])

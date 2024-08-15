@@ -534,10 +534,6 @@ class MWSkyMap(MWSkyMapBase):
             projection_name = "rectilinear"
         else:
             projection_name = self._projection
-        if projection_name != x.name:
-            raise TypeError(
-                f"You can not transform a figure with different projection, you want to transform to '{projection_name}' but your figure is '{x.name}'"
-            )
         if isinstance(x, Figure):
             if len(x.axes) > 1:
                 warnings.warn(
@@ -558,6 +554,10 @@ class MWSkyMap(MWSkyMapBase):
                 f"Your input type {type(x)} is unsupported, can only be matplotlib figure or axes"
             )
         for _ax in ax:
+            if _ax.name != projection_name:
+                raise TypeError(
+                    f"You can not transform a figure with different projection, you want to transform to '{projection_name}' but your figure is '{x.name}'"
+                )
             self.initialize_mwplot(fig, _ax, _multi=True)
 
     def initialize_mwplot(self, fig=None, ax=None, _multi=False):
