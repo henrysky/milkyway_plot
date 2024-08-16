@@ -1,16 +1,15 @@
 import os
 import warnings
-from astropy.coordinates.calculation import HumanError
-import numpy as np
 
-import astropy.units as u
 import astropy.coordinates as apycoords
-
+import astropy.units as u
 import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
+import numpy as np
+from astropy.coordinates.calculation import HumanError
 from matplotlib.axes import Axes
-
+from matplotlib.figure import Figure
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+
 from mw_plot.mw_plot_base import MWPlotBase, MWSkyMapBase
 
 
@@ -141,24 +140,6 @@ class MWPlot(MWPlotBase):
         if kwargs.get("label") is not None:
             self.ax.legend(loc="best", fontsize=self.fontsize, markerscale=kwargs["s"])
 
-    def hist2d(self, x, y, *args, **kwargs):
-        x, y = self.xy_unit_check(x, y)
-        self.initialize_mwplot()
-        if kwargs.get("cmap") is None:
-            kwargs["cmap"] = self.cmap
-        kwargs["cmap"] = self.transparent_cmap(kwargs["cmap"])
-        if kwargs.get("range") is None:
-            kwargs["range"] = np.array(
-                [[self._ext[0], self._ext[1]], [self._ext[2], self._ext[3]]]
-            )
-        self.ax.hist2d(x, y, zorder=3, *args, **kwargs)
-        # just want to set the location right, we dont need image again
-        self.ax.imshow(
-            self._img, zorder=0, extent=self._ext, alpha=0.0, rasterized=True
-        )
-        if kwargs.get("label") is not None:
-            self.ax.legend(loc="best", fontsize=self.fontsize)
-
     def show(self, *args, **kwargs):
         if self.fig is None:
             raise AttributeError("Nothing to show, please plot some data first")
@@ -172,26 +153,6 @@ class MWPlot(MWPlotBase):
             self.fig.tight_layout()
         # this is a pylab method
         self.fig.savefig(file, dpi=dpi, **kwargs)
-
-    @staticmethod
-    def transparent_cmap(cmap, N=255):
-        """
-        Copy colormap and set alpha values
-
-        :param cmap: Color map to covert to transparent color map
-        :type cmap: Union[matplotlib.colors.ListedColormap, str]
-        :param N: Color map to covert to transparent color map
-        :type N: int
-        :return: Transparent color map
-        :rtype cmap: matplotlib.colors.ListedColormap
-        """
-        if type(cmap) == str:
-            mycmap = plt.get_cmap(cmap)
-        else:
-            mycmap = cmap
-        mycmap._init()
-        mycmap._lut[0, -1] = 0
-        return mycmap
 
     def initialize_mwplot(self, fig=None, ax=None, _multi=False):
         """
@@ -283,73 +244,6 @@ class MWPlot(MWPlotBase):
             cmap=plt.get_cmap(self.cmap) if self.cbar_flag else None,
             rasterized=True,
             **kwargs,
-        )
-        self.ax.imshow(
-            self._img, zorder=0, extent=self._ext, alpha=0.0, rasterized=True
-        )
-
-        if self.cbar_flag is True:
-            divider = make_axes_locatable(self.ax)
-            cax = divider.append_axes("right", size="5%", pad=0.05)
-            cbar = self.fig.colorbar(mappable, cax=cax)
-            cbar.ax.tick_params(
-                labelsize=self.fontsize * 0.8,
-                width=self.fontsize / 10,
-                length=self.fontsize / 2,
-            )
-            cbar.set_label(f"{cbar_label}", size=self.fontsize)
-            if self.clim is not None:
-                cbar.set_clim(self.clim)
-
-    def mw_density(self, x, y, c, **kwargs):
-        """
-        Plot desnity with colorbar
-
-        :param x: Scatter points x-coordinates on the plot
-        :type x: astropy.Quantity
-        :param y: Scatter points y-coordinates on the plot
-        :type y: astropy.Quantity
-        :param c: Scatter points color
-        :type c: Union[str, list, ndarry]
-        :param title: Plot title
-        :type title: str
-        :History: 2018-Mar-17 - Written - Henry Leung (University of Toronto)
-        """
-        x, y = self.xy_unit_check(x, y)
-        self.initialize_mwplot()
-
-        if not type(x) == u.quantity.Quantity or not type(y) == u.quantity.Quantity:
-            raise TypeError("Both x and y must carry astropy's unit")
-        else:
-            if x.unit is not None and y.unit is not None:
-                x = x.to(self._unit)
-                y = y.to(self._unit)
-            else:
-                raise TypeError(
-                    "Both x, y, center and radius must carry astropy's unit"
-                )
-
-        # decide whether we need colorbar or not
-        if isinstance(c, list):
-            color = c[0]
-            cbar_label = c[1]
-            self.cbar_flag = True
-            if type(color) == u.quantity.Quantity:
-                color = color.to(self._unit)
-        else:
-            color = c
-
-        heatmap, xedges, yedges = np.histogram2d(
-            x.value,
-            y.value,
-            bins=250,
-            range=[self._ext[:2], [self._ext[3], self._ext[2]]],
-        )
-        mappable = self.ax.imshow(
-            heatmap.T,
-            extent=self._ext,
-            cmap=self.transparent_cmap(plt.get_cmap("Reds")),
-            rasterized=True,
         )
         self.ax.imshow(
             self._img, zorder=0, extent=self._ext, alpha=0.0, rasterized=True
