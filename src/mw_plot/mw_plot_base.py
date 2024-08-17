@@ -8,7 +8,6 @@ import astropy.coordinates as coord
 import astropy.units as u
 import matplotlib.pyplot as plt
 import numpy as np
-from numpy.typing import NDArray
 
 from mw_plot.utils import rgb2gray
 
@@ -123,7 +122,7 @@ class MWPlotCommon(ABC):
 
 class MWPlotBase(MWPlotCommon):
     """
-    MWPlot base class to plot the edge-on Milky Way
+    MWPlot base class to plot the face-on Milky Way
 
     Parameters
     ----------
@@ -182,20 +181,9 @@ class MWPlotBase(MWPlotCommon):
         self._unit = unit
         self.reference_str = None
 
-        self._pixels = 5600
-        self._resolution = (self.r0 / 1078).to(u.lyr)
-
-        # # Fixed value
-        # if self.mode == "face-on":
-        #     self._pixels = 5600
-        #     self._resolution = (self.r0 / 1078).to(u.lyr)
-        # elif self.mode == "edge-on":
-        #     self._pixels = 6500
-        #     self._resolution = 15.384615846 * u.lyr
-        # else:
-        #     raise LookupError(
-        #         f"Unknown mode '{self.mode}', can only be 'edge-on' or 'face-on'"
-        #     )
+        # properties of the images
+        self._pixels = 5600  # number of pixels in x and y axis
+        self._ly_per_pixel = (self.r0 / 1078).to(u.lyr)  # light years per pixel resolution
 
     def lrbt_rot(self):
         """This function rotate matplolti's extent ordered LRBT"""
@@ -208,10 +196,6 @@ class MWPlotBase(MWPlotCommon):
             self._ext = [t, b, r, l]
 
     def images_read(self):
-        # if self.mode == "edge-on":
-        #    self._img_obj = self._MW_IMAGES["MW_edgeon_edr3_unannotate"]
-        #    self._img = np.zeros((6500, 6500, 3), dtype=np.uint8)
-        #    self._img[1625:4875, :, :] =self._img_obj.img
         if self._annotation:
             img_obj = self._MW_IMAGES["MW_bg_annotate"]
         else:
@@ -247,7 +231,7 @@ class MWPlotBase(MWPlotCommon):
             if not isinstance(self._radius, u.quantity.Quantity):
                 self._radius = self._radius * self._unit
 
-        self._resolution = self._resolution.to(self._unit)
+        self._resolution = self._ly_per_pixel.to(self._unit)
         self._radius = self._radius.to(self._unit)
 
         # convert physical unit to pixel unit
@@ -290,30 +274,6 @@ class MWPlotBase(MWPlotCommon):
                     (pixel_radius * 2, pixel_radius * 2, 3), dtype=self._img.dtype
                 )
 
-            # assign them to temp value
-            # just in case the area is outside the images, will fill black pixel
-            temp_x_left_px = max(x_left_px, 0)
-            temp_x_right_px = min(x_right_px, self._pixels)
-            temp_y_top_px = max(y_top_px, 0)
-            temp_y_bottom_px = min(y_bottom_px, self._pixels)
-
-            left_exceed_px = abs(min(x_left_px, 0))
-            top_exceed_px = abs(min(y_top_px, 0))
-            # Extract available area from pre-compiled first
-            self._img = self._img[
-                temp_y_top_px:temp_y_bottom_px, temp_x_left_px:temp_x_right_px
-            ]
-
-            # fill the black/white image with the background image
-            black_img[
-                top_exceed_px : top_exceed_px + self._img.shape[0],
-                left_exceed_px : left_exceed_px + self._img.shape[1],
-                :,
-            ] = self._img
-
-            # Set the images as the filled black-background image
-            self._img = np.array(black_img)
-
         self._img = np.rot90(self._img, self._rot90)
         self._ext = [
             (self._center[0] - self._radius - x_shift).value,
@@ -322,9 +282,12 @@ class MWPlotBase(MWPlotCommon):
             (self._center[1] + self._radius).value,
         ]
 
-        # if self.mode == "edge-on":
-        #     self._ext[2] *= -1
-        #     self._ext[3] *= -1
+        self._img_ext = [
+            np.max([self._ext[0], (self._center[0] - ((5600 / 2) * self._ly_per_pixel).to(self._unit) - x_shift).value]),
+            np.min([self._ext[1], (self._center[0] + ((5600 / 2) * self._ly_per_pixel).to(self._unit)  - x_shift).value]),
+            np.max([self._ext[2], (self._center[1] - ((5600 / 2) * self._ly_per_pixel).to(self._unit)).value]),
+            np.min([self._ext[3], (self._center[1] + ((5600 / 2) * self._ly_per_pixel).to(self._unit)).value]),
+        ]
 
         self._img = self._img
         self._aspect = (

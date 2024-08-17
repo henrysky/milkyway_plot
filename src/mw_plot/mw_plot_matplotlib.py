@@ -1,15 +1,16 @@
 import os
 import warnings
-
-import astropy.coordinates as apycoords
-import astropy.units as u
-import matplotlib.pyplot as plt
-import numpy as np
 from astropy.coordinates.calculation import HumanError
-from matplotlib.axes import Axes
-from matplotlib.figure import Figure
-from mpl_toolkits.axes_grid1 import make_axes_locatable
+import numpy as np
 
+import astropy.units as u
+import astropy.coordinates as apycoords
+
+import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
+from matplotlib.axes import Axes
+
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mw_plot.mw_plot_base import MWPlotBase, MWSkyMapBase
 
 
@@ -182,20 +183,24 @@ class MWPlot(MWPlotBase):
             if not self._grayscale:
                 ax.imshow(
                     self._img,
-                    extent=self._ext,
+                    extent=self._img_ext,
                     zorder=0,
                     alpha=self.imalpha,
                     rasterized=True,
                 )
+                ax.set_xlim(self._ext[0], self._ext[1])
+                ax.set_ylim(self._ext[2], self._ext[3])
             else:
                 ax.imshow(
                     self._img[:, :, 0],
-                    extent=self._ext,
+                    extent=self._img_ext,
                     zorder=0,
                     alpha=self.imalpha,
                     rasterized=True,
                     cmap="gray",
                 )
+                ax.set_xlim(self._ext[0], self._ext[1])
+                ax.set_ylim(self._ext[2], self._ext[3])
             ax.tick_params(
                 labelsize=self.fontsize * 0.8,
                 width=self.fontsize / 10,
@@ -246,7 +251,7 @@ class MWPlot(MWPlotBase):
             **kwargs,
         )
         self.ax.imshow(
-            self._img, zorder=0, extent=self._ext, alpha=0.0, rasterized=True
+            self._img, zorder=0, extent=self._img_ext, alpha=0.0, rasterized=True
         )
 
         if self.cbar_flag is True:
