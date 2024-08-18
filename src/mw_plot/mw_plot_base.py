@@ -82,7 +82,7 @@ class MWPlotCommon(ABC):
         }
 
     @abstractmethod
-    def images_read(self):
+    def read_bg_img(self):
         # class to read images
         pass
 
@@ -195,7 +195,7 @@ class MWPlotBase(MWPlotCommon):
         elif self._rot90 % 4 == 3:  # -270deg
             self._ext = [t, b, r, l]
 
-    def images_read(self):
+    def read_bg_img(self):
         if self._annotation:
             img_obj = self._MW_IMAGES["MW_bg_annotate"]
         else:
@@ -359,7 +359,7 @@ class MWSkyMapBase(MWPlotCommon):
         if self._grayscale:
             self._opposite_color = "black"
 
-    def images_read(self):
+    def read_bg_img(self):
         if self.wavlength == "optical":
             img_key = "MW_edgeon_edr3_unannotate"
         elif self.wavlength == "gamma":

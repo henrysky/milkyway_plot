@@ -80,7 +80,7 @@ class MWPlotBokeh(MWPlotBase):
             self._center = self._center.to(self._unit)
             self._radius = self._radius.to(self._unit)
 
-        self.images_read()
+        self.read_bg_img()
         self.s = 1.0
 
         TOOLS = "pan, wheel_zoom, box_zoom, reset, save, box_select"
@@ -205,7 +205,7 @@ class MWSkyMapBokeh(MWSkyMapBase):
         if self._radius[0] <= 0 or self._radius[0] <= 0:
             raise ValueError("Radius cannot be negative or 0")
 
-        self.images_read()
+        self.read_bg_img()
         self.s = 1.0
 
         TOOLS = "pan, wheel_zoom, box_zoom, reset, save, box_select"

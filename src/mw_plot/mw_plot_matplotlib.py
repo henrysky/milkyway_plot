@@ -89,7 +89,7 @@ class MWPlot(MWPlotBase):
             self._center = self._center.to(self._unit)
             self._radius = self._radius.to(self._unit)
 
-        self.images_read()
+        self.read_bg_img()
 
     def transform(self, x):
         """
@@ -423,7 +423,7 @@ class MWSkyMap(MWSkyMapBase):
         if self._radius[0] <= 0 or self._radius[0] <= 0:
             raise ValueError("Radius cannot be negative or 0")
 
-        self.images_read()
+        self.read_bg_img()
 
     def transform(self, x):
         """
