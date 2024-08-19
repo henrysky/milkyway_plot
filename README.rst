@@ -3,16 +3,22 @@
    :width: 500 px
 
 |
-.. image:: https://readthedocs.org/projects/milkyway-plot/badge/?version=latest
+
+|docs| |license| |ci| |coverage|
+
+.. |docs| image:: https://readthedocs.org/projects/milkyway-plot/badge/?version=latest
    :target: https://milkyway-plot.readthedocs.io/en/latest/
    :alt: Documentation Status
-.. image:: https://img.shields.io/github/license/henrysky/milkyway_plot.svg
+
+.. |license| image:: https://img.shields.io/github/license/henrysky/milkyway_plot.svg
    :target: https://github.com/henrysky/milkyway_plot/blob/master/LICENSE
    :alt: GitHub license
-.. image:: https://github.com/henrysky/astroNN/workflows/CI/badge.svg
+
+.. |ci| image:: https://github.com/henrysky/astroNN/workflows/CI/badge.svg
    :target: https://github.com/henrysky/astroNN/actions
    :alt: Build Status
-.. image:: https://codecov.io/gh/henrysky/milkyway_plot/graph/badge.svg?token=NqMxk1j3PQ 
+
+.. |coverage| image:: https://codecov.io/gh/henrysky/milkyway_plot/graph/badge.svg?token=NqMxk1j3PQ 
    :target: https://codecov.io/gh/henrysky/milkyway_plot
 
 Getting Started
