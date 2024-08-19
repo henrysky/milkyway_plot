@@ -8,6 +8,7 @@ import astropy.coordinates as coord
 import astropy.units as u
 import matplotlib.pyplot as plt
 import numpy as np
+import PIL
 
 from mw_plot.utils import rgb2gray
 
@@ -27,6 +28,11 @@ class MWImage:
         return pathlib.Path(importlib.util.find_spec("mw_plot").origin).parent.joinpath(
             self.filename
         )
+
+    @property
+    def pillow_img(self):
+        # get the image using PIL
+        return PIL.Image.open(self.img_path)
 
 
 class MWPlotCommon(ABC):
@@ -98,6 +104,14 @@ class MWPlotCommon(ABC):
             skycoord = skycoord.icrs
         return [skycoord.ra.deg * u.deg, skycoord.dec.deg * u.deg]
 
+    def unit_check(self, x, unit):
+        """
+        Check if the unit is the same as the default unit and convert to the default unit
+        """
+        # force the unit to be the same as the default unit
+        x <<= unit
+        return x.to(unit)
+
     def xy_unit_check(self, x, y, checkrot=True):
         if not isinstance(x, u.quantity.Quantity) or not isinstance(
             y, u.quantity.Quantity
@@ -106,8 +120,8 @@ class MWPlotCommon(ABC):
         if x.unit is None and y.unit is None:
             raise TypeError("All numbers must carry astropy unit")
         else:
-            x = x.to(self._unit).value
-            y = y.to(self._unit).value
+            x = x.to(self.unit).value
+            y = y.to(self.unit).value
 
         # check if rotation is 90deg or 270deg
         if checkrot:  # nested, do not unnest
@@ -116,8 +130,8 @@ class MWPlotCommon(ABC):
         return x, y
 
     @property
-    def reference(self):
-        return self.reference_str
+    def citation(self):
+        return self.img_obj.citation
 
 
 class MWPlotBase(MWPlotCommon):
@@ -130,18 +144,18 @@ class MWPlotBase(MWPlotCommon):
         Whether to use grayscale background
     annotation : bool
         Whether use a milkyway background with annotation
-    rot90 : int
-        Number of 90 degree rotation
-    coord : str
-        'galactocentric' or 'galactic'
+    angle : int
+        Where the Sun is from the center of the galaxy in degrees. 0 is north, 90 is east...
     r0 : float
         Distance to galactic center in kpc
+    coord : str
+        'galactocentric' or 'galactic'
     center : tuple
-        Coordinates of the center of the plot with astropy units
+        Coordinates as in the system `coord` of the center of the plot with astropy units
     radius : float
         Radius of the plot with astropy units
     unit : astropy units
-        Astropy units
+        Astropy units for the default if none provided and the axes
     figsize : tuple
         Figure size
     dpi : int
@@ -150,154 +164,166 @@ class MWPlotBase(MWPlotCommon):
 
     def __init__(
         self,
-        grayscale,
-        annotation,
-        rot90,
-        coord,
-        r0,
-        center,
-        radius,
-        unit,
-        figsize,
-        dpi,
+        grayscale: bool = False,
+        annotation: bool = False,
+        angle: int = 90,
+        r0: u.Quantity = 8.125 * u.kpc,
+        coord: str = "galactic",
+        center: tuple = (0.0, 0.0),
+        radius: u.Quantity = 20.0 * u.kpc,
+        unit: u.Unit = u.kpc,
+        figsize: tuple = (5, 5),
+        dpi: int = 150,
     ):
         super().__init__()
-        self._coord = coord
-        self._annotation = annotation
-        self._rot90 = rot90
-        self._grayscale = grayscale
-        self.r0 = r0 * u.kpc
-        self._initialized = False
+        self.grayscale = grayscale
+        self.annotation = annotation
+        if angle != 90:
+            raise NotImplementedError("Only 90 degrees is implemented")
+        self.angle = -(angle - 90.0)
+        self.r0 = self.unit_check(r0, unit)
+        self.coord = coord
+        self.center = self.unit_check(center, unit)
+        self.radius = self.unit_check(radius, unit)
+        self.unit = unit
         self.figsize = figsize
         self.dpi = dpi
-
-        # user should not change these values anyway
-        self._ext = None
-        self._img = None
-        self._img_fname = None
-        self._gh_img_url = None
-        self._center = center
-        self._radius = radius
-        self._unit = unit
-        self.reference_str = None
+        self._built = False
+        self.facecolor = (0, 0, 0) if not self.grayscale else (1, 1, 1)
 
         # properties of the images
-        self._pixels = 5600  # number of pixels in x and y axis
-        self._ly_per_pixel = (self.r0 / 1078).to(u.lyr)  # light years per pixel resolution
-
-    def lrbt_rot(self):
-        """This function rotate matplolti's extent ordered LRBT"""
-        l, r, b, t = self._ext[0], self._ext[1], self._ext[2], self._ext[3]
-        if self._rot90 % 4 == 1:  # -90deg
-            self._ext = [b, t, l, r]
-        elif self._rot90 % 4 == 2:  # -180deg
-            self._ext = [r, l, t, b]
-        elif self._rot90 % 4 == 3:  # -270deg
-            self._ext = [t, b, r, l]
+        self.img_pixels = 5600  # number of pixels in x and y axis
+        # light years per pixel resolution given
+        # 1078 is the number of pixels in the image from galactic center to the Sun
+        self.img_resolution = self.unit_check((self.r0 / 1078), unit)
 
     def read_bg_img(self):
-        if self._annotation:
-            img_obj = self._MW_IMAGES["MW_bg_annotate"]
+        if self.annotation:
+            self.img_obj = self._MW_IMAGES["MW_bg_annotate"]
         else:
-            img_obj = self._MW_IMAGES["MW_bg_unannotate"]
-        self._img = plt.imread(img_obj.img_path)
-        self.reference_str = img_obj.citation
-        self._gh_img_url = self._gh_imgbase_url + img_obj.filename
+            self.img_obj = self._MW_IMAGES["MW_bg_unannotate"]
+        self._gh_img_url = self._gh_imgbase_url + self.img_obj.filename
 
-        if self._grayscale:
-            self._img = rgb2gray(self._img)
-
-        if self._coord.lower() == "galactic":
-            # shift the coord by r0 to the new coord system
+        if self.coord.lower() == "galactic":
+            # shift the coord by r0 backt to the galactocentric
             x_shift = self.r0
-            self._center[0] += x_shift
-            self._coord_english = "Galactic Coordinates"
-        elif self._coord.lower() == "galactocentric":
-            x_shift = 0.0 * u.kpc
-            self._coord_english = "Galactocentric Coordinates"
+            # example: if the center is 0,0 and the angle is 90, the Sun is at 0,r0
+            self.center[0] += x_shift
+            self.coord_english = "Galactic Coordinates"
+        elif self.coord.lower() == "galactocentric":
+            x_shift = 0.0 * self.unit
+            self.coord_english = "Galactocentric Coordinates"
         else:
             raise ValueError(
-                "Unknown coordinates, can only be 'galactic' or 'galactocentric'"
+                "Unknown coordinates, can only be `galactic` or `galactocentric`"
             )
+        if self.angle % 90 != 0:  # in case the angle is not 90, 180, 270, 360
+            self.coord_english = ""
 
-        if not isinstance(self._center, u.quantity.Quantity) and not isinstance(
-            self._radius, u.quantity.Quantity
-        ):
-            warnings.warn(
-                f"You did not specify units for center and radius, assuming the unit is {self._unit.long_names[0]}"
-            )
-            if not isinstance(self._center, u.quantity.Quantity):
-                self._center = self._center * self._unit
-            if not isinstance(self._radius, u.quantity.Quantity):
-                self._radius = self._radius * self._unit
-
-        self._resolution = self._ly_per_pixel.to(self._unit)
-        self._radius = self._radius.to(self._unit)
-
-        # convert physical unit to pixel unit
-        pixel_radius = int((self._radius / self._resolution).value)
-        pixel_center = [
-            int((self._pixels / 2 + self._center[0] / self._resolution).value),
-            int((self._pixels / 2 - self._center[1] / self._resolution).value),
+        # calculate the pixel radius and center from physical units
+        pixel_radius = int((self.radius / self.img_resolution))
+        pixel_center = [  # where the center of the image is in pixel
+            int((self.img_pixels / 2 + self.center[0] / self.img_resolution)),
+            int((self.img_pixels / 2 - self.center[1] / self.img_resolution)),
         ]
 
-        # get the pixel coordinates
+        # get the pixel coordinates of four corners
         x_left_px = pixel_center[0] - pixel_radius
         x_right_px = pixel_center[0] + pixel_radius
-        y_top_px = self._pixels - pixel_center[1] - pixel_radius
-        y_bottom_px = self._pixels - pixel_center[1] + pixel_radius
+        y_top_px = pixel_center[1] + pixel_radius
+        y_bottom_px = pixel_center[1] - pixel_radius
 
-        # decide whether it needs to fill black pixels because the range outside the pre-compiled images
-        if np.all(
-            np.array(
+        # decide whether boundary is within the image
+        crop_arg = [0, 0, self.img_pixels, self.img_pixels]
+        # image extent in physical coordinates
+        img_ext_phy = [
+            -self.img_pixels / 2 * self.img_resolution.value,
+            self.img_pixels / 2 * self.img_resolution.value,
+            -self.img_pixels / 2 * self.img_resolution.value,
+            self.img_pixels / 2 * self.img_resolution.value,
+        ]
+        if x_left_px >= 0:
+            crop_arg[0] = x_left_px
+        if x_right_px <= self.img_pixels:
+            crop_arg[2] = x_right_px
+        if y_bottom_px >= 0:
+            crop_arg[1] = y_bottom_px
+        if y_top_px <= self.img_pixels:
+            crop_arg[3] = y_top_px
+
+        # crop the image before rotation
+        self.bg_img = self.img_obj.pillow_img.rotate(
+            self.angle, fillcolor=self.facecolor
+        )
+
+        # rotate the four corners
+        rotation_matrix = np.array(
+            [
+                [np.cos(np.deg2rad(self.angle)), -np.sin(np.deg2rad(self.angle))],
+                [np.sin(np.deg2rad(self.angle)), np.cos(np.deg2rad(self.angle))],
+            ]
+        )
+        bottom_left_phy = np.dot(rotation_matrix, [img_ext_phy[0], img_ext_phy[2]])
+        top_left_phy = np.dot(rotation_matrix, [img_ext_phy[0], img_ext_phy[3]])
+        bottom_right_phy = np.dot(rotation_matrix, [img_ext_phy[1], img_ext_phy[2]])
+        top_right_phy = np.dot(rotation_matrix, [img_ext_phy[1], img_ext_phy[3]])
+
+        # extent=[horizontal_min,horizontal_max,vertical_min,vertical_max]
+        self.bg_img_ext = [
+            np.min(
                 [
-                    x_left_px,
-                    self._pixels - x_right_px,
-                    y_top_px,
-                    self._pixels - y_bottom_px,
+                    bottom_left_phy[0],
+                    top_left_phy[0],
+                    bottom_right_phy[0],
+                    top_right_phy[0],
                 ]
             )
-            >= 0
-        ):
-            self._img = self._img[y_top_px:y_bottom_px, x_left_px:x_right_px]
-        else:
-            # create a black/white image first with 3 channel with the same data type
-            if self._grayscale:
-                black_img = (
-                    np.ones(
-                        (pixel_radius * 2, pixel_radius * 2, 3), dtype=self._img.dtype
-                    )
-                    * 255
-                )
-            else:
-                black_img = np.zeros(
-                    (pixel_radius * 2, pixel_radius * 2, 3), dtype=self._img.dtype
-                )
+            - x_shift.value,
+            np.max(
+                [
+                    bottom_left_phy[0],
+                    top_left_phy[0],
+                    bottom_right_phy[0],
+                    top_right_phy[0],
+                ]
+            )
+            - x_shift.value,
+            np.min(
+                [
+                    bottom_left_phy[1],
+                    top_left_phy[1],
+                    bottom_right_phy[1],
+                    top_right_phy[1],
+                ]
+            ),
+            np.max(
+                [
+                    bottom_left_phy[1],
+                    top_left_phy[1],
+                    bottom_right_phy[1],
+                    top_right_phy[1],
+                ]
+            ),
+        ]
 
-        self._img = np.rot90(self._img, self._rot90)
+        # actual extent of the image
         self._ext = [
-            (self._center[0] - self._radius - x_shift).value,
-            (self._center[0] + self._radius - x_shift).value,
-            (self._center[1] - self._radius).value,
-            (self._center[1] + self._radius).value,
+            (self.center[0] - self.radius - x_shift).value,
+            (self.center[0] + self.radius - x_shift).value,
+            (self.center[1] - self.radius).value,
+            (self.center[1] + self.radius).value,
         ]
 
-        self._img_ext = [
-            np.max([self._ext[0], (self._center[0] - ((5600 / 2) * self._ly_per_pixel).to(self._unit) - x_shift).value]),
-            np.min([self._ext[1], (self._center[0] + ((5600 / 2) * self._ly_per_pixel).to(self._unit)  - x_shift).value]),
-            np.max([self._ext[2], (self._center[1] - ((5600 / 2) * self._ly_per_pixel).to(self._unit)).value]),
-            np.min([self._ext[3], (self._center[1] + ((5600 / 2) * self._ly_per_pixel).to(self._unit)).value]),
-        ]
+        self.bg_img = np.asanyarray(self.bg_img)
+        if self.grayscale:
+            self.bg_img = rgb2gray(self.bg_img)
 
-        self._img = self._img
         self._aspect = (
-            self._img.shape[0]
-            / float(self._img.shape[1])
+            self.bg_img.shape[0]
+            / float(self.bg_img.shape[1])
             * ((self._ext[1] - self._ext[0]) / (self._ext[3] - self._ext[2]))
         )
         self._aspect = np.abs(self._aspect)
-
-        self.lrbt_rot()
 
         return None
 
@@ -353,7 +379,7 @@ class MWSkyMapBase(MWPlotCommon):
         self._grayscale = grayscale
         self.figsize = figsize
         self.dpi = dpi
-        self._initialized = False
+        self._built = False
 
         self._opposite_color = "white"
         if self._grayscale:
@@ -371,18 +397,19 @@ class MWSkyMapBase(MWPlotCommon):
         else:
             raise ValueError("Unknown wavelength")
         img_obj = self._MW_IMAGES[img_key]
-        self._img = plt.imread(img_obj.img_path)
+        self.bg_img = plt.imread(img_obj.img_path)
         self.reference_str = img_obj.citation
 
         # find center pixel and radius pixel
-        y_img_center = self._img.shape[0] // 2 - int(
-            (self._img.shape[0] / 180) * self._center[1].value
+        y_img_center = self.bg_img.shape[0] // 2 - int(
+            (self.bg_img.shape[0] / 180) * self._center[1].value
         )
-        y_radious_px = int((self._img.shape[0] / 180) * self._radius[1].value)
+        y_radious_px = int((self.bg_img.shape[0] / 180) * self._radius[1].value)
         x_img_center = (
-            int((self._img.shape[1] / 360) * self._center[0].value) + self._img.shape[0]
+            int((self.bg_img.shape[1] / 360) * self._center[0].value)
+            + self.bg_img.shape[0]
         )
-        x_radious_px = int((self._img.shape[1] / 360) * self._radius[0].value)
+        x_radious_px = int((self.bg_img.shape[1] / 360) * self._radius[0].value)
 
         self._ext = [
             (self._center[0] - self._radius[0]).value,
@@ -391,14 +418,14 @@ class MWSkyMapBase(MWPlotCommon):
             (self._center[1] + self._radius[1]).value,
         ]
 
-        self._img = self._img[
+        self.bg_img = self.bg_img[
             (y_img_center - y_radious_px) : (y_img_center + y_radious_px),
             (x_img_center - x_radious_px) : (x_img_center + x_radious_px),
             :,
         ]
 
         if self._grayscale:
-            self._img = rgb2gray(self._img)
+            self.bg_img = rgb2gray(self.bg_img)
 
         self._gh_img_url = self._gh_imgbase_url + img_obj.filename
 
@@ -411,8 +438,8 @@ class MWSkyMapBase(MWPlotCommon):
             raise TypeError("Both RA and DEC must carry astropy's unit")
         else:
             if ra.unit is not None and dec.unit is not None:
-                ra = ra.to(self._unit)
-                dec = dec.to(self._unit)
+                ra = ra.to(self.unit)
+                dec = dec.to(self.unit)
                 c_icrs = coord.SkyCoord(ra=ra, dec=dec, frame="icrs")
                 if self._projection == "equirectangular":
                     ra = coord.Angle(-c_icrs.galactic.l).wrap_at(180 * u.degree).value
