@@ -15,31 +15,31 @@ Classes API
 Interactive MilkywWay Bird's Eye View
 --------------------------------------
 
-.. bokeh-plot::
-    :source-position: above
-    :linenos:
+.. .. bokeh-plot::
+..     :source-position: above
+..     :linenos:
 
-    from mw_plot import MWPlotBokeh
-    from astropy import units as  u
-    from bokeh.io import output_file, show
+..     from mw_plot import MWPlotBokeh
+..     from astropy import units as  u
+..     from bokeh.io import output_file, show
 
-    # setup a mw-plot instance of bird's eye view of the disc
-    mw1 = MWPlotBokeh(radius=5 * u.kpc, center=(0, 0)*u.kpc, unit=u.kpc, coord='galactic', grayscale=False, annotation=True)
-    # you should use mw1.show(), I do it this way for the docs to compile correctly
-    show(mw1.bokeh_fig)
+..     # setup a mw-plot instance of bird's eye view of the disc
+..     mw1 = MWPlotBokeh(radius=5 * u.kpc, center=(0, 0)*u.kpc, unit=u.kpc, coord='galactic', grayscale=False, annotation=True)
+..     # you should use mw1.show(), I do it this way for the docs to compile correctly
+..     show(mw1.bokeh_fig)
 
 Interactive MilkyWay Sky Map
 ----------------------------------
 
-.. bokeh-plot::
-    :source-position: above
-    :linenos:
+.. .. bokeh-plot::
+..     :source-position: above
+..     :linenos:
 
-    from mw_plot import MWSkyMapBokeh
-    from astropy import units as  u
-    from bokeh.io import output_file, show
+..     from mw_plot import MWSkyMapBokeh
+..     from astropy import units as  u
+..     from bokeh.io import output_file, show
 
-    # setup a mw-plot instance of the sky
-    mw1 = MWSkyMapBokeh()
-    # you should use mw1.show(), I do it this way for the docs to compile correctly
-    show(mw1.bokeh_fig)
+..     # setup a mw-plot instance of the sky
+..     mw1 = MWSkyMapBokeh()
+..     # you should use mw1.show(), I do it this way for the docs to compile correctly
+..     show(mw1.bokeh_fig)
