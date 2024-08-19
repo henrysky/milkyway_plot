@@ -9,16 +9,32 @@
 Getting Started
 =================
 
-mw-plot handy python package to do plotting on a face-on/edge-on milkyway/skymap with `matplotlib` (https://matplotlib.org/) for 
-static plots or `bokeh` (https://bokeh.org/) for interactive plots (`bokeh` module under develop).
+``mw-plot`` is a handy Python package for plotting face-on and all-sky maps of the Milky Way using ``matplotlib`` (https://matplotlib.org/) for 
+static plots and ``bokeh`` (https://bokeh.org/) for interactive plots.
 
 You can set the center and radius of the plot anywhere on a milkyway galaxy image with galactic or galactocentric coordinates.
 
-``mw_plot`` will fill pixels for region outside the pre-compiled images. No acknowledgement to ``mw_plot``
-is required if you generate plots for your non-commerical publication, but you **must acknowledgement the origin of
+Detailed documentation is available at https://milkyway-plot.readthedocs.io/
+
+No acknowledgement to ``mw_plot`` is required if you generate plots for your non-commerical publication, but you **must acknowledgement the origin of
 the background images**. The relevant reference text can by obtained by the property ``citation`` of a ``mw_plot`` class instance.
 
-Documentation is available at https://milkyway-plot.readthedocs.io/
+For example, to get the citation text for the background image of a face-on Milky Way plot:
+
+.. code-block:: python
+
+    from mw_plot import MWFaceOn
+    mw = MWFaceOn()
+    print(mw.citation)
+
+or for the background infrared image of an all-sky Milky Way plot:
+
+
+.. code-block:: python
+
+    from mw_plot import MWSkyMap
+    mw = MWSkyMap(wavelength="infrared")
+    print(mw.citation)
 
 .. |docs| image:: https://readthedocs.org/projects/milkyway-plot/badge/?version=latest
    :alt: Documentation Status

@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from astropy import units as u
 
-from mw_plot import MWPlot, MWSkyMap
+from mw_plot import MWFaceOn, MWSkyMap
 
 
 @pytest.mark.parametrize(
@@ -63,7 +63,7 @@ def test_skymap_bad_config(projection, grid, wavelength):
 
 def test_mw_plot():
     # setup a MWPlot instance
-    plot_instance = MWPlot(
+    plot_instance = MWFaceOn(
         radius=20 * u.kpc, unit=u.kpc, coord="galactocentric", annotation=True
     )
     plot_instance.imalpha = 1.0
@@ -83,7 +83,7 @@ def test_mw_plot():
 
 
 def test_mw_one_annotation():
-    mw1 = MWPlot(radius=20 * u.kpc, unit=u.kpc, coord="galactocentric", annotation=True)
+    mw1 = MWFaceOn(radius=20 * u.kpc, unit=u.kpc, coord="galactocentric", annotation=True)
     mw1.title = "Annotation"
     mw1.scatter(8 * u.kpc, 0 * u.kpc, c="r", s=200)
     mw1.ax.annotate(
@@ -124,7 +124,7 @@ def test_mwdkymap_one_scatter_annotation():
 
 
 def test_mw_one_scatter_annotation():
-    mw1 = MWPlot(radius=20 * u.kpc, unit=u.kpc, coord="galactocentric", annotation=True)
+    mw1 = MWFaceOn(radius=20 * u.kpc, unit=u.kpc, coord="galactocentric", annotation=True)
 
     mw1.title = "Annotation"
     mw1.scatter_annotate(
@@ -134,13 +134,13 @@ def test_mw_one_scatter_annotation():
 
 
 def test_faceon_transform():
-    mw1 = MWPlot(radius=20 * u.kpc, unit=u.kpc, coord="galactocentric", annotation=True)
+    mw1 = MWFaceOn(radius=20 * u.kpc, unit=u.kpc, coord="galactocentric", annotation=True)
     fig, ax = plt.subplots(figsize=(10, 5))
     # should raise error if not axes or figure
     with pytest.raises(TypeError):
         mw1.transform(np.array([1,2,3]))
 
-    mw1 = MWPlot(radius=20 * u.kpc, unit=u.kpc, coord="galactocentric", annotation=True)
+    mw1 = MWFaceOn(radius=20 * u.kpc, unit=u.kpc, coord="galactocentric", annotation=True)
     fig, ax = plt.subplots(figsize=(10, 5))
     # should not raise error
     mw1.transform(ax)

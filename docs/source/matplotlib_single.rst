@@ -24,7 +24,7 @@ MilkyWay Bird's Eye
     from mw_plot import MWPlot
 
     # setup a mw-plot instance of bird's eye view of the disc
-    mw1 = MWPlot(
+    mw1 = MWFaceOn
         radius=20 * u.kpc,
         unit=u.kpc,
         coord="galactocentric",
@@ -45,7 +45,7 @@ MilkyWay Bird's Eye
     from mw_plot import MWPlot
 
     # setup a mw-plot instance of bird's eye view of the disc
-    mw1 = MWPlot(
+    mw1 = MWFaceOn
         radius=20 * u.kpc,
         unit=u.kpc,
         coord="galactocentric",
@@ -69,7 +69,7 @@ Annotation
     from astropy import units as u
     from mw_plot import MWPlot
 
-    mw1 = MWPlot(radius=20 * u.kpc, unit=u.kpc, coord="galactocentric", annotation=True, figsize=(10, 8),)
+    mw1 = MWFaceOnradius=20 * u.kpc, unit=u.kpc, coord="galactocentric", annotation=True, figsize=(10, 8),)
 
     # set up plot title
     mw1.title = "Annotation"
@@ -83,7 +83,7 @@ Annotation
     from astropy import units as u
     from mw_plot import MWPlot
 
-    mw1 = MWPlot(radius=20 * u.kpc, unit=u.kpc, coord="galactocentric", annotation=True, figsize=(10, 8),)
+    mw1 = MWFaceOnradius=20 * u.kpc, unit=u.kpc, coord="galactocentric", annotation=True, figsize=(10, 8),)
 
     # set up plot title
     mw1.title = "Annotation"

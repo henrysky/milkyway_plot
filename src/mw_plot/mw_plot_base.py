@@ -1,6 +1,5 @@
 import importlib.util
 import pathlib
-import warnings
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
@@ -112,26 +111,25 @@ class MWPlotCommon(ABC):
         x <<= unit
         return x
 
-    def xy_unit_check(self, x, y, checkrot=False):
+    def xy_unit_check(self, x, y):
         if not isinstance(x, u.quantity.Quantity) or not isinstance(
             y, u.quantity.Quantity
         ):
-            raise TypeError("All numbers must be astropy Quantity")
-        if x.unit is None and y.unit is None:
-            raise TypeError("All numbers must carry astropy unit")
+            raise TypeError("Both x and y must carry astropy's unit")
         else:
-            x = x.to(self.unit).value
-            y = y.to(self.unit).value
+            if x.unit is not None and y.unit is not None:
+                x = x.to(self.unit).value
+                y = y.to(self.unit).value
+            else:
+                raise TypeError(
+                    "Both x, y, center and radius must carry astropy's unit"
+                )
 
-        # check if rotation is 90deg or 270deg
-        if checkrot:  # nested, do not unnest
-            if self._rot90 % 2 == 1:
-                x, y = y, x
         return x, y
 
     @property
     def citation(self):
-        return self.img_obj.citation
+        return self.reference_str
 
 
 class MWPlotBase(MWPlotCommon):

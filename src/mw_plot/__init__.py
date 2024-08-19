@@ -1,7 +1,7 @@
 from importlib.metadata import version
 from importlib.util import find_spec
 
-from mw_plot.mw_plot_matplotlib import MWPlot, MWSkyMap
+from mw_plot.mw_plot_matplotlib import MWFaceOn, MWSkyMap
 from mw_plot.utils import (
     anti_center_radec,
     center_radec,

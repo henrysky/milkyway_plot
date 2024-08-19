@@ -14,7 +14,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mw_plot.mw_plot_base import MWPlotBase, MWSkyMapBase
 
 
-class MWPlot(MWPlotBase):
+class MWFaceOn(MWPlotBase):
     """
     MWPlot class plotting with Matplotlib
 
@@ -221,7 +221,7 @@ class MWPlot(MWPlotBase):
         :type c: Union[str, list, ndarry]
         :History: 2018-Mar-17 - Written - Henry Leung (University of Toronto)
         """
-        x, y = self.xy_unit_check(x, y)
+        x, y = self.MWSkyMapBase(x, y)
         self.initialize_mwplot()
 
         # decide whether we need colorbar or not
@@ -230,8 +230,8 @@ class MWPlot(MWPlotBase):
                 color = c[0]
                 cbar_label = c[1]
                 self.cbar_flag = True
-                if type(color) == u.quantity.Quantity:
-                    color = color.to(self.unit).value
+                if isinstance(color, u.quantity.Quantit):
+                    color = color.value
             else:
                 color = c
         else:
@@ -505,7 +505,7 @@ class MWSkyMap(MWSkyMapBase):
                 lat = np.linspace(np.pi / 2.0, -np.pi / 2.0, self.bg_img.shape[0] + 1)
                 Lon, Lat = np.meshgrid(lon, lat)
                 if self.grayscale:
-                    im = ax.pcolormesh(
+                    mappable = ax.pcolormesh(
                         Lon,
                         Lat,
                         np.dot(self.bg_img, [0.2989, 0.5870, 0.1140]),
@@ -515,7 +515,7 @@ class MWSkyMap(MWSkyMapBase):
                         rasterized=True,
                     )
                 else:
-                    im = ax.pcolormesh(
+                    mappable = ax.pcolormesh(
                         Lon,
                         Lat,
                         self.bg_img,
@@ -756,7 +756,7 @@ class MWSkyMap(MWSkyMapBase):
                 color = c[0]
                 cbar_label = c[1]
                 self.cbar_flag = True
-                if type(color) == u.quantity.Quantity:
+                if isinstance(color, u.quantity.Quantity):
                     color = color.to(self.unit).value
             else:
                 color = c
