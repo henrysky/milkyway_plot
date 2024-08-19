@@ -42,8 +42,6 @@ class MWPlotBokeh(MWPlotBase):
     :type coord: str
     :param annotation: whether use a milkyway background with annotation
     :type annotation: bool
-    :param rot90: number of 90 degree rotation
-    :type rot90: int
     :param grayscale: whether to use grayscale background
     :type grayscale: bool
     :param r0: distance to galactic center in kpc
@@ -57,14 +55,12 @@ class MWPlotBokeh(MWPlotBase):
         unit=u.kpc,
         coord="galactic",
         annotation=True,
-        rot90=0,
         grayscale=False,
         r0=8.125,
     ):
         super().__init__(
             grayscale=grayscale,
             annotation=annotation,
-            rot90=rot90,
             coord=coord,
             r0=r0,
             center=center,
@@ -75,7 +71,7 @@ class MWPlotBokeh(MWPlotBase):
         )
 
         # prepossessing procedure
-        self._unit_english = self._unit.short_names[0]
+        self.unit_english = self.unit.short_names[0]
         self.unit_check(self.center, self.unit)
         self.unit_check(self.radius, self.unit)
 
@@ -119,7 +115,7 @@ class MWPlotBokeh(MWPlotBase):
                 anchor="bottom_left",
             )
         else:
-            self._img = to_bokeh_img(self._img)
+            self._img = to_bokeh_img(self.bg_img)
             self.bokeh_fig.image_rgba(
                 image=[self._img],
                 x=self._ext[0],
@@ -129,10 +125,10 @@ class MWPlotBokeh(MWPlotBase):
             )
 
         self.bokeh_fig.xaxis.axis_label = (
-            f"{self._coord_english} ({self._unit_english})"
+            f"{self.coord_english} ({self.unit_english})"
         )
         self.bokeh_fig.yaxis.axis_label = (
-            f"{self._coord_english} ({self._unit_english})"
+            f"{self.coord_english} ({self.unit_english})"
         )
 
     def scatter(self, x, y, *args, **kwargs):
@@ -181,7 +177,7 @@ class MWSkyMapBokeh(MWSkyMapBase):
             figsize=None,
             dpi=None,
         )
-        self._unit = u.degree
+        self.unit = u.degree
         self.s = 1.0
 
         # preprocessing
@@ -244,7 +240,7 @@ class MWSkyMapBokeh(MWSkyMapBase):
                 anchor="bottom_left",
             )
         else:
-            self._img = to_bokeh_img(self._img)
+            self._img = to_bokeh_img(self.bg_img)
             self.bokeh_fig.image_rgba(
                 image=[self._img],
                 x=self._ext[0],

@@ -4,19 +4,18 @@
 
 |
 
-|docs| |license| |ci| |coverage|
+|docs||license||ci||coverage|
 
 .. |docs| image:: https://readthedocs.org/projects/milkyway-plot/badge/?version=latest
    :target: https://milkyway-plot.readthedocs.io/en/latest/
-   :alt: Documentation Status
 
 .. |license| image:: https://img.shields.io/github/license/henrysky/milkyway_plot.svg
-   :target: https://github.com/henrysky/milkyway_plot/blob/master/LICENSE
    :alt: GitHub license
+   :target: https://github.com/henrysky/milkyway_plot/blob/master/LICENSE
 
 .. |ci| image:: https://github.com/henrysky/astroNN/workflows/CI/badge.svg
-   :target: https://github.com/henrysky/astroNN/actions
    :alt: Build Status
+   :target: https://github.com/henrysky/astroNN/actions
 
 .. |coverage| image:: https://codecov.io/gh/henrysky/milkyway_plot/graph/badge.svg?token=NqMxk1j3PQ 
    :target: https://codecov.io/gh/henrysky/milkyway_plot

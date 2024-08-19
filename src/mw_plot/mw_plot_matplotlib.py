@@ -74,7 +74,7 @@ class MWPlot(MWPlotBase):
         self.tight_layout = True
 
         self.unit_english = None
-        self._coord_english = None
+        self.coord_english = None
         self._aspect = None
 
         self.fig = None
@@ -170,10 +170,10 @@ class MWPlot(MWPlotBase):
             if self.title is not None:
                 ax.set_title(self.title, fontsize=self.fontsize)
             ax.set_xlabel(
-                f"{self._coord_english} ({self.unit_english})", fontsize=self.fontsize
+                f"{self.coord_english} ({self.unit_english})", fontsize=self.fontsize
             )
             ax.set_ylabel(
-                f"{self._coord_english} ({self.unit_english})", fontsize=self.fontsize
+                f"{self.coord_english} ({self.unit_english})", fontsize=self.fontsize
             )
             ax.set_aspect(self._aspect)
             ax.set_facecolor(
