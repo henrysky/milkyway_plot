@@ -76,9 +76,8 @@ class MWPlotBokeh(MWPlotBase):
 
         # prepossessing procedure
         self._unit_english = self._unit.short_names[0]
-        if self._center.unit is not None and self._radius.unit is not None:
-            self._center = self._center.to(self._unit)
-            self._radius = self._radius.to(self._unit)
+        self.unit_check(self.center, self.unit)
+        self.unit_check(self.radius, self.unit)
 
         self.read_bg_img()
         self.s = 1.0
@@ -186,23 +185,22 @@ class MWSkyMapBokeh(MWSkyMapBase):
         self.s = 1.0
 
         # preprocessing
-        if self._center.unit is not None and self._radius.unit is not None:
-            self._center = self._center.to(self._unit)
-            self._radius = self._radius.to(self._unit)
+        self.unit_check(self.center, self.unit)
+        self.unit_check(self.radius, self.unit)
 
-        if (self._center[0] + self._radius[0]).value > 180 or (
-            self._center[0] - self._radius[0]
+        if (self.center[0] + self.radius[0]).value > 180 or (
+            self.center[0] - self.radius[0]
         ).value < -180:
             raise ValueError(
                 "The border of the width will be outside the range of -180 to 180 which is not allowed\n"
             )
-        if (self._center[1] + self._radius[1]).value > 90 or (
-            self._center[1] - self._radius[1]
+        if (self.center[1] + self.radius[1]).value > 90 or (
+            self.center[1] - self.radius[1]
         ).value < -90:
             raise ValueError(
                 "The border of the height will be outside the range of -90 to 90 which is not allowed"
             )
-        if self._radius[0] <= 0 or self._radius[0] <= 0:
+        if self.radius[0] <= 0 or self.radius[0] <= 0:
             raise ValueError("Radius cannot be negative or 0")
 
         self.read_bg_img()

@@ -85,9 +85,8 @@ class MWPlot(MWPlotBase):
 
         # prepossessing procedure
         self.unit_english = self.unit.short_names[0]
-        if self.center.unit is not None and self.radius.unit is not None:
-            self.center = self.center.to(self.unit)
-            self.radius = self.radius.to(self.unit)
+        self.unit_check(self.center, self.unit)
+        self.unit_check(self.radius, self.unit)
 
         self.read_bg_img()
 
@@ -322,35 +321,36 @@ class MWSkyMap(MWSkyMapBase):
     """
     MWSkyMap class plotting with Matplotlib
 
-    :param projection: projection system of the plot
-    :type projection: string(["equirectangular", "aitoff", "hammer", "lambert", "mollweide"])
-    :param wavelength: wavelength of the sky map
-    :type wavelength: string([gamma", "optical", "infrared", "far-infrared"])
-    :param center: Coordinates of the center of the plot with astropy degree/radian units
-    :type center: astropy.Quantity
-    :param radius: Radius of the plot with astropy degree/radian units
-    :type radius: astropy.Quantity
-    :param grayscale: whether to use grayscale background
-    :type grayscale: bool
-    :param grid: 'galactic' or 'equatorial' or 'ecliptic'
-    :type grid: str
-
-    :param figsize: Matplotlib figure size
-    :type figsize: turple
-    :param dpi: Matplotlib figure dpi
-    :type dpi: int
+    Parameters
+    ----------
+    grayscale : bool, optional
+        Whether to use grayscale background. The default is False.
+    projection : str, optional
+        Projection of the plot. The default is "equirectangular".
+    wavelength : str, optional
+        Wavelength of the plot. The default is "optical".
+    center : tuple, optional
+        Center of the plot. The default is (0.0, 0.0).
+    radius : tuple, optional
+        Radius of the plot. The default is (180.0, 90.0).
+    grid : str, optional
+        Grid of the plot. The default is None.
+    figsize : tuple, optional
+        Matplotlib figure size. The default is (5, 5).
+    dpi : int, optional
+        Matplotlib figure dpi. The default is 150.
     """
 
     def __init__(
         self,
-        projection="equirectangular",
-        wavelength="optical",
-        center=(0, 0) * u.deg,
-        radius=(180, 90) * u.deg,
-        grayscale=False,
-        grid=None,
-        figsize=(10, 6.5),
-        dpi=None,
+        grayscale: bool = False,
+        projection : str = "equirectangular",
+        wavelength : str = "optical",
+        center : tuple = (0.0, 0.0) * u.deg,
+        radius : tuple = (180.0, 90.0) * u.deg,
+        grid : str = None,
+        figsize : tuple = (5, 5),
+        dpi : int = 150,
     ):
         super().__init__(
             grayscale=grayscale,
@@ -393,7 +393,7 @@ class MWSkyMap(MWSkyMapBase):
 
         # preprocessing
         if (
-            self._projection != "equirectangular"
+            self.projection != "equirectangular"
         ):  # other projections do not support zoom in
             if not np.all(self.center == (0, 0) * u.deg) or not np.all(
                 self.radius == (180, 90) * u.deg
@@ -404,9 +404,8 @@ class MWSkyMap(MWSkyMapBase):
                 self.center = (0, 0) * u.deg
                 self.radius = (180, 90) * u.deg
         else:
-            if self.center.unit is not None and self.radius.unit is not None:
-                self.center = self.center.to(self.unit)
-                self.radius = self.radius.to(self.unit)
+            self.unit_check(self.center, self.unit)
+            self.unit_check(self.radius, self.unit)
 
         if (self.center[0] + self.radius[0]).value > 180 or (
             self.center[0] - self.radius[0]
@@ -429,10 +428,10 @@ class MWSkyMap(MWSkyMapBase):
         """
         Transform matplotlib figure or a single axes
         """
-        if self._projection == "equirectangular":
+        if self.projection == "equirectangular":
             projection_name = "rectilinear"
         else:
-            projection_name = self._projection
+            projection_name = self.projection
         if isinstance(x, Figure):
             if len(x.axes) > 1:
                 warnings.warn(
@@ -465,12 +464,12 @@ class MWSkyMap(MWSkyMapBase):
 
         :return: None
         """
-        if self._projection == "equirectangular":
+        if self.projection == "equirectangular":
             self._fake_rad2deg = np.rad2deg
         else:
             self._fake_rad2deg = lambda x: x
         if not self._built or _multi:
-            if self._projection == "equirectangular":
+            if self.projection == "equirectangular":
                 if self.fig is None and fig is None:
                     fig, ax = plt.subplots(1, figsize=self.figsize, dpi=self.dpi)
                 elif fig is not None:
@@ -495,7 +494,7 @@ class MWSkyMap(MWSkyMapBase):
             else:  # those cases if there is non-trivial projection
                 if self.fig is None and fig is None:
                     fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
-                    ax = fig.add_subplot(111, projection=self._projection)
+                    ax = fig.add_subplot(111, projection=self.projection)
                 elif fig is not None:
                     pass
                 else:
@@ -774,7 +773,7 @@ class MWSkyMap(MWSkyMapBase):
             rasterized=True,
             **kwargs,
         )
-        if self._projection == "equirectangular":
+        if self.projection == "equirectangular":
             self.ax.imshow(
                 self.bg_img, zorder=0, extent=self._ext, alpha=0.0, rasterized=True
             )
@@ -789,7 +788,7 @@ class MWSkyMap(MWSkyMapBase):
                 transform=self.ax.transAxes,
             )
         if self.cbar_flag is True:
-            if self._projection == "equirectangular":
+            if self.projection == "equirectangular":
                 divider = make_axes_locatable(self.ax)
                 cax = divider.append_axes("right", size="5%", pad=0.05)
                 cbar = self.fig.colorbar(mappable, cax=cax)
@@ -811,7 +810,7 @@ class MWSkyMap(MWSkyMapBase):
             kwargs["s"] = self.s
         self.ax.scatter(ra, dec, c=c, zorder=3, rasterized=True, *args, **kwargs)
         # just want to set the location right, we dont need image again
-        if self._projection == "equirectangular":
+        if self.projection == "equirectangular":
             self.ax.imshow(
                 self.bg_img, zorder=0, extent=self._ext, alpha=0.0, rasterized=True
             )

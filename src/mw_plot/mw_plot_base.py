@@ -110,9 +110,9 @@ class MWPlotCommon(ABC):
         """
         # force the unit to be the same as the default unit
         x <<= unit
-        return x.to(unit)
+        return x
 
-    def xy_unit_check(self, x, y, checkrot=True):
+    def xy_unit_check(self, x, y, checkrot=False):
         if not isinstance(x, u.quantity.Quantity) or not isinstance(
             y, u.quantity.Quantity
         ):
@@ -335,18 +335,18 @@ class MWSkyMapBase(MWPlotCommon):
 
     def __init__(
         self,
-        grayscale,
-        projection,
-        wavelength,
-        center,
-        radius,
-        figsize,
-        dpi,
+        grayscale: bool = False,
+        projection : str = "equirectangular",
+        wavelength : str = "optical",
+        center : tuple = (0.0, 0.0),
+        radius : tuple = (180.0, 90.0),
+        figsize : tuple = (5, 5),
+        dpi : int = 150,
     ):
         super().__init__()
-        self._projection = projection
+        self.projection = projection
 
-        if self._projection in (
+        if self.projection in (
             allowed_proj := [
                 "equirectangular",
                 "aitoff",
@@ -356,13 +356,13 @@ class MWSkyMapBase(MWPlotCommon):
         ):
             pass
         # projection that is not suitable for sky map but available from matplotlib
-        elif self._projection in ["lambert", "polar", "rectilinear"]:
+        elif self.projection in ["lambert", "polar", "rectilinear"]:
             raise NotImplementedError(
-                f"`{self._projection}` projection is not implemented for sky map"
+                f"`{self.projection}` projection is not implemented for sky map"
             )
         else:
             raise ValueError(
-                f"Unknown projection `{self._projection}`, allowed values are: {allowed_proj}"
+                f"Unknown projection `{self.projection}`, allowed values are: {allowed_proj}"
             )
 
         if wavelength in (
@@ -374,15 +374,15 @@ class MWSkyMapBase(MWPlotCommon):
                 f"Unknown wavelength, allowed values are: {allowed_wavelength}"
             )
 
-        self._center = center
-        self._radius = radius
-        self._grayscale = grayscale
+        self.center = center
+        self.radius = radius
+        self.grayscale = grayscale
         self.figsize = figsize
         self.dpi = dpi
         self._built = False
 
         self._opposite_color = "white"
-        if self._grayscale:
+        if self.grayscale:
             self._opposite_color = "black"
 
     def read_bg_img(self):
@@ -402,20 +402,20 @@ class MWSkyMapBase(MWPlotCommon):
 
         # find center pixel and radius pixel
         y_img_center = self.bg_img.shape[0] // 2 - int(
-            (self.bg_img.shape[0] / 180) * self._center[1].value
+            (self.bg_img.shape[0] / 180) * self.center[1].value
         )
-        y_radious_px = int((self.bg_img.shape[0] / 180) * self._radius[1].value)
+        y_radious_px = int((self.bg_img.shape[0] / 180) * self.radius[1].value)
         x_img_center = (
-            int((self.bg_img.shape[1] / 360) * self._center[0].value)
+            int((self.bg_img.shape[1] / 360) * self.center[0].value)
             + self.bg_img.shape[0]
         )
-        x_radious_px = int((self.bg_img.shape[1] / 360) * self._radius[0].value)
+        x_radious_px = int((self.bg_img.shape[1] / 360) * self.radius[0].value)
 
         self._ext = [
-            (self._center[0] - self._radius[0]).value,
-            (self._center[0] + self._radius[0]).value,
-            (self._center[1] - self._radius[1]).value,
-            (self._center[1] + self._radius[1]).value,
+            (self.center[0] - self.radius[0]).value,
+            (self.center[0] + self.radius[0]).value,
+            (self.center[1] - self.radius[1]).value,
+            (self.center[1] + self.radius[1]).value,
         ]
 
         self.bg_img = self.bg_img[
@@ -424,7 +424,7 @@ class MWSkyMapBase(MWPlotCommon):
             :,
         ]
 
-        if self._grayscale:
+        if self.grayscale:
             self.bg_img = rgb2gray(self.bg_img)
 
         self._gh_img_url = self._gh_imgbase_url + img_obj.filename
@@ -441,7 +441,7 @@ class MWSkyMapBase(MWPlotCommon):
                 ra = ra.to(self.unit)
                 dec = dec.to(self.unit)
                 c_icrs = coord.SkyCoord(ra=ra, dec=dec, frame="icrs")
-                if self._projection == "equirectangular":
+                if self.projection == "equirectangular":
                     ra = coord.Angle(-c_icrs.galactic.l).wrap_at(180 * u.degree).value
                     dec = coord.Angle(c_icrs.galactic.b).value
                 else:  # projection requires radian instead of degree
