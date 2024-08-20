@@ -29,7 +29,6 @@ For example, to get the citation text for the background image of a face-on Milk
 
 or for the background infrared image of an all-sky Milky Way plot:
 
-
 .. code-block:: python
 
     from mw_plot import MWSkyMap

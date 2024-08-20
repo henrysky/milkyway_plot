@@ -221,7 +221,7 @@ class MWFaceOn(MWPlotBase):
         :type c: Union[str, list, ndarry]
         :History: 2018-Mar-17 - Written - Henry Leung (University of Toronto)
         """
-        x, y = self.MWSkyMapBase(x, y)
+        x, y = self.xy_unit_check(x, y)
         self.initialize_mwplot()
 
         # decide whether we need colorbar or not
@@ -230,7 +230,7 @@ class MWFaceOn(MWPlotBase):
                 color = c[0]
                 cbar_label = c[1]
                 self.cbar_flag = True
-                if isinstance(color, u.quantity.Quantit):
+                if isinstance(color, u.quantity.Quantity):
                     color = color.value
             else:
                 color = c
@@ -843,7 +843,7 @@ class MWSkyMap(MWSkyMapBase):
         """
         if isinstance(position, apycoords.SkyCoord):
             position = self.skycoord_radec(position)
-        position_wo_unit = self.xy_unit_check(position[0], position[1], checkrot=False)
+        position_wo_unit = self.xy_unit_check(position[0], position[1])
         position_text = np.add(position_wo_unit, 10)
         if isinstance(text, list):
             for t, p, pou, pt in zip(text, position, position_wo_unit, position_text):
