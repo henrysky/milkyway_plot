@@ -7,7 +7,7 @@ Orbit of Sun
 .. code-block:: python
     :linenos:
 
-    from mw_plot import MWPlot
+    from mw_plot import MWFaceOn
 
     from galpy.potential import MWPotential2014
     from galpy.orbit import Orbit
@@ -23,7 +23,7 @@ Orbit of Sun
     z = op.z(ts)
 
     # setup a mw-plot instance of bird's eye view of the disc
-    mw1 = MWFaceOnradius=20 * u.kpc, unit=u.kpc, coord='galactocentric', annotation=True, figsize=(15, 12), r0=8)
+    mw1 = MWFaceOn(radius=20 * u.kpc, unit=u.kpc, coord='galactocentric', annotation=True, figsize=(15, 12), r0=8)
 
     # set up plot title
     mw1.title = 'Orbit of Sun in 5Gyr'
@@ -34,7 +34,7 @@ Orbit of Sun
 .. plot::
 
     import matplotlib.pyplot as plt
-    from mw_plot import MWPlot
+    from mw_plot import MWFaceOn
 
     from galpy.potential import MWPotential2014
     from galpy.orbit import Orbit
@@ -50,7 +50,7 @@ Orbit of Sun
     z = op.z(ts)
 
     # setup a mw-plot instance of bird's eye view of the disc
-    mw1 = MWFaceOnradius=20 * u.kpc, unit=u.kpc, coord='galactocentric', annotation=True, figsize=(15, 12), r0=8)
+    mw1 = MWFaceOn(radius=20 * u.kpc, unit=u.kpc, coord='galactocentric', annotation=True, figsize=(15, 12), r0=8)
 
     # set up plot title
     mw1.title = 'Orbit of Sun in 5Gyr'
@@ -66,7 +66,7 @@ Orbit of Sun 2
     :linenos:
 
     import matplotlib.pyplot as plt
-    from mw_plot import MWPlot
+    from mw_plot import MWFaceOn
     from astropy import units as  u
     from galpy.potential import MWPotential2014
     from galpy.orbit import Orbit
@@ -81,8 +81,8 @@ Orbit of Sun 2
     z = op.z(ts)
 
     # setup a mw-plot instance of bird's eye view of the disc
-    mw1 = MWFaceOnradius=20 * u.kpc, center=(0, 0)*u.kpc, unit=u.kpc, coord='galactocentric', annotation=False, grayscale=True)
-    mw2 = MWFaceOnradius=10 * u.kpc, mode="edge-on", center=(0, 0)*u.kpc, unit=u.kpc, coord='galactocentric', annotation=False, grayscale=True)
+    mw1 = MWFaceOn(radius=20 * u.kpc, center=(0, 0)*u.kpc, unit=u.kpc, coord='galactocentric', annotation=False, grayscale=True)
+    mw2 = MWFaceOn(radius=10 * u.kpc, mode="edge-on", center=(0, 0)*u.kpc, unit=u.kpc, coord='galactocentric', annotation=False, grayscale=True)
 
     # setup subplots with matplotlib
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 7.5))
@@ -101,7 +101,7 @@ Orbit of Sun 2
 .. plot::
 
     import matplotlib.pyplot as plt
-    from mw_plot import MWPlot
+    from mw_plot import MWFaceOn
     from astropy import units as  u
     from galpy.potential import MWPotential2014
     from galpy.orbit import Orbit
@@ -116,8 +116,8 @@ Orbit of Sun 2
     z = op.z(ts)
 
     # setup a mw-plot instance of bird's eye view of the disc
-    mw1 = MWFaceOnradius=20 * u.kpc, center=(0, 0)*u.kpc, unit=u.kpc, coord='galactocentric', annotation=False, grayscale=True)
-    mw2 = MWFaceOnradius=10 * u.kpc, mode="edge-on", center=(0, 0)*u.kpc, unit=u.kpc, coord='galactocentric', annotation=False, grayscale=True)
+    mw1 = MWFaceOn(radius=20 * u.kpc, center=(0, 0)*u.kpc, unit=u.kpc, coord='galactocentric', annotation=False, grayscale=True)
+    mw2 = MWFaceOn(radius=10 * u.kpc, mode="edge-on", center=(0, 0)*u.kpc, unit=u.kpc, coord='galactocentric', annotation=False, grayscale=True)
 
     # setup subplots with matplotlib
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 7.5))

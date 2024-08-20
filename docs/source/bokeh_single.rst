@@ -19,7 +19,7 @@ Interactive MilkywWay Bird's Eye View
 ..     :source-position: above
 ..     :linenos:
 
-..     from mw_plot import MWPlotBokeh
+..     from mw_plot import MWFaceOnBokeh
 ..     from astropy import units as  u
 ..     from bokeh.io import output_file, show
 

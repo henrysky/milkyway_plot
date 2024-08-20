@@ -21,10 +21,10 @@ MilkyWay Bird's Eye
 
     import numpy as np
     from astropy import units as u
-    from mw_plot import MWPlot
+    from mw_plot import MWFaceOn
 
     # setup a mw-plot instance of bird's eye view of the disc
-    mw1 = MWFaceOn
+    mw1 = MWFaceOn(
         radius=20 * u.kpc,
         unit=u.kpc,
         coord="galactocentric",
@@ -42,10 +42,10 @@ MilkyWay Bird's Eye
     import matplotlib.pyplot as plt
     import numpy as np
     from astropy import units as u
-    from mw_plot import MWPlot
+    from mw_plot import MWFaceOn
 
     # setup a mw-plot instance of bird's eye view of the disc
-    mw1 = MWFaceOn
+    mw1 = MWFaceOn(
         radius=20 * u.kpc,
         unit=u.kpc,
         coord="galactocentric",
@@ -67,9 +67,9 @@ Annotation
 
     import numpy as np
     from astropy import units as u
-    from mw_plot import MWPlot
+    from mw_plot import MWFaceOn
 
-    mw1 = MWFaceOnradius=20 * u.kpc, unit=u.kpc, coord="galactocentric", annotation=True, figsize=(10, 8),)
+    mw1 = MWFaceOn(radius=20 * u.kpc, unit=u.kpc, coord="galactocentric", annotation=True, figsize=(10, 8),)
 
     # set up plot title
     mw1.title = "Annotation"
@@ -81,9 +81,9 @@ Annotation
     import matplotlib.pyplot as plt
     import numpy as np
     from astropy import units as u
-    from mw_plot import MWPlot
+    from mw_plot import MWFaceOn
 
-    mw1 = MWFaceOnradius=20 * u.kpc, unit=u.kpc, coord="galactocentric", annotation=True, figsize=(10, 8),)
+    mw1 = MWFaceOn(radius=20 * u.kpc, unit=u.kpc, coord="galactocentric", annotation=True, figsize=(10, 8),)
 
     # set up plot title
     mw1.title = "Annotation"
@@ -191,7 +191,7 @@ You can also plot with grid
 
     # setup a MWSkyMap instance with projection, other projection can be 'hammer', 'mollweide' etc
     # grid: whether to show the Galactic grid
-    mw1 = MWSkyMap(projection="aitoff", grid=True)
+    mw1 = MWSkyMap(projection="aitoff", grid="galactic")
 
     # set up plot title
     mw1.title = "LMC and SMC in red dots with Galactic Grid"
@@ -211,7 +211,7 @@ You can also plot with grid
 
     # setup a MWSkyMap instance with projection, other projection can be 'hammer', 'mollweide' etc
     # grid: whether to show the Galactic grid
-    mw1 = MWSkyMap(projection="aitoff", grid=True)
+    mw1 = MWSkyMap(projection="aitoff", grid="galactic")
 
     # set up plot title
     mw1.title = "LMC and SMC in red dots with Galactic Grid"
@@ -232,7 +232,7 @@ You can also plot with grid
 
     # setup a MWSkyMap instance with projection, other projection can be 'hammer', 'mollweide' etc
     # radecgrid: whether to show the RA/DEC grid
-    mw1 = MWSkyMap(projection="aitoff", radecgrid=True)
+    mw1 = MWSkyMap(projection="aitoff", grid="equatorial")
 
     # set up plot title
     mw1.title = "LMC and SMC in red dots with RA/DEC Grid"
@@ -252,7 +252,7 @@ You can also plot with grid
 
     # setup a MWSkyMap instance with projection, other projection can be 'hammer', 'mollweide' etc
     # radecgrid: whether to show the RA/DEC grid
-    mw1 = MWSkyMap(projection="aitoff", radecgrid=True)
+    mw1 = MWSkyMap(projection="aitoff", grid="equatorial")
 
     # set up plot title
     mw1.title = "LMC and SMC in red dots with RA/DEC Grid"
@@ -274,7 +274,7 @@ You can also plot with grid
 
     # setup a MWSkyMap instance with projection, other projection can be 'hammer', 'mollweide' etc
     # radecgrid: whether to show the RA/DEC grid
-    mw1 = MWSkyMap(projection="aitoff", eclgrid=True)
+    mw1 = MWSkyMap(projection="aitoff", grid="ecliptic")
 
     # set up plot title
     mw1.title = "LMC and SMC in red dots with Ecliptic Grid"
@@ -294,7 +294,7 @@ You can also plot with grid
 
     # setup a MWSkyMap instance with projection, other projection can be 'hammer', 'mollweide' etc
     # radecgrid: whether to show the RA/DEC grid
-    mw1 = MWSkyMap(projection="aitoff", eclgrid=True)
+    mw1 = MWSkyMap(projection="aitoff", grid="ecliptic")
 
     # set up plot title
     mw1.title = "LMC and SMC in red dots with Ecliptic Grid"

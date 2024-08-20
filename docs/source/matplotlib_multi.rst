@@ -11,11 +11,11 @@ Tranform a single subplot
     :linenos:
 
     import matplotlib.pyplot as plt
-    from mw_plot import MWPlot
+    from mw_plot import MWFaceOn
     from astropy import units as  u
 
     # setup a mw-plot instance of bird's eyes view of the disc
-    mw1 = MWFaceOnradius=20 * u.kpc, center=(0, 0)*u.kpc, unit=u.kpc, coord='galactocentric', rot90=2, grayscale=False, annotation=False)
+    mw1 = MWFaceOn(radius=20 * u.kpc, center=(0, 0)*u.kpc, unit=u.kpc, coord='galactocentric', rot90=2, grayscale=False, annotation=False)
 
     # setup subplots with matplotlib
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 7.5))
@@ -33,11 +33,11 @@ Tranform a single subplot
 .. plot::
 
     import matplotlib.pyplot as plt
-    from mw_plot import MWPlot
+    from mw_plot import MWFaceOn
     from astropy import units as  u
 
     # setup a mw-plot instance of bird's eyes view of the disc
-    mw1 = MWFaceOnradius=20 * u.kpc, center=(0, 0)*u.kpc, unit=u.kpc, coord='galactocentric', rot90=2, grayscale=False, annotation=False)
+    mw1 = MWFaceOn(radius=20 * u.kpc, center=(0, 0)*u.kpc, unit=u.kpc, coord='galactocentric', rot90=2, grayscale=False, annotation=False)
 
     # setup subplots with matplotlib
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 7.5))
@@ -60,11 +60,11 @@ Tranform multiple subplots
     :linenos:
 
     import matplotlib.pyplot as plt
-    from mw_plot import MWPlot
+    from mw_plot import MWFaceOn
     from astropy import units as  u
 
     # setup a mw-plot instance of bird's eyes view of the disc
-    mw1 = MWFaceOnradius=20 * u.kpc, center=(0, 0)*u.kpc, unit=u.kpc, coord='galactocentric', rot90=2, grayscale=False, annotation=False)
+    mw1 = MWFaceOn(radius=20 * u.kpc, center=(0, 0)*u.kpc, unit=u.kpc, coord='galactocentric', rot90=2, grayscale=False, annotation=False)
 
     # setup subplots with matplotlib
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 7.5))
@@ -83,11 +83,11 @@ Tranform multiple subplots
 .. plot::
 
     import matplotlib.pyplot as plt
-    from mw_plot import MWPlot
+    from mw_plot import MWFaceOn
     from astropy import units as  u
 
     # setup a mw-plot instance of bird's eyes view of the disc
-    mw1 = MWFaceOnradius=20 * u.kpc, center=(0, 0)*u.kpc, unit=u.kpc, coord='galactocentric', rot90=2, grayscale=False, annotation=False)
+    mw1 = MWFaceOn(radius=20 * u.kpc, center=(0, 0)*u.kpc, unit=u.kpc, coord='galactocentric', rot90=2, grayscale=False, annotation=False)
 
     # setup subplots with matplotlib
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 7.5))
@@ -113,12 +113,12 @@ Not only you can transform with one style, you can do multiple style too
     :linenos:
 
     import matplotlib.pyplot as plt
-    from mw_plot import MWPlot, MWSkyMap
+    from mw_plot import MWFaceOn, MWSkyMap
     from astropy import units as  u
 
     # setup a mw-plot instance of bird's eyes view of the disc
-    mw1 = MWFaceOnradius=20 * u.kpc, center=(0, 0)*u.kpc, unit=u.kpc, coord='galactocentric', rot90=2, grayscale=False, annotation=False)
-    mw2 = MWFaceOnradius=20 * u.kpc, center=(0, 0)*u.kpc, unit=u.kpc, coord='galactocentric', rot90=2, grayscale=True, annotation=False)
+    mw1 = MWFaceOn(radius=20 * u.kpc, center=(0, 0)*u.kpc, unit=u.kpc, coord='galactocentric', rot90=2, grayscale=False, annotation=False)
+    mw2 = MWFaceOn(radius=20 * u.kpc, center=(0, 0)*u.kpc, unit=u.kpc, coord='galactocentric', rot90=2, grayscale=True, annotation=False)
     mw3 = MWSkyMap()
 
     # setup subplots with matplotlib
@@ -137,12 +137,12 @@ Not only you can transform with one style, you can do multiple style too
 .. plot::
 
     import matplotlib.pyplot as plt
-    from mw_plot import MWPlot, MWSkyMap
+    from mw_plot import MWFaceOn, MWSkyMap
     from astropy import units as  u
 
     # setup a mw-plot instance of bird's eyes view of the disc
-    mw1 = MWFaceOnradius=20 * u.kpc, center=(0, 0)*u.kpc, unit=u.kpc, coord='galactocentric', rot90=2, grayscale=False, annotation=False)
-    mw2 = MWFaceOnradius=20 * u.kpc, center=(0, 0)*u.kpc, unit=u.kpc, coord='galactocentric', rot90=2, grayscale=True, annotation=False)
+    mw1 = MWFaceOn(radius=20 * u.kpc, center=(0, 0)*u.kpc, unit=u.kpc, coord='galactocentric', rot90=2, grayscale=False, annotation=False)
+    mw2 = MWFaceOn(radius=20 * u.kpc, center=(0, 0)*u.kpc, unit=u.kpc, coord='galactocentric', rot90=2, grayscale=True, annotation=False)
     mw3 = MWSkyMap()
 
     # setup subplots with matplotlib
@@ -170,7 +170,7 @@ You can quickly transform all subplots in a figure
     from mw_plot import MWSkyMap
 
     # setup a mw-plot instance of bird's eyes view of the disc
-    mw1 = MWFaceOnradius=20 * u.kpc, center=(0, 0)*u.kpc, unit=u.kpc, coord='galactocentric', grayscale=False, annotation=False)
+    mw1 = MWFaceOn(radius=20 * u.kpc, center=(0, 0)*u.kpc, unit=u.kpc, coord='galactocentric', grayscale=False, annotation=False)
 
     # setup subplots with matplotlib
     fig, (ax_top, ax_bottom) = plt.subplots(2, 4, figsize=(20, 10))
@@ -182,11 +182,11 @@ You can quickly transform all subplots in a figure
 .. plot::
 
     import matplotlib.pyplot as plt
-    from mw_plot import MWPlot
+    from mw_plot import MWFaceOn
     from astropy import units as  u
 
     # setup a mw-plot instance of bird's eyes view of the disc
-    mw1 = MWFaceOnradius=20 * u.kpc, center=(0, 0)*u.kpc, unit=u.kpc, coord='galactocentric', grayscale=False, annotation=False)
+    mw1 = MWFaceOn(radius=20 * u.kpc, center=(0, 0)*u.kpc, unit=u.kpc, coord='galactocentric', grayscale=False, annotation=False)
 
     # setup subplots with matplotlib
     fig, (ax_top, ax_bottom) = plt.subplots(2, 4, figsize=(20, 10))
