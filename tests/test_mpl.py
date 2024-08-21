@@ -9,10 +9,10 @@ from mw_plot import MWFaceOn, MWSkyMap
 
 def test_hips():
     ls_result = MWSkyMap.search_sky_background("gaia")
-    assert "gaia" in ls_result
+    assert any("Gaia" in i for i in ls_result)
 
     ls_result = MWSkyMap.search_sky_background("gaia dr3")
-    assert "gaia dr3" in ls_result
+    assert any("Gaia DR3" in i for i in ls_result)
 
 
 @pytest.mark.parametrize(

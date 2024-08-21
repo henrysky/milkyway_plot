@@ -20,6 +20,9 @@ from mw_plot.utils import rgb2gray
 _HiPS_metadata_response = None
 _HiPS_image_cache = {}
 
+# increase respond timeout to 120s
+hips2fits.timeout = 120
+
 
 @dataclass
 class MWImage:
@@ -192,10 +195,11 @@ class MWPlotCommon(ABC):
                     elif line.startswith("obs_title"):
                         key, value = line.split("=", 1)
                         _obs_title = value.strip()
-                    elif line.startswith("obs_copyright"):
+                    # some HiPS do have obs_copyright_url so will mess up the parsing
+                    elif line.startswith("obs_copyright") and not line.startswith("obs_copyright_url"):
                         key, value = line.split("=", 1)
                         _obs_copyright = value.strip()
-                    elif line.startswith("obs_description"):
+                    elif line.startswith("obs_description") and not line.startswith("obs_description_url"):
                         key, value = line.split("=", 1)
                         _obs_description = value.strip()
                     elif line.startswith("client_category"):
@@ -279,7 +283,7 @@ class MWPlotCommon(ABC):
         # check if the image is already in the cache
         if hips_id not in _HiPS_image_cache:
             # Create a new WCS astropy object
-            horizontal_pix = 4000
+            horizontal_pix = 3500
             w = astropy_wcs.WCS(
                 header={
                     "NAXIS1": horizontal_pix,  # Width of the output fits/image
@@ -628,6 +632,7 @@ class MWSkyMapBase(MWPlotCommon):
             img_key = "MW_farinfrared"
         else:
             self.bg_img, self.reference_str = self.get_hips_images(self.wavlength)
+            img_obj = None
         if img_key:
             img_obj = self._MW_IMAGES[img_key]
             self.bg_img = plt.imread(img_obj.img_path)
@@ -659,8 +664,9 @@ class MWSkyMapBase(MWPlotCommon):
 
         if self.grayscale:
             self.bg_img = rgb2gray(self.bg_img)
-
-        # self._gh_img_url = self._gh_imgbase_url + img_obj.filename
+        
+        if img_obj:
+            self._gh_img_url = self._gh_imgbase_url + img_obj.filename
 
         return None
 
