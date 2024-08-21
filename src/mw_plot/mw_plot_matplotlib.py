@@ -1,4 +1,3 @@
-import os
 import warnings
 from typing import Tuple, Union
 
@@ -6,7 +5,6 @@ import astropy.coordinates as apycoords
 import astropy.units as u
 import matplotlib.pyplot as plt
 import numpy as np
-from astropy.coordinates.calculation import HumanError
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -166,7 +164,7 @@ class MWFaceOn(MWPlotBase):
             elif fig is not None:
                 pass
             else:
-                raise HumanError("Something is wrong duh")
+                raise NotImplementedError("I think no one will ever reach here")
             if self.title is not None:
                 ax.set_title(self.title, fontsize=self.fontsize)
             ax.set_xlabel(
@@ -400,7 +398,7 @@ class MWSkyMap(MWSkyMapBase):
                 self.radius == (180, 90) * u.deg
             ):
                 warnings.warn(
-                    "Projections other than equirectangular does not support custom center and radius, " 
+                    "Projections other than equirectangular does not support custom center and radius, "
                     "using default center=(0, 0) degree and radius=(180, 90) degree"
                 )
                 self.center = (0, 0) * u.deg
@@ -477,7 +475,7 @@ class MWSkyMap(MWSkyMapBase):
                 elif fig is not None:
                     pass
                 else:
-                    raise HumanError("Something is wrong duh")
+                    raise NotImplementedError("I think no one will ever reach here")
                 ax.set_xlabel("Galactic Longitude (Degree)", fontsize=self.fontsize)
                 ax.set_ylabel("Galactic Latitude (Degree)", fontsize=self.fontsize)
                 self._ext = [
@@ -500,7 +498,7 @@ class MWSkyMap(MWSkyMapBase):
                 elif fig is not None:
                     pass
                 else:
-                    raise HumanError("Something is wrong duh")
+                    raise NotImplementedError("I think no one will ever reach here")
 
                 # coordinates
                 lon = np.linspace(-np.pi, np.pi, self.bg_img.shape[1] + 1)
@@ -781,6 +779,7 @@ class MWSkyMap(MWSkyMapBase):
             self.ax.imshow(
                 self.bg_img, zorder=0, extent=self._ext, alpha=0.0, rasterized=True
             )
+            self.ax.set_aspect("equal")
         else:
             self.ax.imshow(
                 self.bg_img,

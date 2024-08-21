@@ -18,7 +18,6 @@ from mw_plot.utils import rgb2gray
 
 # global variable to store the HiPS metadata response
 _HiPS_metadata_response = None
-_HiPS_image_cache = {}
 
 # increase respond timeout to 120s
 hips2fits.timeout = 120
@@ -196,10 +195,14 @@ class MWPlotCommon(ABC):
                         key, value = line.split("=", 1)
                         _obs_title = value.strip()
                     # some HiPS do have obs_copyright_url so will mess up the parsing
-                    elif line.startswith("obs_copyright") and not line.startswith("obs_copyright_url"):
+                    elif line.startswith("obs_copyright") and not line.startswith(
+                        "obs_copyright_url"
+                    ):
                         key, value = line.split("=", 1)
                         _obs_copyright = value.strip()
-                    elif line.startswith("obs_description") and not line.startswith("obs_description_url"):
+                    elif line.startswith("obs_description") and not line.startswith(
+                        "obs_description_url"
+                    ):
                         key, value = line.split("=", 1)
                         _obs_description = value.strip()
                     elif line.startswith("client_category"):
@@ -268,7 +271,6 @@ class MWPlotCommon(ABC):
             ]
 
     def get_hips_images(self, hips_id: str):
-        global _HiPS_image_cache
         allowed_id, obs_title, obs_copyright, obs_description, obs_regime = (
             self.parse_hips_background()
         )
@@ -280,40 +282,42 @@ class MWPlotCommon(ABC):
                 f"Unknown HiPS ID `{hips_id}`, allowed values are: {allowed_id}"
             )
         obs_copyright = obs_copyright[allowed_id.index(hips_id)]
-        # check if the image is already in the cache
-        if hips_id not in _HiPS_image_cache:
-            # Create a new WCS astropy object
-            horizontal_pix = 3500
-            w = astropy_wcs.WCS(
-                header={
-                    "NAXIS1": horizontal_pix,  # Width of the output fits/image
-                    "NAXIS2": horizontal_pix // 2,  # Height of the output fits/image
-                    "WCSAXES": 2,  # Number of coordinate axes
-                    "CRPIX1": horizontal_pix / 2,  # Pixel coordinate of reference point
-                    "CRPIX2": horizontal_pix / 4,  # Pixel coordinate of reference point
-                    "CDELT1": 360
-                    / horizontal_pix,  # [deg] Coordinate increment at reference point
-                    "CDELT2": 180
-                    / (
-                        horizontal_pix // 2
-                    ),  # [deg] Coordinate increment at reference point
-                    "CUNIT1": "deg",  # Units of coordinate increment and value
-                    "CUNIT2": "deg",  # Units of coordinate increment and value
-                    # https://docs.astropy.org/en/stable/wcs/supported_projections.html
-                    "CTYPE1": "GLON-CAR",  # galactic longitude
-                    "CTYPE2": "GLAT-CAR",  # galactic latitude
-                    "CRVAL1": 0,  # [deg] Coordinate value at reference point
-                    "CRVAL2": 0,  # [deg] Coordinate value at reference point
-                }
-            )
-            result_image = hips2fits.query_with_wcs(
-                hips=hips_id,
-                wcs=w,
-                get_query_payload=False,
-                format="jpg",
-            )
-            _HiPS_image_cache[hips_id] = np.flip(result_image, axis=1)
-        return _HiPS_image_cache[hips_id], obs_copyright
+        # Create a new WCS astropy object
+        horizontal_pix = 4000
+        vertical_pix = horizontal_pix // (self.radius[0].value / self.radius[1].value)
+        w = astropy_wcs.WCS(
+            header={
+                "NAXIS1": horizontal_pix,  # Width of the output fits/image
+                "NAXIS2": vertical_pix,  # Height of the output fits/image
+                "WCSAXES": 2,  # Number of coordinate axes
+                "CRPIX1": horizontal_pix / 2,  # Pixel coordinate of reference point
+                "CRPIX2": vertical_pix / 2,  # Pixel coordinate of reference point
+                "CDELT1": self.radius[0].value
+                / horizontal_pix,  # [deg] Coordinate increment at reference point
+                "CDELT2": self.radius[1].value
+                / (
+                    horizontal_pix // 2
+                ),  # [deg] Coordinate increment at reference point
+                "CUNIT1": "deg",  # Units of coordinate increment and value
+                "CUNIT2": "deg",  # Units of coordinate increment and value
+                # https://docs.astropy.org/en/stable/wcs/supported_projections.html
+                "CTYPE1": "GLON-CAR",  # galactic longitude
+                "CTYPE2": "GLAT-CAR",  # galactic latitude
+                "CRVAL1": -self.center[
+                    0
+                ].value,  # [deg] Coordinate value at reference point
+                "CRVAL2": self.center[
+                    1
+                ].value,  # [deg] Coordinate value at reference point
+            }
+        )
+        result_image = hips2fits.query_with_wcs(
+            hips=hips_id,
+            wcs=w,
+            get_query_payload=False,
+            format="jpg",
+        )
+        return np.flip(result_image, axis=1), obs_copyright
 
     def unit_check(self, x, unit):
         """
@@ -622,6 +626,7 @@ class MWSkyMapBase(MWPlotCommon):
 
     def read_bg_img(self):
         img_key = None
+        need_copping = True
         if self.wavlength == "optical":
             img_key = "MW_edgeon_edr3_unannotate"
         elif self.wavlength == "gamma":
@@ -633,6 +638,7 @@ class MWSkyMapBase(MWPlotCommon):
         else:
             self.bg_img, self.reference_str = self.get_hips_images(self.wavlength)
             img_obj = None
+            need_copping = False
         if img_key:
             img_obj = self._MW_IMAGES[img_key]
             self.bg_img = plt.imread(img_obj.img_path)
@@ -656,15 +662,16 @@ class MWSkyMapBase(MWPlotCommon):
             (self.center[1] + self.radius[1]).value,
         ]
 
-        self.bg_img = self.bg_img[
-            (y_img_center - y_radious_px) : (y_img_center + y_radious_px),
-            (x_img_center - x_radious_px) : (x_img_center + x_radious_px),
-            :,
-        ]
+        if need_copping:
+            self.bg_img = self.bg_img[
+                (y_img_center - y_radious_px) : (y_img_center + y_radious_px),
+                (x_img_center - x_radious_px) : (x_img_center + x_radious_px),
+                :,
+            ]
 
         if self.grayscale:
             self.bg_img = rgb2gray(self.bg_img)
-        
+
         if img_obj:
             self._gh_img_url = self._gh_imgbase_url + img_obj.filename
 
