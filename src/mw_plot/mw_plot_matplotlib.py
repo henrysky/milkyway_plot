@@ -36,8 +36,6 @@ class MWFaceOn(MWPlotBase):
         Unit of the plot. The default is u.kpc.
     figsize : tuple, optional
         Matplotlib figure size. The default is (5, 5).
-    dpi : int, optional
-        Matplotlib figure dpi. The default is 150.
     """
 
     def __init__(
@@ -51,7 +49,6 @@ class MWFaceOn(MWPlotBase):
         radius: u.Quantity = 20.0 * u.kpc,
         unit: u.Unit = u.kpc,
         figsize: tuple = (5, 5),
-        dpi: int = 150,
     ):
         super().__init__(
             grayscale=grayscale,
@@ -63,9 +60,7 @@ class MWFaceOn(MWPlotBase):
             radius=radius,
             unit=unit,
             figsize=figsize,
-            dpi=dpi,
         )
-        self.fontsize = 20
         self.s = 20
         self.cmap = "viridis"
         self.imalpha = 1.0
@@ -123,7 +118,7 @@ class MWFaceOn(MWPlotBase):
             self.bg_img, zorder=0, extent=self._ext, alpha=0.0, rasterized=True
         )
         if kwargs.get("label") is not None:
-            self.ax.legend(loc="best", fontsize=self.fontsize)
+            self.ax.legend(loc="best")
 
     def scatter(self, x, y, c="r", *args, **kwargs):
         x, y = self.xy_unit_check(x, y)
@@ -136,7 +131,7 @@ class MWFaceOn(MWPlotBase):
             self.bg_img, zorder=0, extent=self._ext, alpha=0.0, rasterized=True
         )
         if kwargs.get("label") is not None:
-            self.ax.legend(loc="best", fontsize=self.fontsize, markerscale=kwargs["s"])
+            self.ax.legend(loc="best", markerscale=kwargs["s"])
 
     def show(self, *args, **kwargs):
         if self.fig is None:
@@ -146,11 +141,11 @@ class MWFaceOn(MWPlotBase):
                 self.fig.tight_layout()
             self.fig.show(*args, **kwargs)
 
-    def savefig(self, file="MWPlot.png", dpi="figure", **kwargs):
+    def savefig(self, file="MWPlot.png", **kwargs):
         if self.tight_layout is True:
             self.fig.tight_layout()
         # this is a pylab method
-        self.fig.savefig(file, dpi=dpi, **kwargs)
+        self.fig.savefig(file, **kwargs)
 
     def initialize_mwplot(self, fig=None, ax=None, _multi=False):
         """
@@ -160,18 +155,18 @@ class MWFaceOn(MWPlotBase):
         """
         if not self._built or _multi:
             if self.fig is None and fig is None:
-                fig, ax = plt.subplots(1, figsize=self.figsize, dpi=self.dpi)
+                fig, ax = plt.subplots(1, figsize=self.figsize)
             elif fig is not None:
                 pass
             else:
                 raise NotImplementedError("I think no one will ever reach here")
             if self.title is not None:
-                ax.set_title(self.title, fontsize=self.fontsize)
+                ax.set_title(self.title)
             ax.set_xlabel(
-                f"{self.coord_english} ({self.unit_english})", fontsize=self.fontsize
+                f"{self.coord_english} ({self.unit_english})"
             )
             ax.set_ylabel(
-                f"{self.coord_english} ({self.unit_english})", fontsize=self.fontsize
+                f"{self.coord_english} ({self.unit_english})"
             )
             ax.set_aspect(self._aspect)
             ax.set_facecolor(
@@ -198,11 +193,6 @@ class MWFaceOn(MWPlotBase):
                 )
                 ax.set_xlim(self._ext[0], self._ext[1])
                 ax.set_ylim(self._ext[2], self._ext[3])
-            ax.tick_params(
-                labelsize=self.fontsize * 0.8,
-                width=self.fontsize / 10,
-                length=self.fontsize / 2,
-            )
             self.fig, self.ax = fig, ax
 
             self._built = True
@@ -255,12 +245,7 @@ class MWFaceOn(MWPlotBase):
             divider = make_axes_locatable(self.ax)
             cax = divider.append_axes("right", size="5%", pad=0.05)
             cbar = self.fig.colorbar(mappable, cax=cax)
-            cbar.ax.tick_params(
-                labelsize=self.fontsize * 0.8,
-                width=self.fontsize / 10,
-                length=self.fontsize / 2,
-            )
-            cbar.set_label(f"{cbar_label}", size=self.fontsize)
+            cbar.set_label(f"{cbar_label}")
             if self.clim is not None:
                 cbar.set_clim(self.clim)
 
@@ -336,8 +321,6 @@ class MWSkyMap(MWSkyMapBase):
         Grid of the plot. The default is None.
     figsize : Tuple[float, float], optional
         Matplotlib figure size. The default is (5, 5).
-    dpi : int, optional
-        Matplotlib figure dpi. The default is 150.
     """
 
     def __init__(
@@ -349,7 +332,6 @@ class MWSkyMap(MWSkyMapBase):
         radius: tuple = (180.0, 90.0) * u.deg,
         grid: str = None,
         figsize: Tuple[float, float] = (5, 5),
-        dpi: int = 150,
     ):
         super().__init__(
             grayscale=grayscale,
@@ -358,10 +340,8 @@ class MWSkyMap(MWSkyMapBase):
             center=center,
             radius=radius,
             figsize=figsize,
-            dpi=dpi,
         )
         self.unit = u.degree
-        self.fontsize = 20
         self.s = 20.0
         self.cmap = "viridis"
         self.imalpha = 1.0
@@ -471,13 +451,13 @@ class MWSkyMap(MWSkyMapBase):
         if not self._built or _multi:
             if self.projection == "equirectangular":
                 if self.fig is None and fig is None:
-                    fig, ax = plt.subplots(1, figsize=self.figsize, dpi=self.dpi)
+                    fig, ax = plt.subplots(1, figsize=self.figsize)
                 elif fig is not None:
                     pass
                 else:
                     raise NotImplementedError("I think no one will ever reach here")
-                ax.set_xlabel("Galactic Longitude (Degree)", fontsize=self.fontsize)
-                ax.set_ylabel("Galactic Latitude (Degree)", fontsize=self.fontsize)
+                ax.set_xlabel("Galactic Longitude (Degree)")
+                ax.set_ylabel("Galactic Latitude (Degree)")
                 self._ext = [
                     (self.center[0] - self.radius[0]).value,
                     (self.center[0] + self.radius[0]).value,
@@ -493,7 +473,7 @@ class MWSkyMap(MWSkyMapBase):
                 )
             else:  # those cases if there is non-trivial projection
                 if self.fig is None and fig is None:
-                    fig = plt.figure(figsize=self.figsize, dpi=self.dpi)
+                    fig = plt.figure(figsize=self.figsize)
                     ax = fig.add_subplot(111, projection=self.projection)
                 elif fig is not None:
                     pass
@@ -527,13 +507,8 @@ class MWSkyMap(MWSkyMapBase):
             ax.set_facecolor(
                 self.facecolor
             )  # have a black color background for image with <1.0 alpha
-            ax.tick_params(
-                labelsize=self.fontsize * 0.8,
-                width=self.fontsize / 10,
-                length=self.fontsize / 2,
-            )
             if self.title is not None:
-                ax.set_title(self.title, fontsize=self.fontsize, y=1.05)
+                ax.set_title(self.title, y=1.05)
             self.fig, self.ax = fig, ax
 
             grad_alpha = 0.5
@@ -730,11 +705,11 @@ class MWSkyMap(MWSkyMapBase):
                 self.fig.tight_layout()
             self.fig.show(*args, **kwargs)
 
-    def savefig(self, file="MWSkyMap.png", dpi="figure", **kwargs):
+    def savefig(self, file="MWSkyMap.png", **kwargs):
         if self.tight_layout is True:
             self.fig.tight_layout()
         # this is a pylab method
-        self.fig.savefig(file, dpi=dpi, **kwargs)
+        self.fig.savefig(file, **kwargs)
 
     def mw_scatter(self, ra, dec, c="r", **kwargs):
         """
@@ -797,12 +772,6 @@ class MWSkyMap(MWSkyMapBase):
                 cbar = self.fig.colorbar(mappable, cax=cax)
             else:
                 cbar = self.fig.colorbar(mappable, ax=self.ax)
-            cbar.ax.tick_params(
-                labelsize=self.fontsize * 0.8,
-                width=self.fontsize / 10,
-                length=self.fontsize / 2,
-            )
-            cbar.set_label(f"{cbar_label}", size=self.fontsize)
             if self.clim is not None:
                 cbar.set_clim(self.clim)
 
@@ -813,7 +782,7 @@ class MWSkyMap(MWSkyMapBase):
             kwargs["s"] = self.s
         self.ax.scatter(ra, dec, c=c, zorder=3, rasterized=True, *args, **kwargs)
         # just want to set the location right, we dont need image again
-        if self.projection == "equirectangular":
+        if self.projection == "equirectang ular":
             self.ax.imshow(
                 self.bg_img, zorder=0, extent=self._ext, alpha=0.0, rasterized=True
             )
@@ -828,7 +797,7 @@ class MWSkyMap(MWSkyMapBase):
                 transform=self.ax.transAxes,
             )
         if kwargs.get("label") is not None:
-            self.ax.legend(loc="best", fontsize=self.fontsize, markerscale=kwargs["s"])
+            self.ax.legend(loc="best", markerscale=kwargs["s"])
 
     def scatter_annotate(
         self,
