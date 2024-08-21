@@ -215,6 +215,7 @@ class MWPlotCommon(ABC):
                     _obs_title
                     and _sky_coverage > 0.8
                     and (
+                        # make sure the HiPS is not a solar system object like Mars Map
                         "Solar system" not in _client_category
                         if _client_category
                         else True
@@ -283,7 +284,7 @@ class MWPlotCommon(ABC):
             )
         obs_copyright = obs_copyright[allowed_id.index(hips_id)]
         # Create a new WCS astropy object
-        horizontal_pix = 4000
+        horizontal_pix = 2000
         vertical_pix = horizontal_pix // (self.radius[0].value / self.radius[1].value)
         w = astropy_wcs.WCS(
             header={

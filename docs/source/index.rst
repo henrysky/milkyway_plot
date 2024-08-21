@@ -75,7 +75,8 @@ System Requirement
 .. toctree::
    :caption: Matplotlib backend
    
-   matplotlib_single
+   matplotlib_faceon
+   matplotlib_skymap
    matplotlib_multi
    matplotlib_gallery
 
