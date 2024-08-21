@@ -1,16 +1,16 @@
 import os
 import warnings
-from astropy.coordinates.calculation import HumanError
-import numpy as np
+from typing import Tuple, Union
 
-import astropy.units as u
 import astropy.coordinates as apycoords
-
+import astropy.units as u
 import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
+import numpy as np
+from astropy.coordinates.calculation import HumanError
 from matplotlib.axes import Axes
-
+from matplotlib.figure import Figure
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+
 from mw_plot.mw_plot_base import MWPlotBase, MWSkyMapBase
 
 
@@ -327,15 +327,16 @@ class MWSkyMap(MWSkyMapBase):
         Whether to use grayscale background. The default is False.
     projection : str, optional
         Projection of the plot. The default is "equirectangular".
-    wavelength : str, optional
-        Wavelength of the plot. The default is "optical".
-    center : tuple, optional
-        Center of the plot. The default is (0.0, 0.0).
+    background : str, optional
+        Background image of the plot. The default is "optical".
+        You can use ``MWSkyMap.search_background(keyword=None)`` to search for available background images.
+    center : Union[Tuple[float, float], str], optional
+        Center of the plot. The default is (0.0, 0.0) * u.deg.
     radius : tuple, optional
         Radius of the plot. The default is (180.0, 90.0).
     grid : str, optional
         Grid of the plot. The default is None.
-    figsize : tuple, optional
+    figsize : Tuple[float, float], optional
         Matplotlib figure size. The default is (5, 5).
     dpi : int, optional
         Matplotlib figure dpi. The default is 150.
@@ -344,18 +345,18 @@ class MWSkyMap(MWSkyMapBase):
     def __init__(
         self,
         grayscale: bool = False,
-        projection : str = "equirectangular",
-        wavelength : str = "optical",
-        center : tuple = (0.0, 0.0) * u.deg,
-        radius : tuple = (180.0, 90.0) * u.deg,
-        grid : str = None,
-        figsize : tuple = (5, 5),
-        dpi : int = 150,
+        projection: str = "equirectangular",
+        background: str = "optical",
+        center: Union[Tuple[float, float], str] = (0.0, 0.0) * u.deg,
+        radius: tuple = (180.0, 90.0) * u.deg,
+        grid: str = None,
+        figsize: Tuple[float, float] = (5, 5),
+        dpi: int = 150,
     ):
         super().__init__(
             grayscale=grayscale,
             projection=projection,
-            wavelength=wavelength,
+            background=background,
             center=center,
             radius=radius,
             figsize=figsize,
@@ -398,8 +399,9 @@ class MWSkyMap(MWSkyMapBase):
             if not np.all(self.center == (0, 0) * u.deg) or not np.all(
                 self.radius == (180, 90) * u.deg
             ):
-                print(
-                    "Projections other than equirectangular does not support custom center and radius, using default!"
+                warnings.warn(
+                    "Projections other than equirectangular does not support custom center and radius, " 
+                    "using default center=(0, 0) degree and radius=(180, 90) degree"
                 )
                 self.center = (0, 0) * u.deg
                 self.radius = (180, 90) * u.deg
@@ -562,6 +564,8 @@ class MWSkyMap(MWSkyMapBase):
                         zorder=3,
                         alpha=grad_alpha,
                     )
+            elif self.projection == "equirectangular":
+                pass
             else:
                 # disable ticks if not galactic grid
                 self.ax.set_yticklabels([])

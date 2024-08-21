@@ -7,20 +7,30 @@ from astropy import units as u
 from mw_plot import MWFaceOn, MWSkyMap
 
 
+def test_hips():
+    ls_result = MWSkyMap.search_sky_background("gaia")
+    assert "gaia" in ls_result
+
+    ls_result = MWSkyMap.search_sky_background("gaia dr3")
+    assert "gaia dr3" in ls_result
+
+
 @pytest.mark.parametrize(
-    "projection,grayscale,grid,wavelength",
+    "projection,grayscale,grid,background",
     [
         ("equirectangular", False, "equatorial", "gamma"),
+        ("equirectangular", True, "equatorial", "CDS/P/DM/flux-color-Rp-G-Bp/I/355/gaiadr3"),
         ("aitoff", False, "galactic", "optical"),
         ("hammer", True, "ecliptic", "far-infrared"),
         ("mollweide", True, None, "infrared"),
+        ("mollweide", False, None, "Mellinger color optical survey")
     ],
 )
-def test_mw_skymap(simbad, projection, grayscale, grid, wavelength):
+def test_mw_skymap(simbad, projection, grayscale, grid, background):
     # setup a MWSkyMap instance with projection, other projection can be 'hammer', 'mollweide' etc
     # grayscale: whether to turn the background image to grayscale
     plot_instance = MWSkyMap(
-        projection=projection, grayscale=grayscale, grid=grid, wavelength=wavelength
+        projection=projection, grayscale=grayscale, grid=grid, background=background
     )
 
     # so that the colorbar will has a better contract
@@ -43,7 +53,7 @@ def test_mw_skymap(simbad, projection, grayscale, grid, wavelength):
 
 
 @pytest.mark.parametrize(
-    "projection,grid,wavelength",
+    "projection,grid,background",
     [
         ("equirectangular", "supergalactic", "optical"),
         ("lambert", "galactic", "optical"),
@@ -53,12 +63,12 @@ def test_mw_skymap(simbad, projection, grayscale, grid, wavelength):
         ("mollweide", None, "rainbow"),
     ],
 )
-def test_skymap_bad_config(projection, grid, wavelength):
+def test_skymap_bad_config(projection, grid, background):
     """
     Test bad configuration for MWSkyMap will raise an exception
     """
     with pytest.raises(Exception):
-        MWSkyMap(projection=projection, grid=grid, wavelength=wavelength)
+        MWSkyMap(projection=projection, grid=grid, background=background)
 
 
 def test_mw_plot():

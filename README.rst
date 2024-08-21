@@ -32,7 +32,7 @@ or for the background infrared image of an all-sky Milky Way plot:
 .. code-block:: python
 
     from mw_plot import MWSkyMap
-    mw = MWSkyMap(wavelength="infrared")
+    mw = MWSkyMap(background="infrared")
     print(mw.citation)
 
 .. |docs| image:: https://readthedocs.org/projects/milkyway-plot/badge/?version=latest

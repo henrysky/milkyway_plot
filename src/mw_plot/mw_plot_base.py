@@ -2,14 +2,23 @@ import importlib.util
 import pathlib
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from typing import Optional
 
 import astropy.coordinates as coord
 import astropy.units as u
 import matplotlib.pyplot as plt
 import numpy as np
 import PIL
+import requests
+from astropy import wcs as astropy_wcs
+from astroquery.hips2fits import hips2fits
+from astroquery.simbad import Simbad
 
 from mw_plot.utils import rgb2gray
+
+# global variable to store the HiPS metadata response
+_HiPS_metadata_response = None
+_HiPS_image_cache = {}
 
 
 @dataclass
@@ -97,11 +106,210 @@ class MWPlotCommon(ABC):
         return [skycoord.cartesian.x, skycoord.cartesian.y]
 
     @staticmethod
+    def objname_to_coord(objname: str) -> coord.SkyCoord:
+        """
+        Convert object name to astropy coordinates
+
+        Parameters
+        ----------
+        objname : str
+            Name of the object
+
+        Returns
+        -------
+        coord.SkyCoord
+            Astropy SkyCoord object
+        """
+        simbad = Simbad()
+        simbad.add_votable_fields("ra(d)", "dec(d)", "plx", "distance")
+        result = simbad.query_object(objname)[
+            "RA_d", "DEC_d", "PLX_VALUE", "Distance_distance", "Distance_unit"
+        ].filled(np.nan)
+        if result is None:
+            raise ValueError(f"Object `{objname}` not found in Simbad")
+        distance = (
+            (result["Distance_distance"][0] * u.Unit(result["Distance_unit"][0])).to(
+                u.kpc
+            )
+            if np.isnan(result["PLX_VALUE"][0])
+            else (1 / result["PLX_VALUE"][0]) * u.kpc
+        )
+        if np.isnan(distance):  # in case the distance is not available
+            c = coord.SkyCoord(
+                result["RA_d"].value[0] * u.deg, result["DEC_d"].value[0] * u.deg
+            )
+        else:
+            c = coord.SkyCoord(
+                result["RA_d"].value[0] * u.deg,
+                result["DEC_d"].value[0] * u.deg,
+                distance=distance,
+            )
+        return c
+
+    @staticmethod
     def skycoord_radec(skycoord):
         # convert astropy SkyCoord to list
         if not hasattr(skycoord, "ra"):
             skycoord = skycoord.icrs
         return [skycoord.ra.deg * u.deg, skycoord.dec.deg * u.deg]
+
+    @staticmethod
+    def parse_hips_background():
+        global _HiPS_metadata_response
+        if _HiPS_metadata_response is not None:
+            response = _HiPS_metadata_response
+        else:
+            url = "https://alasky.u-strasbg.fr/MocServer/query?*/P/*&get=record"
+            response = requests.get(url)
+            _HiPS_metadata_response = response
+
+        if response.status_code == 200:
+            # Split the content into chunks based on empty lines
+            content = response.text
+            chunks = content.split("\n\n")
+
+            # Store the chunks in a list
+            chunks_list = [chunk.strip() for chunk in chunks if chunk.strip()]
+
+            ids = []
+            sky_coverage = []
+            obs_title = []
+            obs_copyright = []
+            obs_description = []
+            client_category = []
+            obs_regime = []
+
+            for chunk in chunks_list:
+                _ids = _sky_coverage = _obs_title = None
+                _obs_description = _client_category = _obs_regime = None
+                for line in chunk.splitlines():
+                    if line.startswith("ID"):
+                        key, value = line.split("=", 1)
+                        _ids = value.strip()
+                    elif line.startswith("moc_sky_fraction"):
+                        key, value = line.split("=", 1)
+                        _sky_coverage = float(value.strip())
+                    elif line.startswith("obs_title"):
+                        key, value = line.split("=", 1)
+                        _obs_title = value.strip()
+                    elif line.startswith("obs_copyright"):
+                        key, value = line.split("=", 1)
+                        _obs_copyright = value.strip()
+                    elif line.startswith("obs_description"):
+                        key, value = line.split("=", 1)
+                        _obs_description = value.strip()
+                    elif line.startswith("client_category"):
+                        key, value = line.split("=", 1)
+                        _client_category = value.strip()
+                    elif line.startswith("obs_regime"):
+                        key, value = line.split("=", 1)
+                        _obs_regime = value.strip()
+                if (
+                    _obs_title
+                    and _sky_coverage > 0.8
+                    and (
+                        "Solar system" not in _client_category
+                        if _client_category
+                        else True
+                    )
+                ):
+                    ids.append(_ids)
+                    sky_coverage.append(_sky_coverage)
+                    obs_title.append(_obs_title)
+                    obs_copyright.append(_obs_copyright)
+                    obs_description.append(_obs_description)
+                    client_category.append(_client_category)
+                    obs_regime.append(_obs_regime)
+        else:
+            raise ConnectionError(
+                f"Failed to retrieve data. Status code: {response.status_code}"
+            )
+
+        return ids, obs_title, obs_copyright, obs_description, obs_regime
+
+    @classmethod
+    def search_sky_background(cls, keywords: Optional[str] = None):
+        """
+        Search for HiPS background images based on keywords
+
+        Parameters
+        ----------
+        keywords : str
+            Keywords to search for
+
+        Returns
+        -------
+        list
+            List of HiPS background images
+        """
+        _, obs_title, _, obs_description, obs_regime = cls.parse_hips_background()
+        if keywords is None:
+            return obs_title
+        else:
+            # search for all keywords in the title and description, only return the corresponding title only if all keywords are found
+            keywords = keywords.lower()
+            return [
+                obs_title[i]
+                for i, title in enumerate(obs_title)
+                if all(
+                    kw in title.lower()
+                    or (
+                        kw in obs_description[i].lower()
+                        if obs_description[i]
+                        else False
+                    )
+                    or (kw in obs_regime[i].lower() if obs_regime[i] else False)
+                    for kw in keywords.split()
+                )
+            ]
+
+    def get_hips_images(self, hips_id: str):
+        global _HiPS_image_cache
+        allowed_id, obs_title, obs_copyright, obs_description, obs_regime = (
+            self.parse_hips_background()
+        )
+        if hips_id in obs_title:
+            # get the corresponding id
+            hips_id = allowed_id[obs_title.index(hips_id)]
+        if hips_id not in allowed_id:
+            raise ValueError(
+                f"Unknown HiPS ID `{hips_id}`, allowed values are: {allowed_id}"
+            )
+        obs_copyright = obs_copyright[allowed_id.index(hips_id)]
+        # check if the image is already in the cache
+        if hips_id not in _HiPS_image_cache:
+            # Create a new WCS astropy object
+            horizontal_pix = 4000
+            w = astropy_wcs.WCS(
+                header={
+                    "NAXIS1": horizontal_pix,  # Width of the output fits/image
+                    "NAXIS2": horizontal_pix // 2,  # Height of the output fits/image
+                    "WCSAXES": 2,  # Number of coordinate axes
+                    "CRPIX1": horizontal_pix / 2,  # Pixel coordinate of reference point
+                    "CRPIX2": horizontal_pix / 4,  # Pixel coordinate of reference point
+                    "CDELT1": 360
+                    / horizontal_pix,  # [deg] Coordinate increment at reference point
+                    "CDELT2": 180
+                    / (
+                        horizontal_pix // 2
+                    ),  # [deg] Coordinate increment at reference point
+                    "CUNIT1": "deg",  # Units of coordinate increment and value
+                    "CUNIT2": "deg",  # Units of coordinate increment and value
+                    # https://docs.astropy.org/en/stable/wcs/supported_projections.html
+                    "CTYPE1": "GLON-CAR",  # galactic longitude
+                    "CTYPE2": "GLAT-CAR",  # galactic latitude
+                    "CRVAL1": 0,  # [deg] Coordinate value at reference point
+                    "CRVAL2": 0,  # [deg] Coordinate value at reference point
+                }
+            )
+            result_image = hips2fits.query_with_wcs(
+                hips=hips_id,
+                wcs=w,
+                get_query_payload=False,
+                format="jpg",
+            )
+            _HiPS_image_cache[hips_id] = np.flip(result_image, axis=1)
+        return _HiPS_image_cache[hips_id], obs_copyright
 
     def unit_check(self, x, unit):
         """
@@ -334,12 +542,12 @@ class MWSkyMapBase(MWPlotCommon):
     def __init__(
         self,
         grayscale: bool = False,
-        projection : str = "equirectangular",
-        wavelength : str = "optical",
-        center : tuple = (0.0, 0.0),
-        radius : tuple = (180.0, 90.0),
-        figsize : tuple = (5, 5),
-        dpi : int = 150,
+        projection: str = "equirectangular",
+        background: str = "optical",
+        center: tuple = (0.0, 0.0),
+        radius: tuple = (180.0, 90.0),
+        figsize: tuple = (5, 5),
+        dpi: int = 150,
     ):
         super().__init__()
         self.projection = projection
@@ -363,14 +571,39 @@ class MWSkyMapBase(MWPlotCommon):
                 f"Unknown projection `{self.projection}`, allowed values are: {allowed_proj}"
             )
 
-        if wavelength in (
-            allowed_wavelength := ["gamma", "optical", "infrared", "far-infrared"]
-        ):
-            self.wavlength = wavelength
-        else:
-            raise ValueError(
-                f"Unknown wavelength, allowed values are: {allowed_wavelength}"
-            )
+        # # ipython Auto-completion
+        # try:
+        #     from IPython import get_ipython
+        # except ImportError:
+        #     pass
+        # else:
+        #     if (ipy := get_ipython()) is not None:
+        #         def hips_completer(ipython, event):
+        #             _, out, _ = self.parse_hips_background()
+        #             print(out)
+        #             return out
+
+        #         ipy.set_hook(
+        #             "complete_command",
+        #             hips_completer,
+        #             re_key="MWSkyMap",
+        #         )
+
+        # if background in (
+        #     allowed_background := ["gamma", "optical", "infrared", "far-infrared"]
+        # ):
+        #     self.wavlength = background
+        # else:
+        #     raise ValueError(
+        #         f"Unknown background, allowed values are: {allowed_background}"
+        #     )
+        self.wavlength = background
+
+        # turn object name to coordinates
+        if isinstance(center, str):
+            c = self.objname_to_coord(center)
+            c = c.transform_to(coord.Galactic)
+            center = (-c.l.wrap_at(180 * u.degree).value, c.b.value) * u.deg
 
         self.center = center
         self.radius = radius
@@ -384,6 +617,7 @@ class MWSkyMapBase(MWPlotCommon):
             self._opposite_color = "black"
 
     def read_bg_img(self):
+        img_key = None
         if self.wavlength == "optical":
             img_key = "MW_edgeon_edr3_unannotate"
         elif self.wavlength == "gamma":
@@ -393,10 +627,11 @@ class MWSkyMapBase(MWPlotCommon):
         elif self.wavlength == "far-infrared":
             img_key = "MW_farinfrared"
         else:
-            raise ValueError("Unknown wavelength")
-        img_obj = self._MW_IMAGES[img_key]
-        self.bg_img = plt.imread(img_obj.img_path)
-        self.reference_str = img_obj.citation
+            self.bg_img, self.reference_str = self.get_hips_images(self.wavlength)
+        if img_key:
+            img_obj = self._MW_IMAGES[img_key]
+            self.bg_img = plt.imread(img_obj.img_path)
+            self.reference_str = img_obj.citation
 
         # find center pixel and radius pixel
         y_img_center = self.bg_img.shape[0] // 2 - int(
@@ -425,7 +660,7 @@ class MWSkyMapBase(MWPlotCommon):
         if self.grayscale:
             self.bg_img = rgb2gray(self.bg_img)
 
-        self._gh_img_url = self._gh_imgbase_url + img_obj.filename
+        # self._gh_img_url = self._gh_imgbase_url + img_obj.filename
 
         return None
 

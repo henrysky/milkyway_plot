@@ -3,6 +3,7 @@
 ## [0.13.0] - xx xxxx 20xx
 - Remove `setuptools` as a requirement
 - Add milkyway background in far-infrared, infrared and gamma
+- Add fetching Hierarchical Progressive Surveys (HiPS) images as background
 
 ## [0.12.0] - 10 June 2024
 - Add radius (r) as supported parameter for bokeh figures (Mitlasóczki Bence)

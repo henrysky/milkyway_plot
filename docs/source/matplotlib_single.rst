@@ -94,6 +94,33 @@ Annotation
 MilkyWay Sky Map
 ------------------
 
+By default, ``mw_plot`` has a few background images included within the package which represent ``optical``, ``gamma``, ``far-infrared`` and ``infrared``. 
+You can also use other background images from Hierarchical Progressive Surveys (HiPS).
+
+You can search for HiPS images with keywords.
+
+.. code-block:: python
+    :linenos:
+
+    from mw_plot import MWSkyMap
+
+    # search for HiPS images with keywords
+    MWSkyMap.search_sky_background(keywords=None)
+
+which will return a list of all available HiPS images with ``keywords=None``.
+
+You can search for HiPS images with specific keywords. For example
+
+.. code-block:: python
+    :linenos:
+
+    from mw_plot import MWSkyMap
+
+    # search for HiPS images with keywords
+    MWSkyMap.search_sky_background(keywords="Gaia DR3")
+
+will return a list of all available HiPS images came from Gaia DR3.
+
 .. code-block:: python
     :linenos:
 
@@ -135,7 +162,7 @@ MilkyWay Sky Map
     mw1.scatter(lsmc_ra, lsmc_dec, c="r", s=200)
     plt.tight_layout()
 
-You can also plot in different wavelength
+You can also plot in different background
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
@@ -147,7 +174,7 @@ You can also plot in different wavelength
 
     # setup a MWSkyMap instance with projection, other projection can be 'hammer', 'mollweide' etc
     # grid: whether to show the Galactic grid
-    mw1 = MWSkyMap(projection="aitoff", wavelength="gamma")
+    mw1 = MWSkyMap(projection="aitoff", background="gamma")
 
     # set up plot title
     mw1.title = "LMC and SMC in Green dots"
@@ -167,7 +194,7 @@ You can also plot in different wavelength
 
     # setup a MWSkyMap instance with projection, other projection can be 'hammer', 'mollweide' etc
     # grid: whether to show the Galactic grid
-    mw1 = MWSkyMap(projection="aitoff", wavelength="gamma")
+    mw1 = MWSkyMap(projection="aitoff", background="gamma")
 
     # set up plot title
     mw1.title = "LMC and SMC in red dots with Galactic Grid"
