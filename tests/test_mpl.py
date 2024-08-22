@@ -111,7 +111,7 @@ def test_mw_one_annotation():
 
 def test_mwdkymap_one_scatter_annotation():
     # plot
-    mw1 = MWSkyMap(projection="equirectangular", grayscale=False, dpi=100)
+    mw1 = MWSkyMap(projection="equirectangular", grayscale=False)
     mw1.title = "Samples"
 
     # scatter points

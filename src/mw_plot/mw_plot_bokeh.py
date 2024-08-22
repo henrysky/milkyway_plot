@@ -67,7 +67,6 @@ class MWPlotBokeh(MWPlotBase):
             radius=radius,
             unit=unit,
             figsize=None,
-            dpi=None,
         )
 
         # prepossessing procedure
@@ -175,7 +174,6 @@ class MWSkyMapBokeh(MWSkyMapBase):
             center=center,
             radius=radius,
             figsize=None,
-            dpi=None,
         )
         self.unit = u.degree
         self.s = 1.0

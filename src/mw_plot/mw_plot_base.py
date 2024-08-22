@@ -2,6 +2,7 @@ import importlib.util
 import pathlib
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from functools import reduce
 from typing import Optional
 
 import astropy.coordinates as coord
@@ -187,11 +188,10 @@ class MWPlotCommon(ABC):
                     data[key.strip()] = value.strip()
                 dist_ls.append(data)
             df = pd.DataFrame(dist_ls)
-            df[
+            _HiPS_metadata_response = df[
                 (~df["client_category"].str.contains("solar", case=False, na=False))
-                & (df["moc_sky_fraction"].astype(float) > 0.8)
-            ]
-            _HiPS_metadata_response = df
+                & (df["moc_sky_fraction"].astype(float) > 0.6)
+            ].reset_index(drop=True)
 
         return _HiPS_metadata_response
 
@@ -211,28 +211,30 @@ class MWPlotCommon(ABC):
             List of HiPS background images
         """
         df = cls.parse_hips_background()
-        obs_title = df["obs_title"].tolist()
-        obs_description = df["obs_description"].tolist()
-        obs_regime = df["obs_regime"].tolist()
         if keywords is None:
-            return obs_title
+            return df["obs_title"].tolist()
         else:
+            # replace some common spelling variations
+            keywords = keywords.replace("colour", "color").replace("gray", "grey").replace("tmass", "2mass")
             # search for all keywords in the title and description, only return the corresponding title only if all keywords are found
             keywords = keywords.lower()
-            return [
-                obs_title[i]
-                for i, title in enumerate(obs_title)
-                if all(
-                    kw in title.lower()
-                    or (
-                        kw in obs_description[i].lower()
-                        if obs_description[i]
-                        else False
-                    )
-                    or (kw in obs_regime[i].lower() if obs_regime[i] else False)
-                    for kw in keywords.split()
+            # use \b to match the whole word
+            return df["obs_title"][
+                reduce(
+                    # make sure all keywords are found in the title or description
+                    lambda x, y: x & y,
+                    [
+                        df[["obs_title", "obs_description", "obs_regime"]]
+                        .apply(
+                            lambda x: x.str.contains(
+                                f"\\b{kw}\\b", case=False, na=False
+                            )
+                        )
+                        .any(axis=1)
+                        for kw in keywords.split()
+                    ],
                 )
-            ]
+            ].tolist()
 
     def get_hips_images(self, hips_id: str):
         df = self.parse_hips_background()
@@ -249,7 +251,7 @@ class MWPlotCommon(ABC):
             obs_copyright = obs_copyright[allowed_id.index(hips_id)]
         if cond1:
             obs_copyright = obs_copyright[obs_title.index(hips_id)]
-        
+
         # Create a new WCS astropy object
         horizontal_pix = 2000
         vertical_pix = horizontal_pix // (self.radius[0].value / self.radius[1].value)
@@ -260,12 +262,12 @@ class MWPlotCommon(ABC):
                 "WCSAXES": 2,  # Number of coordinate axes
                 "CRPIX1": horizontal_pix / 2,  # Pixel coordinate of reference point
                 "CRPIX2": vertical_pix / 2,  # Pixel coordinate of reference point
-                "CDELT1": self.radius[0].value
+                "CDELT1": 2.0
+                * self.radius[0].value
                 / horizontal_pix,  # [deg] Coordinate increment at reference point
-                "CDELT2": self.radius[1].value
-                / (
-                    horizontal_pix // 2
-                ),  # [deg] Coordinate increment at reference point
+                "CDELT2": 2.0
+                * self.radius[1].value
+                / vertical_pix,  # [deg] Coordinate increment at reference point
                 "CUNIT1": "deg",  # Units of coordinate increment and value
                 "CUNIT2": "deg",  # Units of coordinate increment and value
                 # https://docs.astropy.org/en/stable/wcs/supported_projections.html
