@@ -456,8 +456,8 @@ class MWSkyMap(MWSkyMapBase):
                     pass
                 else:
                     raise NotImplementedError("I think no one will ever reach here")
-                ax.set_xlabel("Galactic Longitude (Degree)")
-                ax.set_ylabel("Galactic Latitude (Degree)")
+                ax.set_xlabel(r"$l$ (deg)")
+                ax.set_ylabel(r"$b$ (deg)")
                 self._ext = [
                     (self.center[0] - self.radius[0]).value,
                     (self.center[0] + self.radius[0]).value,

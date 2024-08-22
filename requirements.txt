@@ -2,6 +2,7 @@ astropy
 astroquery
 matplotlib
 numpy
+pandas
 requests
 ipython
 ipykernel

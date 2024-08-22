@@ -8,6 +8,7 @@ import astropy.coordinates as coord
 import astropy.units as u
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import PIL
 import requests
 from astropy import wcs as astropy_wcs
@@ -26,7 +27,7 @@ hips2fits.timeout = 120
 @dataclass
 class MWImage:
     """
-    Dataclass to keep track of background images
+    Dataclass to keep track of pre-packaged background images
     """
 
     filename: str
@@ -70,7 +71,7 @@ class MWPlotCommon(ABC):
                 # only in jupyter notebook/lab has the kernel trait
                 self._in_jupyter = ip.has_trait("kernel")
 
-        # all the background images
+        # all the packaged background images
         self._MW_IMAGES = {
             "MW_bg_unannotate": MWImage(
                 filename="MW_bg_unannotate.jpg",
@@ -99,7 +100,7 @@ class MWPlotCommon(ABC):
 
     @abstractmethod
     def read_bg_img(self):
-        # class to read images
+        # class to read images and set appropriate attributes like extent, aspect ratio etc
         pass
 
     @staticmethod
@@ -115,7 +116,7 @@ class MWPlotCommon(ABC):
         Parameters
         ----------
         objname : str
-            Name of the object
+            Name of an object
 
         Returns
         -------
@@ -126,27 +127,30 @@ class MWPlotCommon(ABC):
         simbad.add_votable_fields("ra(d)", "dec(d)", "plx", "distance")
         result = simbad.query_object(objname)[
             "RA_d", "DEC_d", "PLX_VALUE", "Distance_distance", "Distance_unit"
-        ].filled(np.nan)
+        ]  # result is a single object
         if result is None:
             raise ValueError(f"Object `{objname}` not found in Simbad")
-        distance = (
-            (result["Distance_distance"][0] * u.Unit(result["Distance_unit"][0])).to(
-                u.kpc
+        if len(result) != 1:
+            raise ValueError(
+                f"Multiple objects found for `{objname}` in Simbad but expected only one"
             )
-            if np.isnan(result["PLX_VALUE"][0])
-            else (1 / result["PLX_VALUE"][0]) * u.kpc
+        result = result.filled(np.nan)[0]
+
+        if np.isnan(result["PLX_VALUE"]):
+            distance = (
+                result["Distance_distance"] * u.Unit(result["Distance_unit"])
+            ).to(u.kpc)
+        elif np.isnan(result["Distance_distance"]):
+            # in case the distance is not available
+            distance = None
+        else:  # use parallax to calculate distance
+            distance = (1 / result["PLX_VALUE"]) * u.kpc
+
+        return coord.SkyCoord(
+            result["RA_d"] * u.deg,
+            result["DEC_d"] * u.deg,
+            distance=distance,
         )
-        if np.isnan(distance):  # in case the distance is not available
-            c = coord.SkyCoord(
-                result["RA_d"].value[0] * u.deg, result["DEC_d"].value[0] * u.deg
-            )
-        else:
-            c = coord.SkyCoord(
-                result["RA_d"].value[0] * u.deg,
-                result["DEC_d"].value[0] * u.deg,
-                distance=distance,
-            )
-        return c
 
     @staticmethod
     def skycoord_radec(skycoord):
@@ -158,82 +162,38 @@ class MWPlotCommon(ABC):
     @staticmethod
     def parse_hips_background():
         global _HiPS_metadata_response
-        if _HiPS_metadata_response is not None:
-            response = _HiPS_metadata_response
-        else:
-            url = "https://alasky.u-strasbg.fr/MocServer/query?*/P/*&get=record"
-            response = requests.get(url)
-            _HiPS_metadata_response = response
-
-        if response.status_code == 200:
+        # cache the response if it is not already cached
+        if _HiPS_metadata_response is None:
+            response = requests.get(
+                "https://alasky.u-strasbg.fr/MocServer/query?*/P/*&get=record"
+            )
+            # only store the response if it is successful
+            if response.status_code != 200:
+                raise ConnectionError(
+                    f"Failed to retrieve data. Status code: {response.status_code}"
+                )
             # Split the content into chunks based on empty lines
-            content = response.text
-            chunks = content.split("\n\n")
+            chunks = response.text.split("\n\n")
 
             # Store the chunks in a list
             chunks_list = [chunk.strip() for chunk in chunks if chunk.strip()]
 
-            ids = []
-            sky_coverage = []
-            obs_title = []
-            obs_copyright = []
-            obs_description = []
-            client_category = []
-            obs_regime = []
-
+            dist_ls = []
             for chunk in chunks_list:
-                _ids = _sky_coverage = _obs_title = None
-                _obs_description = _client_category = _obs_regime = None
+                # parse the chunk into a dictionary
+                data = {}
                 for line in chunk.splitlines():
-                    if line.startswith("ID"):
-                        key, value = line.split("=", 1)
-                        _ids = value.strip()
-                    elif line.startswith("moc_sky_fraction"):
-                        key, value = line.split("=", 1)
-                        _sky_coverage = float(value.strip())
-                    elif line.startswith("obs_title"):
-                        key, value = line.split("=", 1)
-                        _obs_title = value.strip()
-                    # some HiPS do have obs_copyright_url so will mess up the parsing
-                    elif line.startswith("obs_copyright") and not line.startswith(
-                        "obs_copyright_url"
-                    ):
-                        key, value = line.split("=", 1)
-                        _obs_copyright = value.strip()
-                    elif line.startswith("obs_description") and not line.startswith(
-                        "obs_description_url"
-                    ):
-                        key, value = line.split("=", 1)
-                        _obs_description = value.strip()
-                    elif line.startswith("client_category"):
-                        key, value = line.split("=", 1)
-                        _client_category = value.strip()
-                    elif line.startswith("obs_regime"):
-                        key, value = line.split("=", 1)
-                        _obs_regime = value.strip()
-                if (
-                    _obs_title
-                    and _sky_coverage > 0.8
-                    and (
-                        # make sure the HiPS is not a solar system object like Mars Map
-                        "Solar system" not in _client_category
-                        if _client_category
-                        else True
-                    )
-                ):
-                    ids.append(_ids)
-                    sky_coverage.append(_sky_coverage)
-                    obs_title.append(_obs_title)
-                    obs_copyright.append(_obs_copyright)
-                    obs_description.append(_obs_description)
-                    client_category.append(_client_category)
-                    obs_regime.append(_obs_regime)
-        else:
-            raise ConnectionError(
-                f"Failed to retrieve data. Status code: {response.status_code}"
-            )
+                    key, value = line.split("=", 1)
+                    data[key.strip()] = value.strip()
+                dist_ls.append(data)
+            df = pd.DataFrame(dist_ls)
+            df[
+                (~df["client_category"].str.contains("solar", case=False, na=False))
+                & (df["moc_sky_fraction"].astype(float) > 0.8)
+            ]
+            _HiPS_metadata_response = df
 
-        return ids, obs_title, obs_copyright, obs_description, obs_regime
+        return _HiPS_metadata_response
 
     @classmethod
     def search_sky_background(cls, keywords: Optional[str] = None):
@@ -250,7 +210,10 @@ class MWPlotCommon(ABC):
         list
             List of HiPS background images
         """
-        _, obs_title, _, obs_description, obs_regime = cls.parse_hips_background()
+        df = cls.parse_hips_background()
+        obs_title = df["obs_title"].tolist()
+        obs_description = df["obs_description"].tolist()
+        obs_regime = df["obs_regime"].tolist()
         if keywords is None:
             return obs_title
         else:
@@ -272,17 +235,21 @@ class MWPlotCommon(ABC):
             ]
 
     def get_hips_images(self, hips_id: str):
-        allowed_id, obs_title, obs_copyright, obs_description, obs_regime = (
-            self.parse_hips_background()
-        )
-        if hips_id in obs_title:
-            # get the corresponding id
-            hips_id = allowed_id[obs_title.index(hips_id)]
-        if hips_id not in allowed_id:
+        df = self.parse_hips_background()
+        obs_title = df["obs_title"].tolist()
+        obs_copyright = df["obs_copyright"].tolist()
+        allowed_id = df["ID"].tolist()
+
+        # need to use & operator to avoid short-circuiting
+        if (cond1 := hips_id not in allowed_id) & (cond2 := hips_id not in obs_title):
             raise ValueError(
-                f"Unknown HiPS ID `{hips_id}`, allowed values are: {allowed_id}"
+                f"Unknown HiPS ID `{hips_id}`, allowed IDs are: {allowed_id}"
             )
-        obs_copyright = obs_copyright[allowed_id.index(hips_id)]
+        if cond2:
+            obs_copyright = obs_copyright[allowed_id.index(hips_id)]
+        if cond1:
+            obs_copyright = obs_copyright[obs_title.index(hips_id)]
+        
         # Create a new WCS astropy object
         horizontal_pix = 2000
         vertical_pix = horizontal_pix // (self.radius[0].value / self.radius[1].value)
