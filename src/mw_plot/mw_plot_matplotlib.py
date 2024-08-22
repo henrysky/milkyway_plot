@@ -331,7 +331,7 @@ class MWSkyMap(MWSkyMapBase):
         center: Union[Tuple[float, float], str] = (0.0, 0.0) * u.deg,
         radius: tuple = (180.0, 90.0) * u.deg,
         grid: str = None,
-        figsize: Tuple[float, float] = (5, 5),
+        figsize: Tuple[float, float] = (6, 4),
     ):
         super().__init__(
             grayscale=grayscale,

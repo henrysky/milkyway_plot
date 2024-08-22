@@ -185,14 +185,16 @@ class MWPlotCommon(ABC):
                 data = {}
                 for line in chunk.splitlines():
                     key, value = line.split("=", 1)
-                    data[key.strip()] = value.strip()
+                    # only if key not start with
+                    if not key.startswith("addendum_id") and not key.startswith("hipsgen_"):
+                        data[key.strip()] = value.strip()
                 dist_ls.append(data)
             df = pd.DataFrame(dist_ls)
+            df["moc_sky_fraction"] = df["moc_sky_fraction"].astype(float)
             _HiPS_metadata_response = df[
                 (~df["client_category"].str.contains("solar", case=False, na=False))
-                & (df["moc_sky_fraction"].astype(float) > 0.6)
+                & (df["moc_sky_fraction"].astype(float) > 0.7)
             ].reset_index(drop=True)
-
         return _HiPS_metadata_response
 
     @classmethod
@@ -203,7 +205,7 @@ class MWPlotCommon(ABC):
         Parameters
         ----------
         keywords : str
-            Keywords to search for
+            Keywords to search for, multiple keywords can be separated by space
 
         Returns
         -------
@@ -342,8 +344,6 @@ class MWPlotBase(MWPlotCommon):
         Astropy units for the default if none provided and the axes
     figsize : tuple
         Figure size
-    dpi : int
-        Dots per inch
     """
 
     def __init__(
@@ -357,7 +357,6 @@ class MWPlotBase(MWPlotCommon):
         radius: u.Quantity = 20.0 * u.kpc,
         unit: u.Unit = u.kpc,
         figsize: tuple = (5, 5),
-        dpi: int = 150,
     ):
         super().__init__()
         self.grayscale = grayscale
@@ -371,7 +370,6 @@ class MWPlotBase(MWPlotCommon):
         self.radius = self.unit_check(radius, unit)
         self.unit = unit
         self.figsize = figsize
-        self.dpi = dpi
         self._built = False
         self.facecolor = (0, 0, 0) if not self.grayscale else (1, 1, 1)
 
@@ -525,7 +523,6 @@ class MWSkyMapBase(MWPlotCommon):
         center: tuple = (0.0, 0.0),
         radius: tuple = (180.0, 90.0),
         figsize: tuple = (5, 5),
-        dpi: int = 150,
     ):
         super().__init__()
         self.projection = projection
@@ -549,32 +546,6 @@ class MWSkyMapBase(MWPlotCommon):
                 f"Unknown projection `{self.projection}`, allowed values are: {allowed_proj}"
             )
 
-        # # ipython Auto-completion
-        # try:
-        #     from IPython import get_ipython
-        # except ImportError:
-        #     pass
-        # else:
-        #     if (ipy := get_ipython()) is not None:
-        #         def hips_completer(ipython, event):
-        #             _, out, _ = self.parse_hips_background()
-        #             print(out)
-        #             return out
-
-        #         ipy.set_hook(
-        #             "complete_command",
-        #             hips_completer,
-        #             re_key="MWSkyMap",
-        #         )
-
-        # if background in (
-        #     allowed_background := ["gamma", "optical", "infrared", "far-infrared"]
-        # ):
-        #     self.wavlength = background
-        # else:
-        #     raise ValueError(
-        #         f"Unknown background, allowed values are: {allowed_background}"
-        #     )
         self.wavlength = background
 
         # turn object name to coordinates
@@ -587,7 +558,6 @@ class MWSkyMapBase(MWPlotCommon):
         self.radius = radius
         self.grayscale = grayscale
         self.figsize = figsize
-        self.dpi = dpi
         self._built = False
 
         self._opposite_color = "white"
