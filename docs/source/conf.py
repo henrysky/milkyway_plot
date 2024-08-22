@@ -41,6 +41,7 @@ extensions = [
     "sphinx.ext.mathjax",
     "sphinx.ext.inheritance_diagram",
     "sphinx.ext.viewcode",
+    "sphinx.ext.doctest",
     "sphinx-prompt",
     "bokeh.sphinxext.bokeh_plot",
     "sphinx_copybutton",
@@ -153,3 +154,6 @@ html_show_sourcelink = True
 inheritance_graph_attrs = dict(dpi=144)
 
 inheritance_node_attrs = dict(dpi=144)
+
+copybutton_prompt_text = r">>> |\.\.\. |\$ |In \[\d*\]: | {2,5}\.\.\.: | {5,8}: "
+copybutton_prompt_is_regexp = True

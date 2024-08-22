@@ -504,9 +504,9 @@ class MWSkyMap(MWSkyMapBase):
                         rasterized=True,
                     )
 
-            ax.set_facecolor(
-                self.facecolor
-            )  # have a black color background for image with <1.0 alpha
+            # ax.set_facecolor(
+            #     self.facecolor
+            # )  # have a black color background for image with <1.0 alpha
             if self.title is not None:
                 ax.set_title(self.title, y=1.05)
             self.fig, self.ax = fig, ax
@@ -516,6 +516,7 @@ class MWSkyMap(MWSkyMapBase):
             grid_style = "--"
 
             self._built = True
+            self.ax.set_xticklabels([])
             if self.grid is True:
                 for i in [0, -15, 15, -30, 30, -45, 45, -60, 60, -75, 75]:
                     self.ax.plot(

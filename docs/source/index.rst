@@ -20,17 +20,17 @@ For example, to get the citation text for the background image of a face-on Milk
 
 .. code-block:: python
 
-    from mw_plot import MWFaceOn
-    mw = MWFaceOn()
-    print(mw.citation)
+    >>> from mw_plot import MWFaceOn
+    >>> mw = MWFaceOn()
+    >>> mw.citation
 
 or for the background infrared image of an all-sky Milky Way plot:
 
 .. code-block:: python
 
-    from mw_plot import MWSkyMap
-    mw = MWSkyMap(background="infrared")
-    print(mw.citation)
+    >>> from mw_plot import MWSkyMap
+    >>> mw = MWSkyMap()
+    >>> mw.citation
 
 Install
 ---------------------
@@ -39,14 +39,14 @@ To install via ``pip``
 
 .. prompt:: bash $
    
-   pip install mw_plot
+   python -m pip install mw_plot
 
 
 If something is not working properly, try to upgrade first and then report it as an issue
 
 .. prompt:: bash $
 
-   pip install mw_plot --upgrade
+   python -m pip install mw_plot --upgrade
 
 
 OR clone the latest commit of mw_plot from Github by running the following command
@@ -59,11 +59,11 @@ OR clone the latest commit of mw_plot from Github by running the following comma
 System Requirement
 ---------------------
 
--  | **Python** 3.8 or above
--  | **astropy** 5.0 or above
--  | **Numpy** 1.20.0 or above
--  | **Matplotlib** 3.7.0 or above
--  | **Pillow** 7.0.0 above
+-  **Python** 3.8 or above
+-  **astropy** 5.0 or above
+-  **Numpy** 1.20.0 or above
+-  **Matplotlib** 3.7.0 or above
+-  **Pillow** 7.0.0 above
 
 .. toctree::
    :maxdepth: 2
