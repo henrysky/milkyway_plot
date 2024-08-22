@@ -3,11 +3,11 @@
 Face-On View of Milky Way
 ==============================
 
-Classes API
----------------
+Introduction
+------------------
 
-.. autoclass:: mw_plot.MWPlot
-    :members:
+``MWFaceOn`` class is a wrapper around the ``matplotlib`` library to plot the face-on view of 
+the Milky Way. It provides a simple interface to plot the face-on view of the Milky Way.
 
 MilkyWay Bird's Eye
 ---------------------
@@ -15,37 +15,45 @@ MilkyWay Bird's Eye
 .. code-block:: python
     :linenos:
 
-    import numpy as np
-    from astropy import units as u
-    from mw_plot import MWFaceOn
+    >>> import numpy as np
+    >>> from astropy import units as u
+    >>> from mw_plot import MWFaceOn
 
-    # setup a mw-plot instance of bird's eye view of the disc
-    mw1 = MWFaceOn(
-        radius=20 * u.kpc,
-        unit=u.kpc,
-        coord="galactocentric",
-        annotation=True,
-        figsize=(10, 8),
-    )
+    >>> mw1 = MWFaceOn(
+    ...     radius=20 * u.kpc,
+    ...     unit=u.kpc,
+    ...     coord="galactocentric",
+    ...     annotation=True,
+    ...     figsize=(10, 8),
+    ... )
 
-    # set up plot title
-    mw1.title = "Bird's Eyes View"
+    >>> mw1.title = "Bird's Eyes View"
+    >>> mw1.scatter(8 * u.kpc, 0 * u.kpc, c="r", s=2)
 
-    mw1.scatter(8 * u.kpc, 0 * u.kpc, c="r", s=200)
+.. image:: mpl_imgs/mw_faceon.jpg
+    :width: 400
+    :align: center
 
-Annotation
-^^^^^^^^^^^
+Annotation and Grayscale
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. code-block:: python
-    :linenos:
+If you set annotation to True, the annotation of the Milky Way components will be shown.
 
-    import numpy as np
-    from astropy import units as u
-    from mw_plot import MWFaceOn
+.. image:: mpl_imgs/mw_faceon_annotated.jpg
+    :width: 400
+    :align: center
 
-    mw1 = MWFaceOn(radius=20 * u.kpc, unit=u.kpc, coord="galactocentric", annotation=True, figsize=(10, 8),)
+If you set grayscale to True, the image will be shown in grayscale.
 
-    # set up plot title
-    mw1.title = "Annotation"
+.. image:: mpl_imgs/mw_faceon_grayscale.jpg
+    :width: 400
+    :align: center
 
-    mw1.scatter_annotate(["Earth", "Galactic \n Center"], [[8.0, 0.0], [0.0, 0.0]] * u.kpc)
+Coordinates and units
+^^^^^^^^^^^^^^^^^^^^^^
+
+Class API
+---------------
+
+.. autoclass:: mw_plot.MWPlot
+    :members:

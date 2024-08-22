@@ -3,12 +3,6 @@
 Sky Map of Milky Way
 ==============================
 
-API
----------------
-
-.. autoclass:: mw_plot.MWSkyMap
-    :members:
-
 Introduction
 ------------------
 
@@ -115,3 +109,9 @@ You can plot the sky map with grid lines. The grid lines can be in Galactic, Equ
 .. image:: mpl_imgs/mellinger_allsky_grid.jpg
     :width: 400
     :align: center
+
+Class API
+---------------
+
+.. autoclass:: mw_plot.MWSkyMap
+    :members:

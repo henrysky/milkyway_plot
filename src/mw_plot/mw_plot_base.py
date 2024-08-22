@@ -391,10 +391,10 @@ class MWPlotBase(MWPlotCommon):
             x_shift = self.r0
             # example: if the center is 0,0 and the angle is 90, the Sun is at 0,r0
             self.center[0] += x_shift
-            self.coord_english = "Galactic Coordinates"
+            self.coord_english = "Galactic"
         elif self.coord.lower() == "galactocentric":
             x_shift = 0.0 * self.unit
-            self.coord_english = "Galactocentric Coordinates"
+            self.coord_english = "Galactocentric"
         else:
             raise ValueError(
                 "Unknown coordinates, can only be `galactic` or `galactocentric`"
