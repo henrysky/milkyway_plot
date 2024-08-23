@@ -5,7 +5,7 @@ Orbit of Sun
 --------------
 
 .. code-block:: python
-    :linenos:
+
 
     from mw_plot import MWFaceOn
 
@@ -35,7 +35,7 @@ Orbit of Sun 2
 ---------------
 
 .. code-block:: python
-    :linenos:
+
 
     import matplotlib.pyplot as plt
     from mw_plot import MWFaceOn

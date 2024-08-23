@@ -13,7 +13,6 @@ MilkyWay Bird's Eye
 ---------------------
 
 .. code-block:: python
-    :linenos:
 
     >>> import numpy as np
     >>> from astropy import units as u
@@ -31,7 +30,7 @@ MilkyWay Bird's Eye
     >>> mw1.scatter(8 * u.kpc, 0 * u.kpc, c="r", s=2)
 
 .. image:: mpl_imgs/mw_faceon.jpg
-    :width: 400
+    :width: 500
     :align: center
 
 Annotation and Grayscale
@@ -40,13 +39,13 @@ Annotation and Grayscale
 If you set annotation to True, the annotation of the Milky Way components will be shown.
 
 .. image:: mpl_imgs/mw_faceon_annotated.jpg
-    :width: 400
+    :width: 500
     :align: center
 
 If you set grayscale to True, the image will be shown in grayscale.
 
 .. image:: mpl_imgs/mw_faceon_grayscale.jpg
-    :width: 400
+    :width: 500
     :align: center
 
 Coordinates and units
@@ -55,5 +54,5 @@ Coordinates and units
 Class API
 ---------------
 
-.. autoclass:: mw_plot.MWPlot
+.. autoclass:: mw_plot.MWFaceOn
     :members:

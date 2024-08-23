@@ -6,7 +6,7 @@ Interactive Single Plot
 Classes API
 -------------
 
-.. autoclass:: mw_plot.MWPlotBokeh
+.. autoclass:: mw_plot.MWFaceOnBokeh
     :members:
 
 .. autoclass:: mw_plot.MWSkyMapBokeh
@@ -17,7 +17,7 @@ Interactive MilkywWay Bird's Eye View
 
 .. .. bokeh-plot::
 ..     :source-position: above
-..     :linenos:
+.. 
 
 ..     from mw_plot import MWFaceOnBokeh
 ..     from astropy import units as  u
@@ -33,7 +33,7 @@ Interactive MilkyWay Sky Map
 
 .. .. bokeh-plot::
 ..     :source-position: above
-..     :linenos:
+.. 
 
 ..     from mw_plot import MWSkyMapBokeh
 ..     from astropy import units as  u

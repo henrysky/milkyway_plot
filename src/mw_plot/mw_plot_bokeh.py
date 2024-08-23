@@ -28,7 +28,7 @@ def to_bokeh_img(imgarray):
     return img
 
 
-class MWPlotBokeh(MWPlotBase):
+class MWFaceOnBokeh(MWPlotBase):
     """
     MWPlot Brokeh class plotting with Bokeh
 

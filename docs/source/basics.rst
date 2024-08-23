@@ -10,7 +10,7 @@ Useful constants
 
 .. code-block:: python
     :caption: A few usage constants
-    :linenos:
+
 
     from mw_plot import center_radec, anti_center_radec, northpole_radec, southpole_radec  # constants
     from mw_plot import mw_radec # milkyway plane in RA/DEC
