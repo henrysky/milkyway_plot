@@ -27,7 +27,7 @@ def test_mw_skymap_bokeh(simbad):
 
 def test_mw_plot_bokeh():
     # setup a MWPlotBokeh instance
-    plot_instance = MWPlotBokeh(
+    plot_instance = MWFaceOnBokeh(
         radius=20 * u.kpc, unit=u.kpc, coord="galactocentric", annotation=True
     )
     plot_instance.imalpha = 1.0

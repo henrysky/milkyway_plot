@@ -1,4 +1,4 @@
-.. automodule:: mw_plot.mw_plot_bokeh
+.. automodule:: mw_plot.bokeh_backend
 
 Interactive Single Plot
 ==========================

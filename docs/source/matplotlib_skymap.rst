@@ -1,4 +1,4 @@
-.. automodule:: mw_plot.mw_plot_matplotlib
+.. automodule:: mw_plot.matplotlib_backend
 
 Sky Map of Milky Way
 ==============================
@@ -18,6 +18,10 @@ The class is designed to be simple and easy to use.
     >>> mw1 = MWSkyMap(projection="aitoff", grayscale=False)
     >>> mw1.title = "LMC and SMC in red dots"
     >>> mw1.scatter([78.77, 16.26] * u.degree, [-69.01, -72.42] * u.degree, c="r", s=3)
+
+..
+    >>> import matplotlib.pyplot as plt
+    >>> plt.close("all")
 
 .. image:: mpl_imgs/mollweide_LMC_SMC.jpg
     :width: 500
@@ -58,6 +62,10 @@ You then can use the ``background`` parameter to set the background image from t
     >>> mw1.title = "LMC and SMC in red dots"
     >>> mw1.scatter([78.77, 16.26] * u.degree, [-69.01, -72.42] * u.degree, c="r", s=3)
 
+..
+    >>> import matplotlib.pyplot as plt
+    >>> plt.close("all")
+
 .. image:: mpl_imgs/mellinger_allsky.jpg
     :width: 500
     :align: center
@@ -77,6 +85,10 @@ parameters. For example to zoom in to the M31 galaxy, you can use the following 
     ... )
     >>> fig, ax = plt.subplots(figsize=(5, 5))
     >>> mw1.transform(ax)
+
+..
+    >>> import matplotlib.pyplot as plt
+    >>> plt.close("all")
 
 .. image:: mpl_imgs/mellinger_M31.jpg
     :width: 500
@@ -98,6 +110,10 @@ You can plot the sky map with grid lines. The grid lines can be in Galactic, Equ
     >>> mw1 = MWSkyMap(background="Mellinger color optical survey", grid="ecliptic")
     >>> mw1.title = "LMC and SMC (red) with Ecliptic grid"
     >>> mw1.scatter([78.77, 16.26] * u.degree, [-69.01, -72.42] * u.degree, c="r", s=3)
+
+..
+    >>> import matplotlib.pyplot as plt
+    >>> plt.close("all")
 
 .. image:: mpl_imgs/mellinger_allsky_grid.jpg
     :width: 500

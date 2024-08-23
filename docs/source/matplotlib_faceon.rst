@@ -1,4 +1,4 @@
-.. automodule:: mw_plot.mw_plot_matplotlib
+.. automodule:: mw_plot.matplotlib_backend
 
 Face-On View of Milky Way
 ==============================
@@ -27,6 +27,10 @@ MilkyWay Bird's Eye
     ... )
     >>> mw1.title = "Bird's Eyes View"
     >>> mw1.scatter(8 * u.kpc, 0 * u.kpc, c="r", s=2)
+
+..
+    >>> import matplotlib.pyplot as plt
+    >>> plt.close("all")
 
 .. image:: mpl_imgs/mw_faceon.jpg
     :width: 500

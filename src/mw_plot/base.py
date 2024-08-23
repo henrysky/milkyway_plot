@@ -384,6 +384,7 @@ class MWPlotBase(MWPlotCommon):
             self.img_obj = self._MW_IMAGES["MW_bg_annotate"]
         else:
             self.img_obj = self._MW_IMAGES["MW_bg_unannotate"]
+        self.reference_str = self.img_obj.citation
         self._gh_img_url = self._gh_imgbase_url + self.img_obj.filename
 
         if self.coord.lower() == "galactic":
