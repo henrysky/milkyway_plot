@@ -42,14 +42,14 @@ To install via ``pip``
    python -m pip install mw_plot
 
 
-If something is not working properly, try to upgrade first and then report it as an issue
+If something is not working properly, try to upgrade first and then report it as an issue on Github if the problem persists
 
 .. prompt:: bash $
 
    python -m pip install mw_plot --upgrade
 
 
-OR clone the latest commit of mw_plot from Github by running the following command
+You can also clone the latest commit of mw_plot from Github by running the following command to install the package in editable mode
 
 .. prompt:: bash $
 
@@ -59,18 +59,19 @@ OR clone the latest commit of mw_plot from Github by running the following comma
 System Requirement
 ---------------------
 
-We require Python 3.8 or above. The following packages are required which will be installed automatically when you install ``mw_plot``:
+``mw-plot`` requires Python 3.8 or above. The following packages are required which will be installed automatically when you install ``mw_plot``:
 
 .. literalinclude:: ../../requirements.txt
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Getting Started
    
    basics
    changelog
 
 .. toctree::
+   :maxdepth: 2
    :caption: Matplotlib backend
    
    matplotlib_faceon
@@ -79,6 +80,7 @@ We require Python 3.8 or above. The following packages are required which will b
    matplotlib_gallery
 
 .. toctree::
+   :maxdepth: 2
    :caption: Bokeh backend
 
    bokeh_single
