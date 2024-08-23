@@ -137,13 +137,13 @@ class MWPlotCommon(ABC):
             )
         result = result.filled(np.nan)[0]
 
-        if np.isnan(result["PLX_VALUE"]):
+        if np.isnan(result["PLX_VALUE"]) and np.isnan(result["Distance_distance"]):
+            # in case the distance is not available
+            distance = None
+        elif np.isnan(result["PLX_VALUE"]):
             distance = (
                 result["Distance_distance"] * u.Unit(result["Distance_unit"])
             ).to(u.kpc)
-        elif np.isnan(result["Distance_distance"]):
-            # in case the distance is not available
-            distance = None
         else:  # use parallax to calculate distance
             distance = (1 / result["PLX_VALUE"]) * u.kpc
 

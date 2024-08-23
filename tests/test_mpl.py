@@ -52,6 +52,11 @@ def test_mw_skymap(simbad, projection, grayscale, grid, background):
     plot_instance.savefig(file="lmc_smc_projection.png")
 
 
+@pytest.mark.parametrize("objname", ["M31", "Galactic Center"])
+def test_mw_skymap_objname(objname):
+    plot_instance = MWSkyMap(center=objname, radius=(5000, 5000) * u.arcsec, background="Gaia DR3 density map")
+
+
 @pytest.mark.parametrize(
     "projection,grid,background",
     [

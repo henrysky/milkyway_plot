@@ -516,7 +516,8 @@ class MWSkyMap(MWSkyMapBase):
             grid_style = "--"
 
             self._built = True
-            self.ax.set_xticklabels([])
+            if self.projection != "equirectangular":
+                self.ax.set_xticklabels([])
             if self.grid is True:
                 for i in [0, -15, 15, -30, 30, -45, 45, -60, 60, -75, 75]:
                     self.ax.plot(
