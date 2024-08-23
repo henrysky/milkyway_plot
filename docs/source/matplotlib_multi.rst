@@ -13,17 +13,17 @@ In a multiple subplot scenario, you can transform a single subplot with ``mw-plo
 
     >>> import matplotlib.pyplot as plt
     >>> from mw_plot import MWFaceOn
-    >>>
+
     >>> mw1 = MWFaceOn()
     >>> fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
     >>> # transform the first subplot
     >>> mw1.transform(ax2)
-    >>>
+
     >>> # plot something in the first subplot
     >>> ax1.plot([0, 1], [0, 1])
     >>> ax1.plot([0, 1], [1, 0])
     >>> ax1.set_aspect("equal")
-    >>>
+
     >>> # you can plot something on top of the transformed subplot
     >>> ax2.plot([-10, 10], [10, -10], c="r", ls="--")
 
@@ -40,13 +40,13 @@ To transform multiple subplots at once, you can pass a list of axes to the ``tra
 
     >>> import matplotlib.pyplot as plt
     >>> from mw_plot import MWFaceOn
-    >>>
+
     >>> mw1 = MWFaceOn()
     >>> fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
-    >>> 
+
     >>> # transform multiple axes with mw-plot at once
     >>> mw1.transform([ax1, ax2])
-    >>>
+
     >>> # plot something in both plots
     >>> ax1.plot([10, -10], [10, -10], c="r", ls="--")
     >>> ax2.plot([10, -10], [-10, 10], c="r", ls="--")
@@ -64,13 +64,13 @@ If you are plotting sky maps with projection, your subplot should be in that par
 
     >>> import matplotlib.pyplot as plt
     >>> from mw_plot import MWSkyMap
-    >>>
+
     >>> fig = plt.figure(figsize=(6, 4))
     >>> ax1 = fig.add_subplot(221, projection="mollweide")
     >>> ax2 = fig.add_subplot(222, projection="mollweide")
     >>> ax3 = fig.add_subplot(223, projection="mollweide")
     >>> ax4 = fig.add_subplot(224, projection="mollweide")
-    >>> 
+
     >>> mw1 = MWSkyMap(projection="mollweide", background="far-infrared")
     >>> mw1.transform(ax1)
     >>> mw2 = MWSkyMap(projection="mollweide", background="infrared")
@@ -79,7 +79,7 @@ If you are plotting sky maps with projection, your subplot should be in that par
     >>> mw3.transform(ax3)
     >>> mw4 = MWSkyMap(projection="mollweide", background="gamma")
     >>> mw4.transform(ax4)
-    >>> 
+
     >>> ax1.set_title("Far-Infrared")
     >>> ax2.set_title("Infrared")
     >>> ax3.set_title("Optical")

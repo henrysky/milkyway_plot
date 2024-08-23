@@ -17,7 +17,7 @@ The class is designed to be simple and easy to use.
 
     >>> mw1 = MWSkyMap(projection="aitoff", grayscale=False)
     >>> mw1.title = "LMC and SMC in red dots"
-    >>> mw1.scatter([78.77, 16.26] * u.degree, [-69.01, -72.42] * u.degree, c="r", s=200)
+    >>> mw1.scatter([78.77, 16.26] * u.degree, [-69.01, -72.42] * u.degree, c="r", s=3)
 
 .. image:: mpl_imgs/mollweide_LMC_SMC.jpg
     :width: 500
@@ -108,3 +108,5 @@ Class API
 
 .. autoclass:: mw_plot.MWSkyMap
     :members:
+
+
