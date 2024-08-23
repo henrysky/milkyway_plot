@@ -12,7 +12,7 @@ else:
 import requests
 import numpy as np
 import astropy.units as u
-from mw_plot.mw_plot_base import MWPlotBase, MWSkyMapBase
+from mw_plot.base import MWPlotBase, MWSkyMapBase
 
 
 def to_bokeh_img(imgarray):

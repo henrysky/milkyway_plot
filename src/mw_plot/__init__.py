@@ -1,8 +1,8 @@
 from importlib.metadata import version
 from importlib.util import find_spec
 
-from mw_plot.mw_plot_matplotlib import MWFaceOn, MWSkyMap
-from mw_plot.mw_plot_bokeh import MWFaceOnBokeh, MWSkyMapBokeh
+from mw_plot.matplotlib_backend import MWFaceOn, MWSkyMap
+from mw_plot.bokeh_backend import MWFaceOnBokeh, MWSkyMapBokeh
 from mw_plot.utils import (
     anti_center_radec,
     center_radec,

@@ -1,6 +1,6 @@
 from astropy import units as u
 
-from mw_plot.mw_plot_bokeh import MWPlotBokeh, MWSkyMapBokeh
+from mw_plot.bokeh_backend import MWFaceOnBokeh, MWSkyMapBokeh
 
 
 def test_mw_skymap_bokeh(simbad):

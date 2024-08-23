@@ -9,7 +9,7 @@ from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-from mw_plot.mw_plot_base import MWPlotBase, MWSkyMapBase
+from mw_plot.base import MWPlotBase, MWSkyMapBase
 
 
 class MWFaceOn(MWPlotBase):
