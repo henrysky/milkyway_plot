@@ -59,11 +59,9 @@ OR clone the latest commit of mw_plot from Github by running the following comma
 System Requirement
 ---------------------
 
--  **Python** 3.8 or above
--  **astropy** 5.0 or above
--  **Numpy** 1.20.0 or above
--  **Matplotlib** 3.7.0 or above
--  **Pillow** 7.0.0 above
+We require Python 3.8 or above. The following packages are required which will be installed automatically when you install ``mw_plot``:
+
+.. literalinclude:: ../../requirements.txt
 
 .. toctree::
    :maxdepth: 2
