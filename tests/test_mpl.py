@@ -52,9 +52,19 @@ def test_mw_skymap(simbad, projection, grayscale, grid, background):
     plot_instance.savefig(file="lmc_smc_projection.png")
 
 
-@pytest.mark.parametrize("objname", ["M31", "Galactic Center"])
-def test_mw_skymap_objname(objname):
-    plot_instance = MWSkyMap(center=objname, radius=(5000, 5000) * u.arcsec, background="Gaia DR3 density map")
+def test_mw_skymap_objname():
+    # without parallax but have distance
+    MWSkyMap(center="M31", radius=(5000, 5000) * u.arcsec, background="Gaia DR3 density map")
+    # with parallax
+    MWSkyMap(center="LMC", radius=(5000, 5000) * u.arcsec, background="Gaia DR3 density map")
+    # without parallax and without distance
+    MWSkyMap(center="Galactic Center", radius=(5000, 5000) * u.arcsec, background="Gaia DR3 density map")
+
+    with pytest.raises(Exception):
+        MWSkyMap(center="Alien Spaceship", radius=(5000, 5000) * u.arcsec, background="Gaia DR3 density map")
+
+    with pytest.raises(Exception):
+        MWSkyMap(center="M31", radius=(5000, 5000) * u.arcsec, background="Alien Spaceship")
 
 
 @pytest.mark.parametrize(

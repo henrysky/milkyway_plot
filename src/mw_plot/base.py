@@ -64,7 +64,7 @@ class MWPlotCommon(ABC):
         except ImportError:
             # the case where ipython is not installed
             pass
-        else:
+        else:  # pragma: no cover
             if (ip := get_ipython()) is None:
                 # the case where ipython is installed but not in ipython runtime
                 pass
@@ -100,7 +100,7 @@ class MWPlotCommon(ABC):
         }
 
     @abstractmethod
-    def read_bg_img(self):
+    def read_bg_img(self):  # pragma: no cover
         # class to read images and set appropriate attributes like extent, aspect ratio etc
         pass
 
@@ -126,21 +126,27 @@ class MWPlotCommon(ABC):
         """
         simbad = Simbad()
         simbad.add_votable_fields("ra(d)", "dec(d)", "plx", "distance")
-        result = simbad.query_object(objname)[
-            "RA_d", "DEC_d", "PLX_VALUE", "Distance_distance", "Distance_unit"
-        ]  # result is a single object
+        result = simbad.query_object(objname)
+
         if result is None:
             raise ValueError(f"Object `{objname}` not found in Simbad")
+        else:
+            result = result[
+            "RA_d", "DEC_d", "PLX_VALUE", "Distance_distance", "Distance_unit"
+        ].filled(np.nan)  # result is a single object
+            
         if len(result) != 1:
             raise ValueError(
                 f"Multiple objects found for `{objname}` in Simbad but expected only one"
             )
-        result = result.filled(np.nan)[0]
+        else:
+            result = result[0]
 
         if np.isnan(result["PLX_VALUE"]) and np.isnan(result["Distance_distance"]):
             # in case the distance is not available
             distance = None
         elif np.isnan(result["PLX_VALUE"]):
+            # only use distance if parallax is not available
             distance = (
                 result["Distance_distance"] * u.Unit(result["Distance_unit"])
             ).to(u.kpc)
