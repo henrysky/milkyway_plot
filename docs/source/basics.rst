@@ -1,16 +1,29 @@
 Basic Usage
 =================
 
-This python package consists of two major abstract classes - ``MWPlotBase`` and ``MWSkyMapBase`` with Matplotlib or Bokeh backend as well as  a few useful utilities. 
+This python package consists of two major abstract classes - ``MWPlotBase`` and ``MWSkyMapBase`` with 
+Matplotlib or Bokeh backend as well as  a few useful utilities. 
 
 ``MWPlotBase`` is used to plot things on a face-on milkyway with galactic and galactocentric coordinates. 
 ``MWSkyMapBase`` is used to plot skymap with milkyway background with RA/DEC.
 
-Useful constants
+Matpotlib Style Sheet
+-----------------------
+
+The package comes with a matplotlib style sheet that you can use to make your plots look better and consistent. 
+To use the style sheet for you own plot without importing ``mw-plot``, you can do the following before plotting anything:
+
+.. code-block:: python
+
+    >>> import matplotlib.pyplot as plt
+    >>> plt.style.use("mw_plot.mplstyle")
+
+Now you can plot anything and matplotlib will use the style sheet.
+
+Useful Constants
 -------------------
 
 .. code-block:: python
-    :caption: A few usage constants
 
     >>> from mw_plot import center_radec, anti_center_radec, northpole_radec, southpole_radec  # constants
     >>> from mw_plot import mw_radec # milkyway plane in RA/DEC
