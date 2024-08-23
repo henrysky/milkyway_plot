@@ -79,7 +79,6 @@ System Requirement
    matplotlib_faceon
    matplotlib_skymap
    matplotlib_multi
-   matplotlib_gallery
 
 .. toctree::
    :maxdepth: 2
