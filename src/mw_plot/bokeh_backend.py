@@ -98,8 +98,8 @@ class MWFaceOnBokeh(MWPlotBase):
                     max(self._ext[2], self._ext[3]),
                 ],
             ),
-            width=1000,
-            height=1000,
+            width=600,
+            height=600,
         )
         if (
             requests.head(self._gh_img_url, allow_redirects=True).status_code == -9999
@@ -221,8 +221,8 @@ class MWSkyMapBokeh(MWSkyMapBase):
                     max(self._ext[2], self._ext[3]),
                 ],
             ),
-            width=1000,
-            height=500,
+            width=600,
+            height=300,
         )
 
         if (
