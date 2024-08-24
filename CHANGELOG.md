@@ -1,5 +1,8 @@
 # Change log
 
+## [0.14.0] - xx xxxx 20xx
+- N/A
+
 ## [0.13.0] - 24 August 2024
 - Removed setuptools as a requirement
 - Added Milky Way background images in far-infrared, infrared, and gamma-ray wavelengths
