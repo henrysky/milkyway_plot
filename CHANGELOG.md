@@ -1,11 +1,12 @@
 # Change log
 
-## [0.13.0] - xx xxxx 20xx
+## [0.13.0] - 24 August 2024
 - Removed setuptools as a requirement
 - Added Milky Way background images in far-infrared, infrared, and gamma-ray wavelengths
 - Added support for fetching Hierarchical Progressive Surveys (HiPS) images as backgrounds
 - Improved test suite coverage
 - Enhanced documentation
+- Minimum Python requirement is >3.9
 
 ## [0.12.0] - 10 June 2024
 - Added radius (r) as supported parameter for bokeh figures (Mitlasóczki Bence)

@@ -27,7 +27,7 @@ The class is designed to be simple and easy to use.
     :width: 500
     :align: center
 
-Bbackground Images
+Background Images
 ------------------
 
 ``mw_plot`` use Gaia DR3 as the default background image. But a few background images are included within the package which represent 
