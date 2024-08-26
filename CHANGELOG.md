@@ -3,6 +3,9 @@
 ## [0.14.0] - xx xxxx 20xx
 - N/A
 
+## [0.13.1] - 26 August 2024
+- Fixed the issue that matplotlib style sheet is not included in the release
+
 ## [0.13.0] - 24 August 2024
 - Removed setuptools as a requirement
 - Added Milky Way background images in far-infrared, infrared, and gamma-ray wavelengths
