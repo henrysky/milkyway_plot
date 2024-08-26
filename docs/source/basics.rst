@@ -18,6 +18,9 @@ To use the style sheet for you own plot without importing ``mw-plot``, you can d
     >>> import matplotlib.pyplot as plt
     >>> plt.style.use("mw_plot.mplstyle")
 
+..
+    >>> plt.style.use("default")  # to revert back to default style to avoid installing latex dependency in CI tests
+
 Now you can plot anything and matplotlib will use the style sheet.
 
 Useful Constants
