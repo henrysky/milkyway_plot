@@ -23,17 +23,20 @@ For example, to get the citation text for the background image of a face-on Milk
 
 .. code-block:: python
 
-    from mw_plot import MWFaceOn
-    mw = MWFaceOn()
-    print(mw.citation)
+    >>> from mw_plot import MWFaceOn
+    >>> mw = MWFaceOn()
+    >>> mw.citation
+    'NASA/JPL-Caltech/R. Hurt (SSC/Caltech)'
 
 or for the background infrared image of an all-sky Milky Way plot:
 
 .. code-block:: python
 
-    from mw_plot import MWSkyMap
-    mw = MWSkyMap(background="infrared")
-    print(mw.citation)
+    >>> from mw_plot import MWSkyMap
+    >>> mw = MWSkyMap()
+    >>> mw.citation
+    'ESA/Gaia/DPAC'
+
 
 .. |docs| image:: https://readthedocs.org/projects/milkyway-plot/badge/?version=latest
    :alt: Documentation Status

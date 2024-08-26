@@ -15,6 +15,7 @@ To use the style sheet for you own plot without importing ``mw-plot``, you can d
 
 .. code-block:: python
 
+    >>> import mw_plot
     >>> import matplotlib.pyplot as plt
     >>> plt.style.use("mw_plot.mplstyle")
 
