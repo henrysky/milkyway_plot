@@ -61,7 +61,7 @@ You can also clone the latest commit of mw_plot from Github by running the follo
 System Requirement
 ---------------------
 
-``mw-plot`` requires Python 3.8 or above. The following packages are required which will be installed automatically when you install ``mw_plot``:
+``mw-plot`` requires Python 3.9 or above. The following packages are required which will be installed automatically when you install ``mw_plot``:
 
 .. literalinclude:: ../../requirements.txt
 

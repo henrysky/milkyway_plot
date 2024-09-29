@@ -2,6 +2,6 @@ bokeh
 sphinx_rtd_theme
 sphinx-prompt
 sphinx-copybutton
-sphinx
+sphinx>8
 nbsphinx
 myst_parser
