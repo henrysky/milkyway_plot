@@ -20,7 +20,7 @@ jobs:
         run: >
           python -m pytest -v --cov mw_plot --doctest-glob="*.rst" --junitxml=junit.xml
       - name: Upload results to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
       - name: Upload test results to Codecov
