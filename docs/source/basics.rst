@@ -10,13 +10,14 @@ Matplotlib or Bokeh backend as well as  a few useful utilities.
 Matpotlib Style Sheet
 -----------------------
 
-The package comes with a matplotlib style sheet that you can use to make your plots look better and consistent. 
+The package comes with a matplotlib style sheet that you can use to make your plots look better and consistent which
+required $\LaTeX$ to be installed (see https://www.latex-project.org/get/ for how to install $\LaTeX$ on your computer). 
 To use the style sheet for you own plot without importing ``mw-plot``, you can do the following before plotting anything:
 
 .. code-block:: python
 
     >>> import matplotlib.pyplot as plt
-    >>> plt.style.use("mw_plot.mplstyle")
+    >>> plt.style.use("mw_plot.mplstyle")  # require LaTeX installed in your system
 
 ..
     >>> plt.style.use("default")  # to revert back to default style to avoid installing latex dependency in CI tests
