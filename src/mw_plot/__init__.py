@@ -2,7 +2,13 @@ from importlib.metadata import version
 from importlib.util import find_spec
 
 from mw_plot.matplotlib_backend import MWFaceOn, MWSkyMap
-from mw_plot.bokeh_backend import MWFaceOnBokeh, MWSkyMapBokeh
+try:
+    import bokeh
+    _HAS_BOKEH = True
+    from mw_plot.bokeh_backend import MWFaceOnBokeh, MWSkyMapBokeh
+except ImportError:
+    _HAS_BOKEH = False
+
 from mw_plot.utils import (
     anti_center_radec,
     center_radec,

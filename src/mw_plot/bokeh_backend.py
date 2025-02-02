@@ -1,13 +1,13 @@
-try:
-    import bokeh
-except ImportError:
-    raise ImportError(
-        "Bokeh is not installed. Please install Bokeh to use this feature"
-    )
-else:
+from mw_plot import _HAS_BOKEH
+
+if _HAS_BOKEH:
     from bokeh.plotting import figure, show
     from bokeh.io import output_file, save, output_notebook
     from bokeh.models import Range1d
+else:
+    raise ImportError(
+        "Bokeh is not installed. Please install Bokeh to use this feature"
+    )
 
 import requests
 import numpy as np
