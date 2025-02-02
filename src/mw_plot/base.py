@@ -3,7 +3,7 @@ import pathlib
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from functools import reduce
-from typing import Optional
+from typing import Optional, Tuple, Union
 
 import astropy.coordinates as coord
 import astropy.units as u
@@ -125,8 +125,8 @@ class MWPlotCommon(ABC):
             Astropy SkyCoord object
         """
         simbad = Simbad()
-        simbad.add_votable_fields("plx", "distance")
-        result = simbad.query_object(objname)
+        simbad.add_votable_fields("plx_value", "mesdistance")
+        result = simbad.query_objects([objname])
 
         if result is None:
             raise ValueError(f"Object `{objname}` not found in Simbad")
@@ -530,7 +530,7 @@ class MWSkyMapBase(MWPlotCommon):
         grayscale: bool = False,
         projection: str = "equirectangular",
         background: str = "optical",
-        center: tuple = (0.0, 0.0),
+        center: Union[Tuple[float, float], str] = (0.0, 0.0),
         radius: tuple = (180.0, 90.0),
         figsize: tuple = (5, 5),
     ):
