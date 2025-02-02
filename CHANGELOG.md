@@ -1,7 +1,8 @@
 # Change log
 
 ## [0.14.0] - xx xxxx 20xx
-- Allow the suage of Matplotlib backend even if bokeh is not installed instead of throwing ImportError
+- Allow the usage of Matplotlib backend even if bokeh is not installed instead of throwing ImportError
+- Updated to be compatible with astroquery >=0.4.9 with new SIMBAD votable fields
 
 ## [0.13.1] - 26 August 2024
 - Fixed the issue that matplotlib style sheet is not included in the release

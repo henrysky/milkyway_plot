@@ -125,14 +125,14 @@ class MWPlotCommon(ABC):
             Astropy SkyCoord object
         """
         simbad = Simbad()
-        simbad.add_votable_fields("ra(d)", "dec(d)", "plx", "distance")
+        simbad.add_votable_fields("plx", "distance")
         result = simbad.query_object(objname)
 
         if result is None:
             raise ValueError(f"Object `{objname}` not found in Simbad")
         else:
             result = result[
-            "RA_d", "DEC_d", "PLX_VALUE", "Distance_distance", "Distance_unit"
+            "ra", "dec", "plx_value", "mesdistance.dist", "mesdistance.unit"
         ].filled(np.nan)  # result is a single object
             
         if len(result) != 1:
@@ -142,20 +142,20 @@ class MWPlotCommon(ABC):
         else:
             result = result[0]
 
-        if np.isnan(result["PLX_VALUE"]) and np.isnan(result["Distance_distance"]):
+        if np.isnan(result["plx_value"]) and np.isnan(result["mesdistance.dist"]):
             # in case the distance is not available
             distance = None
-        elif np.isnan(result["PLX_VALUE"]):
+        elif np.isnan(result["plx_value"]):
             # only use distance if parallax is not available
             distance = (
-                result["Distance_distance"] * u.Unit(result["Distance_unit"])
+                result["mesdistance.dist"] * u.Unit(result["mesdistance.unit"])
             ).to(u.kpc)
         else:  # use parallax to calculate distance
-            distance = (1 / result["PLX_VALUE"]) * u.kpc
+            distance = (1 / result["plx_value"]) * u.kpc
 
         return coord.SkyCoord(
-            result["RA_d"] * u.deg,
-            result["DEC_d"] * u.deg,
+            result["ra"] * u.deg,
+            result["dec"] * u.deg,
             distance=distance,
         )
 

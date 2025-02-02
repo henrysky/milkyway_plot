@@ -22,7 +22,7 @@ def test_mw_skymap_bokeh(simbad):
     result = simbad.query_objects(["LMC", "SMC"])
 
     # use mw_scatter instead of scatter
-    plot_instance.scatter(u.Quantity(result["RA_d"]), u.Quantity(result["DEC_d"]))
+    plot_instance.scatter(u.Quantity(result["ra"]), u.Quantity(result["dec"]))
 
 
 def test_mw_plot_bokeh():

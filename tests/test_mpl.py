@@ -47,7 +47,7 @@ def test_mw_skymap(simbad, projection, grayscale, grid, background):
     result = simbad.query_objects(["LMC", "SMC"])
 
     # use mw_scatter instead of scatter
-    plot_instance.mw_scatter(u.Quantity(result["RA_d"]), u.Quantity(result["DEC_d"]), c="r")
+    plot_instance.mw_scatter(u.Quantity(result["ra"]), u.Quantity(result["dec"]), c="r")
 
     plot_instance.savefig(file="lmc_smc_projection.png")
 
