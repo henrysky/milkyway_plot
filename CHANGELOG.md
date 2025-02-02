@@ -1,7 +1,7 @@
 # Change log
 
 ## [0.14.0] - xx xxxx 20xx
-- N/A
+- Allow the suage of Matplotlib backend even if bokeh is not installed instead of throwing ImportError
 
 ## [0.13.1] - 26 August 2024
 - Fixed the issue that matplotlib style sheet is not included in the release

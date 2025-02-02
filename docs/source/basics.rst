@@ -11,7 +11,7 @@ Matpotlib Style Sheet
 -----------------------
 
 The package comes with a matplotlib style sheet that you can use to make your plots look better and consistent which
-required $\LaTeX$ to be installed (see https://www.latex-project.org/get/ for how to install $\LaTeX$ on your computer). 
+required :math:`\LaTeX` to be installed (see https://www.latex-project.org/get/ for how to install :math:`\LaTeX` on your computer). 
 To use the style sheet for you own plot without importing ``mw-plot``, you can do the following before plotting anything:
 
 .. code-block:: python
