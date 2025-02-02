@@ -135,12 +135,15 @@ class MWPlotCommon(ABC):
             "ra", "dec", "plx_value", "mesdistance.dist", "mesdistance.unit"
         ].filled(np.nan)  # result is a single object
             
-        if len(result) != 1:
-            raise ValueError(
-                f"Multiple objects found for `{objname}` in Simbad but expected only one"
-            )
-        else:
-            result = result[0]
+        # if len(result) != 1:
+        #     raise ValueError(
+        #         f"Multiple objects found for `{objname}` in Simbad but expected only one"
+        #     )
+        # else:
+        #     result = result[0]
+
+        # getting the first entry should be enough
+        result = result[0]
 
         if np.isnan(result["plx_value"]) and np.isnan(result["mesdistance.dist"]):
             # in case the distance is not available
