@@ -13,7 +13,7 @@ You can set the center and radius of the plot anywhere on a milkyway galaxy imag
 
 Detailed documentation is available at https://milkyway-plot.readthedocs.io/
 
-No acknowledgement to ``mw_plot`` is required if you generate plots for your non-commerical publication, but you **must acknowledgement the origin of
+No acknowledgement to ``mw_plot`` is required if you generate plots for your non-commercial publication, but you **must acknowledgement the origin of
 the background images**. The relevant reference text can by obtained by the property ``citation`` of a ``mw_plot`` class instance.
 
 For example, to get the citation text for the background image of a face-on Milky Way plot:
