@@ -16,6 +16,7 @@ jobs:
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
           pip install .
+          python -c "from astroquery.simbad import Simbad; simbad = Simbad(); simbad.query_objects(['LMC', 'M31'])"
       - name: Test mw-plot
         run: >
           python -m pytest -v --cov mw_plot --doctest-glob="*.rst" --junitxml=junit.xml
