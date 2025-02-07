@@ -73,6 +73,15 @@ You then can use the ``background`` parameter to set the background image from t
 You can also zoom in to a specific region of the sky by setting the ``center`` and ``radius`` 
 parameters. For example to zoom in to the M31 galaxy, you can use the following code
 
+..
+    >>> # initialize astroquery
+    >>> from astroquery.simbad import Simbad
+    >>> simbad = Simbad()
+    >>> try: 
+    >>>     simbad.query_objects(['LMC', 'M31'])
+    >>> except Exception as e:
+    >>>     pass
+
 .. code-block:: python
 
     >>> import matplotlib.pyplot as plt
