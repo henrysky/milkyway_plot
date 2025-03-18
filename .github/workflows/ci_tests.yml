@@ -18,7 +18,6 @@ jobs:
           pip install .
       - name: Test mw-plot
         run: >
-          python tests/simbad_warmup.py
           python -m pytest -v --cov mw_plot --doctest-glob="*.rst" --junitxml=junit.xml
       - name: Upload results to Codecov
         uses: codecov/codecov-action@v5
