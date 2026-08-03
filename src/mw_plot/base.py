@@ -33,6 +33,9 @@ class MWImage:
 
     filename: str
     citation: str
+    source_url: str
+    copyright: str
+    license: str
 
     @property
     def img_path(self) -> pathlib.Path:
@@ -77,25 +80,58 @@ class MWPlotCommon(ABC):
             "MW_bg_unannotate": MWImage(
                 filename="MW_bg_unannotate.jpg",
                 citation="NASA/JPL-Caltech/R. Hurt (SSC/Caltech)",
+                source_url="",
+                copyright="",
+                license="",
             ),
             "MW_bg_annotate": MWImage(
                 filename="MW_bg_annotate.jpg",
                 citation="NASA/JPL-Caltech/R. Hurt (SSC/Caltech)",
+                source_url="",
+                copyright="",
+                license="",
             ),
-            "MW_edgeon_edr3_unannotate": MWImage(
-                filename="MW_edgeon_edr3_unannotate.jpg", citation="ESA/Gaia/DPAC"
+            "MW_gaia_bg_lowres_unannotate": MWImage(
+                filename="The_best_Milky_Way_map_by_Gaia.jpg",
+                citation="ESA/Gaia/DPAC, Stefan Payne-Wardenaar",
+                source_url="https://www.esa.int/ESA_Multimedia/Images/2025/01/The_best_Milky_Way_map_by_Gaia",
+                copyright="",
+                license="CC BY-SA 3.0 IGO",
+            ),
+            "MW_gaia_bg_annotate": MWImage(
+                filename="The_best_Milky_Way_map_by_Gaia_labelled.jpg",
+                citation="ESA/Gaia/DPAC, Stefan Payne-Wardenaar",
+                source_url="https://www.esa.int/ESA_Multimedia/Images/2025/01/The_best_Milky_Way_map_by_Gaia_labelled",
+                copyright="",
+                license="CC BY-SA 3.0 IGO",
+            ),
+            "MW_gaia_skymap_edr3_unannotate": MWImage(
+                filename="MW_gaia_skymap_edr3_unannotate.jpg",
+                citation="ESA/Gaia/DPAC, A. Moitinho",
+                source_url="https://sci.esa.int/web/gaia/-/the-colour-of-the-sky-from-gaia-s-early-data-release-3-equirectangular-projection",
+                copyright="ESA/Gaia/DPAC",
+                license="CC BY-SA 3.0 IGO",
             ),
             "MW_fermi_gamma": MWImage(
                 filename="MW_fermi_gamma.jpg",
                 citation="NASA/DOE/Fermi LAT Collaboration",
+                source_url="",
+                copyright="",
+                license=""
             ),
             "MW_2mass": MWImage(
                 filename="MW_2mass.jpg",
                 citation="2MASS/IPAC/Caltech/University of Massachusetts",
+                source_url="",
+                copyright="",
+                license=""
             ),
             "MW_farinfrared": MWImage(
                 filename="MW_farinfrared.jpg",
                 citation="WISE/NASA/JPL-Caltech/UCLA & IRAS/NASA",
+                source_url="",
+                copyright="",
+                license=""
             ),
         }
 
@@ -388,16 +424,21 @@ class MWPlotBase(MWPlotCommon):
         # 1078 is the number of pixels in the image from galactic center to the Sun
         self.img_resolution = self.unit_check((self.r0 / 1078), unit)
 
+    # def read_bg_img(self, image_key: Optional[str] = "MW_gaia_bg_lowres_unannotate"):
     def read_bg_img(self):
+        # self.img_obj = self._MW_IMAGES[image_key]
         if self.annotation:
-            self.img_obj = self._MW_IMAGES["MW_bg_annotate"]
+            # self.img_obj = self._MW_IMAGES["MW_bg_annotate"]
+            self.img_obj = self._MW_IMAGES["MW_gaia_bg_annotate"]
         else:
-            self.img_obj = self._MW_IMAGES["MW_bg_unannotate"]
+            image_key = "MW_gaia_bg_lowres_unannotate"
+            # self.img_obj = self._MW_IMAGES["MW_bg_unannotate"]
+            self.img_obj = self._MW_IMAGES[image_key]
         self.reference_str = self.img_obj.citation
         self._gh_img_url = self._gh_imgbase_url + self.img_obj.filename
 
         if self.coord.lower() == "galactic":
-            # shift the coord by r0 backt to the galactocentric
+            # shift the coord by r0 back to the galactocentric
             x_shift = self.r0
             # example: if the center is 0,0 and the angle is 90, the Sun is at 0,r0
             self.center[0] += x_shift

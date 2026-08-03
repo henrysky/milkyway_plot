@@ -82,6 +82,7 @@ class MWFaceOn(MWPlotBase):
         self.unit_check(self.radius, self.unit)
 
         self.read_bg_img()
+        # self.read_bg_img(image_key=image_key)
 
     def transform(self, x):
         """
